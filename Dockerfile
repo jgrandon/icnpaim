@@ -1,16 +1,17 @@
 FROM public.ecr.aws/docker/library/node:14
 
-# Create app directory
-RUN mkdir -p /usr/app
 WORKDIR /usr/app
 
-# Install app dependencies
-COPY package.json package-lock.json /usr/app/
+COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 
-# Bundle app source
-COPY . /usr/app
+COPY . .
+
+RUN sed -i 's/\r$//' ./launch.sh && chmod +x ./launch.sh
+
 RUN npm run build-server && npm run build-public
 
+ENV PORT=3000
 EXPOSE 3000
-CMD ./launch.sh
+
+CMD ["sh", "-c", "./launch.sh"]
