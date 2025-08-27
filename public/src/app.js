@@ -1,4 +1,6 @@
 import Dashboard from './components/pages/dashboard';
+import TestPage from './components/pages/testPage';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import queryString from 'query-string';
@@ -17,6 +19,7 @@ if (queryParams) {
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route path='/' component={Dashboard}/>
+      {/*<Route path='/' component={Dashboard}/>*/}
+      <Route path='/' component={TestPage}/>
     </Switch>
   </BrowserRouter>, document.getElementById('root'));
