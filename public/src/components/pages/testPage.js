@@ -19,9 +19,9 @@ export default class testPage extends React.Component {
   render() {
     return (
       <div>
-        <Typography variant='h4' gutterBottom>
+        <div>
           Haz click y valida que tipo de patinador eres
-        </Typography>
+        </div>
         <button onClick={()=> alert('Lo sentimos, eres QUAD')}>Validar</button>
       </div>    
     );
