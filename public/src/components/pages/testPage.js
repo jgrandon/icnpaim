@@ -9,7 +9,7 @@ export default function testPage () {
   
 	useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setId(params.get('id' ?? 'no recibido'));
+    setId(params.get('id') ?? 'no recibido');
   }, []);
 
   return (
