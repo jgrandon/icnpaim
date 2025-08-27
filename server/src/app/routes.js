@@ -307,6 +307,9 @@ module.exports = function (app) {
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     if (messageType === 'LtiDeepLinkingRequest') {
       res.redirect(`/deep_link_options?nonce=${state}`);
+    } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {
+      // Nueva ruta personalizada para tu aplicación React
+      res.redirect(`/lti_custom_app?nonce=${state}`);
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
       res.redirect(`/lti_bobcat_view?nonce=${state}`);
     } else if (jwtPayload.target_link_uri.endsWith('proctoring')) {

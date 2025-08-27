@@ -4,6 +4,7 @@ import AssignGradesView from "./assignGradesView";
 import CIMRequestView from "./cimRequestView";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ContentItemView from "./contentItemView";
+import CustomLtiApp from "./customLtiApp";
 import CssBaseline from "@material-ui/core/CssBaseline/index";
 import DeepLinkOptions from "./deepLinkOptions";
 import DeepLinkPayloadView from "./deepLinkView";
@@ -144,6 +145,7 @@ class Dashboard extends React.Component {
                 path="/assign_grades_view"
                 component={AssignGradesView}
               />
+              <Route path="/lti_custom_app" component={CustomLtiApp}/>
             </main>
             <SnackBar/>
           </ErrorBoundary>

@@ -25,4 +25,9 @@ if (process.env.DATABASE_DIRECTORY) {
   configResult['database_directory'] = process.env.DATABASE_DIRECTORY;
 }
 
+// Asegurar que el directorio de base de datos termine con /
+if (configResult['database_directory'] && !configResult['database_directory'].endsWith('/')) {
+  configResult['database_directory'] += '/';
+}
+
 export default _.defaultsDeep(configResult, configJson);

@@ -66,7 +66,12 @@ export const getAuthFromState = (state) => {
 };
 
 export const getAllAuth = () => {
-  return auth.getData('.auth-data');
+  try {
+    return auth.getData('.auth-data');
+  } catch (error) {
+    // Si no existe el path, retornar array vacío
+    return [];
+  }
 };
 
 export const insertNewState = async (state) => {
@@ -132,6 +137,12 @@ export const getExpiredSessions = () => {
   try {
     let expiredSessions = [];
     const sessions = getAllAuth();
+    
+    // Verificar que sessions sea un array
+    if (!Array.isArray(sessions)) {
+      return [];
+    }
+    
     sessions.forEach(session => {
       const created = new Date(session.expirationDate);
       if (Object.prototype.hasOwnProperty.call(sessions, 'jwt')) {
@@ -154,7 +165,7 @@ export const getExpiredSessions = () => {
 export const deleteExpiredSessions = () => {
   let sessions;
   sessions = getExpiredSessions();
-  if (sessions.length > 0) {
+  if (sessions && sessions.length > 0) {
     sessions.forEach(session => {
       try {
         const index = auth.getIndex('.auth-data', session.state);
