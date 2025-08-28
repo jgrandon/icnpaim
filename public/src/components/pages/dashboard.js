@@ -38,6 +38,7 @@ import { Route } from 'react-router-dom';
 import { darkMode, lightMode } from "../../common/styles/palette";
 import { fullListItems } from "../page_objects/listItems";
 import { styles } from "../../common/styles/styles";
+import TestPage from './testPage'
 
 class Dashboard extends React.Component {
   state = {
@@ -124,8 +125,12 @@ class Dashboard extends React.Component {
           <ErrorBoundary>
             <main className={classes.content}>
               <div className={classes.appBarSpacer}/>
+              {/*
               <Route exact path="/" component={LaunchEndpoint}/>
               <Route path="/home" component={LaunchEndpoint}/>
+              */}
+              <Route exact path="/" component={TestPage}/>
+              <Route path="/home" component={TestPage}/>
               <Route path="/content_item" component={ContentItemView}/>
               <Route path="/cim_request" component={CIMRequestView}/>
               <Route path="/lti_adv_view" component={LtiAdvView}/>
