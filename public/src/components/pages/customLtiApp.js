@@ -3,6 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { Button, Card, CardContent, Grid, Box } from '@material-ui/core';
 import { styles } from '../../common/styles/custom.js';
 import parameters from '../../util/parameters';
+import TestPage from './testPage.js';
 
 const params = parameters.getInstance();
 
@@ -148,8 +149,7 @@ export default class CustomLtiApp extends React.Component {
                     💡 Área de Desarrollo
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Aquí puedes agregar tus componentes personalizados, formularios, 
-                    integraciones con APIs, contenido de WordPress, etc.
+                    <TestPage />
                   </Typography>
                 </Box>
               </CardContent>

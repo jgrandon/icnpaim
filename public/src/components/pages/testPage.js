@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 // import { useSearchParams } from 'react-router';
 
 
-export default function testPage () {
+export default function TestPage () {
   // const [searchParams, setSearchParams] = useSearchParams();
 	// const id = searchParams.get('id') ?? 'no recibido'
   const [id, setId] = useState('');
