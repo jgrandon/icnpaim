@@ -20,10 +20,67 @@ class WordPressClient {
         'Content-Type': 'application/json'
       }
     });
+    
+    // Interceptor para logging
+    this.client.interceptors.request.use(
+      (config) => {
+        console.log('WP API Request:', {
+          url: config.url,
+          method: config.method,
+          data: config.data,
+          params: config.params
+        });
+        return config;
+      },
+      (error) => {
+        console.error('WP API Request Error:', error);
+        return Promise.reject(error);
+      }
+    );
+    
+    this.client.interceptors.response.use(
+      (response) => {
+        console.log('WP API Response:', {
+          status: response.status,
+          url: response.config.url,
+          data: response.data
+        });
+        return response;
+      },
+      (error) => {
+        console.error('WP API Response Error:', {
+          status: error.response?.status,
+          url: error.config?.url,
+          message: error.message,
+          data: error.response?.data
+        });
+        return Promise.reject(error);
+      }
+    );
   }
 
   async findOrCreateStudent({ sub, email, name }) {
     try {
+      // Primero intentar sincronizar via endpoint personalizado
+      try {
+        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/student', {
+          sub,
+          email,
+          name
+        }, {
+          auth: this.client.defaults.auth,
+          timeout: 5000
+        });
+        
+        console.log('Student sync response:', syncResponse.data);
+        
+        // Obtener el estudiante actualizado
+        const studentResponse = await this.client.get(`/student/${syncResponse.data.id}`);
+        return studentResponse.data;
+      } catch (syncError) {
+        console.warn('Sync endpoint failed, falling back to direct API:', syncError.message);
+      }
+      
       // Buscar por meta lms_sub (sin underscore inicial)
       const searchResponse = await this.client.get('/student', {
         params: {
@@ -68,6 +125,26 @@ class WordPressClient {
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
+      // Primero intentar sincronizar via endpoint personalizado
+      try {
+        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/course', {
+          contextId,
+          title,
+          label
+        }, {
+          auth: this.client.defaults.auth,
+          timeout: 5000
+        });
+        
+        console.log('Course sync response:', syncResponse.data);
+        
+        // Obtener el curso actualizado
+        const courseResponse = await this.client.get(`/course/${syncResponse.data.id}`);
+        return courseResponse.data;
+      } catch (syncError) {
+        console.warn('Course sync endpoint failed, falling back to direct API:', syncError.message);
+      }
+      
       // Buscar por meta lms_context_id
       const searchResponse = await this.client.get('/course', {
         params: {
@@ -112,6 +189,8 @@ class WordPressClient {
 
   async linkStudentToCourse(studentId, courseId) {
     try {
+      console.log('Linking student to course:', { studentId, courseId });
+      
       // Obtener student actual
       const studentResponse = await this.client.get(`/student/${studentId}`);
       const student = studentResponse.data;
@@ -121,23 +200,26 @@ class WordPressClient {
       const course = courseResponse.data;
 
       // Actualizar relaciones bidireccionales
-      const studentCourseIds = student.meta.course_ids || [];
-      const courseStudentIds = course.meta.student_ids || [];
+      const studentCourseIds = student.meta.course_ids ? 
+        (typeof student.meta.course_ids === 'string' ? JSON.parse(student.meta.course_ids) : student.meta.course_ids) : [];
+      const courseStudentIds = course.meta.student_ids ? 
+        (typeof course.meta.student_ids === 'string' ? JSON.parse(course.meta.student_ids) : course.meta.student_ids) : [];
 
       if (!studentCourseIds.includes(courseId)) {
         studentCourseIds.push(courseId);
         await this.client.post(`/student/${studentId}`, {
-          meta: { course_ids: studentCourseIds }
+          meta: { course_ids: JSON.stringify(studentCourseIds) }
         });
       }
 
       if (!courseStudentIds.includes(studentId)) {
         courseStudentIds.push(studentId);
         await this.client.post(`/course/${courseId}`, {
-          meta: { student_ids: courseStudentIds }
+          meta: { student_ids: JSON.stringify(courseStudentIds) }
         });
       }
 
+      console.log('Student-Course link completed');
       return { success: true };
     } catch (error) {
       console.error('Error in linkStudentToCourse:', error.message);
@@ -147,6 +229,8 @@ class WordPressClient {
 
   async getUnits(courseId) {
     try {
+      console.log('Getting units for course:', courseId);
+      
       const response = await this.client.get('/unit', {
         params: {
           meta_key: 'course_id',
@@ -157,8 +241,10 @@ class WordPressClient {
 
       return response.data.map(unit => ({
         ...unit,
-        cards: unit.meta.unit_cards ? JSON.parse(unit.meta.unit_cards) : [],
-        settings: unit.meta.unit_settings ? JSON.parse(unit.meta.unit_settings) : {}
+        cards: unit.meta.unit_cards ? 
+          (typeof unit.meta.unit_cards === 'string' ? JSON.parse(unit.meta.unit_cards) : unit.meta.unit_cards) : [],
+        settings: unit.meta.unit_settings ? 
+          (typeof unit.meta.unit_settings === 'string' ? JSON.parse(unit.meta.unit_settings) : unit.meta.unit_settings) : {}
       }));
     } catch (error) {
       console.error('Error in getUnits:', error.message);
@@ -188,7 +274,7 @@ class WordPressClient {
       if (existingProgress) {
         progress = existingProgress;
         completedCardIds = progress.meta.completed_card_ids ? 
-          JSON.parse(progress.meta.completed_card_ids) : [];
+          (typeof progress.meta.completed_card_ids === 'string' ? JSON.parse(progress.meta.completed_card_ids) : progress.meta.completed_card_ids) : [];
       }
 
       // Añadir nueva card completada (evitar duplicados)
@@ -199,7 +285,7 @@ class WordPressClient {
       // Obtener total de cards de la unidad
       const unit = await this.client.get(`/unit/${unitId}`);
       const unitCards = unit.data.meta.unit_cards ? 
-        JSON.parse(unit.data.meta.unit_cards) : [];
+        (typeof unit.data.meta.unit_cards === 'string' ? JSON.parse(unit.data.meta.unit_cards) : unit.data.meta.unit_cards) : [];
       const totalCards = unitCards.length;
       const percent = totalCards > 0 ? Math.round((completedCardIds.length / totalCards) * 100) : 0;
 
