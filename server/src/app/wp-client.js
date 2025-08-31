@@ -21,10 +21,10 @@ class WordPressClient {
 
   async findOrCreateStudent({ sub, email, name }) {
     try {
-      // Buscar por meta _lms_sub
+      // Buscar por meta lms_sub (sin underscore inicial)
       const searchResponse = await this.client.get('/student', {
         params: {
-          meta_key: '_lms_sub',
+          meta_key: 'lms_sub',
           meta_value: sub,
           per_page: 1
         }
@@ -36,9 +36,9 @@ class WordPressClient {
         await this.client.post(`/student/${student.id}`, {
           title: name,
           meta: {
-            _lms_sub: sub,
-            _email: email,
-            _full_name: name
+            lms_sub: sub,
+            email: email,
+            full_name: name
           }
         });
         return student;
@@ -49,10 +49,10 @@ class WordPressClient {
         title: name,
         status: 'publish',
         meta: {
-          _lms_sub: sub,
-          _email: email,
-          _full_name: name,
-          _course_ids: []
+          lms_sub: sub,
+          email: email,
+          full_name: name,
+          course_ids: []
         }
       });
 
@@ -65,10 +65,10 @@ class WordPressClient {
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
-      // Buscar por meta _lms_context_id
+      // Buscar por meta lms_context_id
       const searchResponse = await this.client.get('/course', {
         params: {
-          meta_key: '_lms_context_id',
+          meta_key: 'lms_context_id',
           meta_value: contextId,
           per_page: 1
         }
@@ -80,9 +80,9 @@ class WordPressClient {
         await this.client.post(`/course/${course.id}`, {
           title: title,
           meta: {
-            _lms_context_id: contextId,
-            _lms_context_label: label,
-            _lms_context_title: title
+            lms_context_id: contextId,
+            lms_context_label: label,
+            lms_context_title: title
           }
         });
         return course;
@@ -93,10 +93,10 @@ class WordPressClient {
         title: title,
         status: 'publish',
         meta: {
-          _lms_context_id: contextId,
-          _lms_context_label: label,
-          _lms_context_title: title,
-          _student_ids: []
+          lms_context_id: contextId,
+          lms_context_label: label,
+          lms_context_title: title,
+          student_ids: []
         }
       });
 
@@ -118,20 +118,20 @@ class WordPressClient {
       const course = courseResponse.data;
 
       // Actualizar relaciones bidireccionales
-      const studentCourseIds = student.meta._course_ids || [];
-      const courseStudentIds = course.meta._student_ids || [];
+      const studentCourseIds = student.meta.course_ids || [];
+      const courseStudentIds = course.meta.student_ids || [];
 
       if (!studentCourseIds.includes(courseId)) {
         studentCourseIds.push(courseId);
         await this.client.post(`/student/${studentId}`, {
-          meta: { _course_ids: studentCourseIds }
+          meta: { course_ids: studentCourseIds }
         });
       }
 
       if (!courseStudentIds.includes(studentId)) {
         courseStudentIds.push(studentId);
         await this.client.post(`/course/${courseId}`, {
-          meta: { _student_ids: courseStudentIds }
+          meta: { student_ids: courseStudentIds }
         });
       }
 
@@ -146,7 +146,7 @@ class WordPressClient {
     try {
       const response = await this.client.get('/unit', {
         params: {
-          meta_key: '_course_id',
+          meta_key: 'course_id',
           meta_value: courseId,
           per_page: 100
         }
@@ -154,8 +154,8 @@ class WordPressClient {
 
       return response.data.map(unit => ({
         ...unit,
-        cards: unit.meta._unit_cards || [],
-        settings: unit.meta._unit_settings || {}
+        cards: unit.meta.unit_cards ? JSON.parse(unit.meta.unit_cards) : [],
+        settings: unit.meta.unit_settings ? JSON.parse(unit.meta.unit_settings) : {}
       }));
     } catch (error) {
       console.error('Error in getUnits:', error.message);
@@ -168,11 +168,8 @@ class WordPressClient {
       // Buscar progreso existente
       const searchResponse = await this.client.get('/progress', {
         params: {
-          meta_query: JSON.stringify([
-            { key: '_student_id', value: studentId },
-            { key: '_course_id', value: courseId },
-            { key: '_unit_id', value: unitId }
-          ]),
+          meta_key: 'student_id',
+          meta_value: studentId,
           per_page: 1
         }
       });
@@ -180,9 +177,15 @@ class WordPressClient {
       let progress;
       let completedCardIds = [];
       
-      if (searchResponse.data.length > 0) {
-        progress = searchResponse.data[0];
-        completedCardIds = progress.meta._completed_card_ids || [];
+      // Filtrar por course_id y unit_id
+      const existingProgress = searchResponse.data.find(p => 
+        p.meta.course_id == courseId && p.meta.unit_id == unitId
+      );
+      
+      if (existingProgress) {
+        progress = existingProgress;
+        completedCardIds = progress.meta.completed_card_ids ? 
+          JSON.parse(progress.meta.completed_card_ids) : [];
       }
 
       // Añadir nueva card completada (evitar duplicados)
@@ -192,18 +195,20 @@ class WordPressClient {
 
       // Obtener total de cards de la unidad
       const unit = await this.client.get(`/unit/${unitId}`);
-      const totalCards = (unit.data.meta._unit_cards || []).length;
+      const unitCards = unit.data.meta.unit_cards ? 
+        JSON.parse(unit.data.meta.unit_cards) : [];
+      const totalCards = unitCards.length;
       const percent = totalCards > 0 ? Math.round((completedCardIds.length / totalCards) * 100) : 0;
 
       const progressData = {
         title: `Progreso ${studentId}-${courseId}-${unitId}`,
         status: 'publish',
         meta: {
-          _student_id: studentId,
-          _course_id: courseId,
-          _unit_id: unitId,
-          _completed_card_ids: completedCardIds,
-          _percent: percent
+          student_id: studentId,
+          course_id: courseId,
+          unit_id: unitId,
+          completed_card_ids: JSON.stringify(completedCardIds),
+          percent: percent
         }
       };
 
@@ -226,15 +231,14 @@ class WordPressClient {
     try {
       const response = await this.client.get('/grade', {
         params: {
-          meta_query: JSON.stringify([
-            { key: '_student_id', value: studentId },
-            { key: '_course_id', value: courseId }
-          ]),
+          meta_key: 'student_id',
+          meta_value: studentId,
           per_page: 100
         }
       });
 
-      return response.data;
+      // Filtrar por course_id
+      return response.data.filter(grade => grade.meta.course_id == courseId);
     } catch (error) {
       console.error('Error in getGrades:', error.message);
       return [];
@@ -250,34 +254,35 @@ class WordPressClient {
           title: `Nota ${result.lineItemId} - ${studentId}`,
           status: 'publish',
           meta: {
-            _student_id: studentId,
-            _course_id: courseId,
-            _lineitem_id: result.lineItemId,
-            _score_given: result.scoreGiven || 0,
-            _score_maximum: result.scoreMaximum || 100,
-            _activity_title: result.activityTitle || 'Actividad',
-            _attempt_id: result.attemptId || null,
-            _timestamp: result.timestamp || new Date().toISOString(),
-            _provenance: 'lms'
+            student_id: studentId,
+            course_id: courseId,
+            lineitem_id: result.lineItemId,
+            score_given: result.scoreGiven || 0,
+            score_maximum: result.scoreMaximum || 100,
+            activity_title: result.activityTitle || 'Actividad',
+            attempt_id: result.attemptId || null,
+            timestamp: result.timestamp || new Date().toISOString(),
+            provenance: 'lms'
           }
         };
 
-        // Buscar grade existente por lineitem_id + student_id
+        // Buscar grade existente
         const searchResponse = await this.client.get('/grade', {
           params: {
-            meta_query: JSON.stringify([
-              { key: '_student_id', value: studentId },
-              { key: '_lineitem_id', value: result.lineItemId }
-            ]),
+            meta_key: 'lineitem_id',
+            meta_value: result.lineItemId,
             per_page: 1
           }
         });
 
-        if (searchResponse.data.length > 0) {
+        const existingGrade = searchResponse.data.find(g => 
+          g.meta.student_id == studentId
+        );
+        
+        if (existingGrade) {
           // Actualizar existente
-          const grade = searchResponse.data[0];
-          await this.client.post(`/grade/${grade.id}`, gradeData);
-          results.push({ ...grade, meta: gradeData.meta });
+          await this.client.post(`/grade/${existingGrade.id}`, gradeData);
+          results.push({ ...existingGrade, meta: gradeData.meta });
         } else {
           // Crear nuevo
           const createResponse = await this.client.post('/grade', gradeData);
@@ -294,23 +299,20 @@ class WordPressClient {
 
   async getProgress(studentId, courseId, unitId = null) {
     try {
-      const metaQuery = [
-        { key: '_student_id', value: studentId },
-        { key: '_course_id', value: courseId }
-      ];
-
-      if (unitId) {
-        metaQuery.push({ key: '_unit_id', value: unitId });
-      }
-
       const response = await this.client.get('/progress', {
         params: {
-          meta_query: JSON.stringify(metaQuery),
+          meta_key: 'student_id',
+          meta_value: studentId,
           per_page: 100
         }
       });
 
-      return response.data;
+      // Filtrar por course_id y opcionalmente unit_id
+      return response.data.filter(progress => {
+        const matchesCourse = progress.meta.course_id == courseId;
+        const matchesUnit = unitId ? progress.meta.unit_id == unitId : true;
+        return matchesCourse && matchesUnit;
+      });
     } catch (error) {
       console.error('Error in getProgress:', error.message);
       return [];

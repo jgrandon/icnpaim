@@ -60,7 +60,7 @@ router.get('/courses', requireLTISession, async (req, res) => {
     // Buscar student en WP
     const students = await wpClient.client.get('/student', {
       params: {
-        meta_key: '_lms_sub',
+        meta_key: 'lms_sub',
         meta_value: sub,
         per_page: 1
       }
@@ -71,7 +71,8 @@ router.get('/courses', requireLTISession, async (req, res) => {
     }
 
     const student = students.data[0];
-    const courseIds = student.meta._course_ids || [];
+    const courseIds = student.meta.course_ids ? 
+      JSON.parse(student.meta.course_ids) : [];
 
     if (courseIds.length === 0) {
       return res.json([]);
@@ -114,7 +115,7 @@ router.get('/courses/:courseId/grades', requireLTISession, async (req, res) => {
     // Buscar student en WP
     const students = await wpClient.client.get('/student', {
       params: {
-        meta_key: '_lms_sub',
+        meta_key: 'lms_sub',
         meta_value: sub,
         per_page: 1
       }
@@ -143,7 +144,7 @@ router.get('/progress', requireLTISession, async (req, res) => {
     // Buscar student en WP
     const students = await wpClient.client.get('/student', {
       params: {
-        meta_key: '_lms_sub',
+        meta_key: 'lms_sub',
         meta_value: sub,
         per_page: 1
       }
@@ -172,7 +173,7 @@ router.post('/progress', requireLTISession, async (req, res) => {
     // Buscar student en WP
     const students = await wpClient.client.get('/student', {
       params: {
-        meta_key: '_lms_sub',
+        meta_key: 'lms_sub',
         meta_value: sub,
         per_page: 1
       }
@@ -213,7 +214,7 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
     // Buscar student en WP
     const students = await wpClient.client.get('/student', {
       params: {
-        meta_key: '_lms_sub',
+        meta_key: 'lms_sub',
         meta_value: sub,
         per_page: 1
       }
@@ -228,7 +229,7 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
     // Buscar course en WP
     const courses = await wpClient.client.get('/course', {
       params: {
-        meta_key: '_lms_context_id',
+        meta_key: 'lms_context_id',
         meta_value: context.id,
         per_page: 1
       }

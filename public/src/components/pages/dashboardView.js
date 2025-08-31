@@ -233,12 +233,13 @@ class DashboardView extends React.Component {
 
   getProgressForUnit = (unitId) => {
     const unitProgress = this.state.progress.find(p => p.meta._unit_id == unitId);
-    return unitProgress ? unitProgress.meta._percent || 0 : 0;
+    return unitProgress ? unitProgress.meta.percent || 0 : 0;
   };
 
   getCompletedCards = (unitId) => {
     const unitProgress = this.state.progress.find(p => p.meta._unit_id == unitId);
-    return unitProgress ? unitProgress.meta._completed_card_ids || [] : [];
+    return unitProgress ? (unitProgress.meta.completed_card_ids ? 
+      JSON.parse(unitProgress.meta.completed_card_ids) : []) : [];
   };
 
   render() {
@@ -444,14 +445,14 @@ class DashboardView extends React.Component {
                     </TableRow>
                   ) : (
                     grades.map((grade, index) => {
-                      const scoreGiven = grade.meta._score_given || 0;
-                      const scoreMaximum = grade.meta._score_maximum || 100;
+                      const scoreGiven = grade.meta.score_given || 0;
+                      const scoreMaximum = grade.meta.score_maximum || 100;
                       const percentage = scoreMaximum > 0 ? Math.round((scoreGiven / scoreMaximum) * 100) : 0;
-                      const timestamp = grade.meta._timestamp ? new Date(grade.meta._timestamp).toLocaleDateString() : 'N/A';
+                      const timestamp = grade.meta.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
 
                       return (
                         <TableRow key={index}>
-                          <TableCell>{grade.meta._activity_title || 'Actividad'}</TableCell>
+                          <TableCell>{grade.meta.activity_title || 'Actividad'}</TableCell>
                           <TableCell align="center">{scoreGiven}</TableCell>
                           <TableCell align="center">{scoreMaximum}</TableCell>
                           <TableCell align="center">
@@ -485,7 +486,10 @@ class DashboardView extends React.Component {
         {courses.length === 0 && (
           <Box textAlign="center" style={{ marginTop: 32 }}>
             <Typography variant="h6" color="textSecondary">
-              No tienes cursos asignados en este momento
+              No tienes cursos asignados en este momento. Verifica que el curso esté vinculado en WordPress.
+            </Typography>
+            <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+              Debug: Usuario LTI sub = {user?.sub}
             </Typography>
           </Box>
         )}
