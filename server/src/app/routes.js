@@ -19,6 +19,8 @@ import { buildProctoringEndReturnPayload, buildProctoringStartReturnPayload } fr
 import { handleSubmissionNotice } from './processor';
 import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
+import apiRoutes from './api-routes';
+import wpClient from './wp-client';
 
 const contentitem_key = 'contentItemData';
 
@@ -77,6 +79,9 @@ const getToolConfig = function(frontendUrl) {
 
 module.exports = function (app) {
   app.use(cookieParser());
+  
+  // API routes para integración WordPress
+  app.use('/api', apiRoutes);
 
   const frontendUrl = config.frontend_url;
   const lti11Setup = config.lti11Setup;
@@ -308,8 +313,12 @@ module.exports = function (app) {
     if (messageType === 'LtiDeepLinkingRequest') {
       res.redirect(`/deep_link_options?nonce=${state}`);
     } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {
-      // Nueva ruta personalizada para tu aplicación React
-      res.redirect(`/lti_custom_app?nonce=${state}`);
+      // Upsert en WordPress antes de redirigir
+      await upsertWpEntities(jwtPayload, state);
+      // Guardar estado en cookie para el dashboard
+      res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
+      // Redirigir al dashboard
+      res.redirect('/dashboard');
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
       res.redirect(`/lti_bobcat_view?nonce=${state}`);
     } else if (jwtPayload.target_link_uri.endsWith('proctoring')) {
@@ -327,9 +336,41 @@ module.exports = function (app) {
     } else if (jwtPayload.target_link_uri.endsWith('msteams')) {
       res.redirect(`/ms_teams_view?nonce=${state}`);
     } else {
-      res.send(`Sorry Dave, I can't use that target_link_uri ${jwtPayload.target_link_uri}`);
+      // Default: upsert en WordPress y redirigir al dashboard
+      await upsertWpEntities(jwtPayload, state);
+      res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
+      res.redirect('/dashboard');
     }
   });
+
+  // Función para upsert en WordPress
+  const upsertWpEntities = async (jwtPayload, state) => {
+    try {
+      const user = {
+        sub: jwtPayload.body.sub,
+        email: jwtPayload.body.email,
+        name: jwtPayload.body.name || `${jwtPayload.body.given_name} ${jwtPayload.body.family_name}`.trim()
+      };
+
+      const context = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/context'];
+      const course = {
+        contextId: context.id,
+        title: context.title,
+        label: context.label
+      };
+
+      console.log('Upserting WordPress entities:', { user: user.sub, course: course.contextId });
+      
+      const student = await wpClient.findOrCreateStudent(user);
+      const courseWP = await wpClient.findOrCreateCourse(course);
+      await wpClient.linkStudentToCourse(student.id, courseWP.id);
+      
+      console.log('WordPress upsert completed successfully');
+    } catch (error) {
+      console.error('WordPress upsert failed:', error.message);
+      // No bloquear el flujo si WP falla
+    }
+  };
 
   app.get('/jwtPayloadData', async (req, res) => {
     try {

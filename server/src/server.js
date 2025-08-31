@@ -3,6 +3,7 @@ import config from './config/config.js';
 import express from 'express';
 import request from 'request';
 import routes from './app/routes.js';
+import { sessionMiddleware } from './app/session-middleware';
 import { Task, SimpleIntervalJob, ToadScheduler } from 'toad-scheduler';
 import { deleteExpiredSessions } from './database/db-utility';
 
@@ -55,6 +56,9 @@ app.use(
     extended: true
   })
 );
+
+// Añadir middleware de sesión
+app.use(sessionMiddleware);
 
 httpProxy.use(function (err, req, res) {
   //console.log(err.stack);

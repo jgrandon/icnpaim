@@ -39,6 +39,7 @@ import { darkMode, lightMode } from "../../common/styles/palette";
 import { fullListItems } from "../page_objects/listItems";
 import { styles } from "../../common/styles/styles";
 import TestPage from './testPage'
+import DashboardView from './dashboardView'
 
 class Dashboard extends React.Component {
   state = {
