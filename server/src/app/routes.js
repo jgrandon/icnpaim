@@ -620,20 +620,77 @@ module.exports = function (app) {
   app.get('/test-wp', async (req, res) => {
     console.log('-------------------\ntest-wp');
     try {
-      // Test básico de conectividad
-      const response = await wpClient.client.get('/');
-      console.log('WordPress connection test successful');
-      res.json({ 
-        status: 'success', 
-        message: 'WordPress connection working',
-        wp_version: response.data.description || 'unknown'
+      // Test completo de conectividad y permisos
+      console.log('Testing WordPress connection with credentials:', process.env.WORDPRESS_API_USER);
+      
+      // Test 1: Conectividad básica
+      const basicResponse = await wpClient.client.get('/');
+      console.log('✓ Basic WordPress REST API accessible');
+      
+      // Test 2: Autenticación
+      const userResponse = await wpClient.client.get('/users/me');
+      console.log('✓ Authentication successful, user:', userResponse.data.name);
+      
+      // Test 3: CPTs
+      const cpts = ['student', 'course', 'unit', 'progress', 'grade'];
+      const cptStatus = {};
+      
+      for (const cpt of cpts) {
+        try {
+          const cptResponse = await wpClient.client.get(`/${cpt}?per_page=1`);
+          cptStatus[cpt] = { status: 'ok', count: cptResponse.data.length };
+        } catch (error) {
+          cptStatus[cpt] = { 
+            status: 'error', 
+            error: error.response?.status,
+            message: error.response?.data?.message 
+          };
+        }
+      }
+      
+      // Test 4: Endpoint personalizado
+      let customEndpoint = { status: 'not_tested' };
+      try {
+        const pingResponse = await axios.get('https://icnpaim.cl/wp-json/lti/v1/ping');
+        customEndpoint = { status: 'ok', data: pingResponse.data };
+      } catch (error) {
+        customEndpoint = { 
+          status: 'error', 
+          message: 'PHP functions not loaded' 
+        };
+      }
+      
+      res.json({
+        status: 'success',
+        message: 'WordPress connection test completed',
+        details: {
+          basic_api: 'ok',
+          authentication: {
+            user: userResponse.data.name,
+            roles: userResponse.data.roles,
+            id: userResponse.data.id
+          },
+          cpts: cptStatus,
+          custom_endpoints: customEndpoint,
+          environment: {
+            wp_user: process.env.WORDPRESS_API_USER,
+            wp_api_base: process.env.WP_API_BASE
+          }
+        }
       });
     } catch (error) {
       console.error('WordPress connection test failed:', error.message);
+      console.error('Error details:', error.response?.data);
       res.status(500).json({ 
         status: 'error', 
         message: error.message,
-        details: error.response?.data 
+        details: error.response?.data,
+        suggestions: [
+          'Verify WordPress credentials are correct',
+          'Check that user has Editor or Administrator role',
+          'Ensure Application Passwords are enabled',
+          'Verify the PHP functions are loaded in WordPress'
+        ]
       });
     }
   });

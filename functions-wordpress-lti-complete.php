@@ -53,6 +53,16 @@ function lti_register_all_cpts() {
         'show_in_rest' => true,
         'rest_base' => 'student',
         'capability_type' => 'post',
+        'capabilities' => array(
+            'edit_post' => 'edit_posts',
+            'read_post' => 'read_posts',
+            'delete_post' => 'delete_posts',
+            'edit_posts' => 'edit_posts',
+            'edit_others_posts' => 'edit_others_posts',
+            'publish_posts' => 'publish_posts',
+            'read_private_posts' => 'read_private_posts',
+            'create_posts' => 'edit_posts'
+        ),
         'hierarchical' => false,
         'rewrite' => array('slug' => 'student'),
         'supports' => array('title', 'custom-fields'),
@@ -80,6 +90,16 @@ function lti_register_all_cpts() {
         'show_in_rest' => true,
         'rest_base' => 'course',
         'capability_type' => 'post',
+        'capabilities' => array(
+            'edit_post' => 'edit_posts',
+            'read_post' => 'read_posts',
+            'delete_post' => 'delete_posts',
+            'edit_posts' => 'edit_posts',
+            'edit_others_posts' => 'edit_others_posts',
+            'publish_posts' => 'publish_posts',
+            'read_private_posts' => 'read_private_posts',
+            'create_posts' => 'edit_posts'
+        ),
         'hierarchical' => false,
         'rewrite' => array('slug' => 'course'),
         'supports' => array('title', 'editor', 'custom-fields'),
@@ -107,6 +127,16 @@ function lti_register_all_cpts() {
         'show_in_rest' => true,
         'rest_base' => 'unit',
         'capability_type' => 'post',
+        'capabilities' => array(
+            'edit_post' => 'edit_posts',
+            'read_post' => 'read_posts',
+            'delete_post' => 'delete_posts',
+            'edit_posts' => 'edit_posts',
+            'edit_others_posts' => 'edit_others_posts',
+            'publish_posts' => 'publish_posts',
+            'read_private_posts' => 'read_private_posts',
+            'create_posts' => 'edit_posts'
+        ),
         'hierarchical' => false,
         'rewrite' => array('slug' => 'unit'),
         'supports' => array('title', 'editor', 'custom-fields'),
@@ -134,6 +164,16 @@ function lti_register_all_cpts() {
         'show_in_rest' => true,
         'rest_base' => 'progress',
         'capability_type' => 'post',
+        'capabilities' => array(
+            'edit_post' => 'edit_posts',
+            'read_post' => 'read_posts',
+            'delete_post' => 'delete_posts',
+            'edit_posts' => 'edit_posts',
+            'edit_others_posts' => 'edit_others_posts',
+            'publish_posts' => 'publish_posts',
+            'read_private_posts' => 'read_private_posts',
+            'create_posts' => 'edit_posts'
+        ),
         'hierarchical' => false,
         'rewrite' => array('slug' => 'progress'),
         'supports' => array('title', 'custom-fields'),
@@ -161,6 +201,16 @@ function lti_register_all_cpts() {
         'show_in_rest' => true,
         'rest_base' => 'grade',
         'capability_type' => 'post',
+        'capabilities' => array(
+            'edit_post' => 'edit_posts',
+            'read_post' => 'read_posts',
+            'delete_post' => 'delete_posts',
+            'edit_posts' => 'edit_posts',
+            'edit_others_posts' => 'edit_others_posts',
+            'publish_posts' => 'publish_posts',
+            'read_private_posts' => 'read_private_posts',
+            'create_posts' => 'edit_posts'
+        ),
         'hierarchical' => false,
         'rewrite' => array('slug' => 'grade'),
         'supports' => array('title', 'custom-fields'),
@@ -172,8 +222,25 @@ function lti_register_all_cpts() {
 }
 add_action('init', 'lti_register_all_cpts');
 
+// Asegurar permisos correctos para los CPTs
+function lti_fix_cpt_capabilities() {
+    $cpts = array('student', 'course', 'unit', 'progress', 'grade');
+    
+    foreach ($cpts as $cpt) {
+        $post_type_object = get_post_type_object($cpt);
+        if ($post_type_object) {
+            // Dar permisos de editor a todos los CPTs
+            $post_type_object->cap->edit_posts = 'edit_posts';
+            $post_type_object->cap->edit_others_posts = 'edit_others_posts';
+            $post_type_object->cap->publish_posts = 'publish_posts';
+            $post_type_object->cap->read_private_posts = 'read_private_posts';
+            $post_type_object->cap->create_posts = 'edit_posts';
+        }
+    }
+}
+add_action('init', 'lti_fix_cpt_capabilities', 20);
+
 // Registrar meta fields para todos los CPTs (SIN underscore inicial)
-function lti_register_meta_fields() {
     lti_log("Registering meta fields");
     
     // Meta fields para Student

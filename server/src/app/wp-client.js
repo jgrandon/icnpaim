@@ -4,8 +4,8 @@ import crypto from 'crypto';
 const baseURL = process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2';
 const BASIC_AUTH = process.env.WP_BASIC_AUTH;
 const JWT_TOKEN = process.env.WP_JWT;
-const WP_USER = process.env.WORDPRESS_API_USER;
-const WP_PASS = process.env.WORDPRESS_API_PASSWORD;
+const WP_USER = process.env.WORDPRESS_API_USER || 'martin.castillo@iacc.cl';
+const WP_PASS = process.env.WORDPRESS_API_PASSWORD || 'm1a3r0xDd.';
 
 const shortHash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -23,16 +23,19 @@ class WordPressClient {
     // Setup authentication
     this.client.interceptors.request.use((config) => {
       console.log('WP API Request URL:', config.baseURL + config.url);
+      console.log('WP API Method:', config.method);
+      console.log('WP API Data:', config.data);
+      
       if (JWT_TOKEN) {
         config.headers.Authorization = `Bearer ${JWT_TOKEN}`;
         console.log('Using JWT authentication');
       } else if (BASIC_AUTH) {
         config.headers.Authorization = BASIC_AUTH.startsWith('Basic') ? BASIC_AUTH : `Basic ${BASIC_AUTH}`;
-        console.log('Using Basic Auth');
+        console.log('Using Basic Auth (from WP_BASIC_AUTH)');
       } else if (WP_USER && WP_PASS) {
         const auth = Buffer.from(`${WP_USER}:${WP_PASS}`).toString('base64');
         config.headers.Authorization = `Basic ${auth}`;
-        console.log('Using Basic Auth with env vars');
+        console.log('Using Basic Auth with credentials:', WP_USER);
       } else {
         console.warn('No WordPress authentication configured!');
       }
