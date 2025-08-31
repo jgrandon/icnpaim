@@ -314,9 +314,12 @@ module.exports = function (app) {
       res.redirect(`/deep_link_options?nonce=${state}`);
     } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {
       // Upsert en WordPress antes de redirigir
-      await upsertWpEntities(jwtPayload, state);
+      const { wpStudentId, wpCourseId } = await upsertWpEntities(jwtPayload, state);
       // Guardar estado en cookie para el dashboard
       res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
+      // Store WP IDs in session for API routes
+      await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
+      await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       // Redirigir al dashboard
       res.redirect('/dashboard');
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
@@ -337,8 +340,10 @@ module.exports = function (app) {
       res.redirect(`/ms_teams_view?nonce=${state}`);
     } else {
       // Default: upsert en WordPress y redirigir al dashboard
-      await upsertWpEntities(jwtPayload, state);
+      const { wpStudentId, wpCourseId } = await upsertWpEntities(jwtPayload, state);
       res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
+      await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
+      await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       res.redirect('/dashboard');
     }
   });
@@ -346,9 +351,6 @@ module.exports = function (app) {
   // Función para upsert en WordPress
   const upsertWpEntities = async (jwtPayload, state) => {
     try {
-      console.log('=== INICIANDO SINCRONIZACIÓN CON WORDPRESS ===');
-      console.log('JWT Payload:', JSON.stringify(jwtPayload.body, null, 2));
-      
       const user = {
         sub: jwtPayload.body.sub,
         email: jwtPayload.body.email,
@@ -362,25 +364,20 @@ module.exports = function (app) {
         label: context.label
       };
 
-      console.log('=== DATOS A SINCRONIZAR ===');
-      console.log('User:', user);
-      console.log('Course:', course);
-      
       const student = await wpClient.findOrCreateStudent(user);
-      console.log('Student result:', student);
-      
       const courseWP = await wpClient.findOrCreateCourse(course);
-      console.log('Course result:', courseWP);
-      
       await wpClient.linkStudentToCourse(student.id, courseWP.id);
       
-      console.log('=== SINCRONIZACIÓN COMPLETADA ===');
-      console.log(`Student ID: ${student.id}, Course ID: ${courseWP.id}`);
+      console.log(`WordPress sync completed - Student ID: ${student.id}, Course ID: ${courseWP.id}`);
+      
+      return {
+        wpStudentId: student.id,
+        wpCourseId: courseWP.id
+      };
     } catch (error) {
-      console.error('=== ERROR EN SINCRONIZACIÓN ===');
       console.error('Error:', error.message);
-      console.error('Stack:', error.stack);
       // No bloquear el flujo si WP falla
+      return { wpStudentId: null, wpCourseId: null };
     }
   };
 

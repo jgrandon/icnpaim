@@ -15,7 +15,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@material-ui/core';
 import { 
   School, 
@@ -23,23 +24,16 @@ import {
   PlayArrow, 
   CheckCircle, 
   Refresh,
-  TrendingUp 
+  TrendingUp,
+  OpenInNew
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   root: {
     padding: theme.spacing(3),
-    // Ocultar el header del dashboard demo
-    '& .MuiAppBar-root': {
-      display: 'none !important'
-    },
-    '& .MuiDrawer-root': {
-      display: 'none !important'
-    },
-    '& .Dashboard-appBarSpacer-13': {
-      display: 'none !important'
-    }
+    minHeight: '100vh',
+    backgroundColor: '#f8fafc'
   },
   welcomeCard: {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -49,24 +43,32 @@ const styles = theme => ({
   courseCard: {
     height: '100%',
     cursor: 'pointer',
-    transition: 'transform 0.2s ease-in-out',
+    transition: 'all 0.3s ease-in-out',
+    border: '2px solid transparent',
     '&:hover': {
       transform: 'translateY(-4px)',
-      boxShadow: theme.shadows[8]
+      boxShadow: theme.shadows[8],
+      borderColor: theme.palette.primary.main
     }
   },
+  selectedCourse: {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: '#f0f7ff'
+  },
   unitCard: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
+    transition: 'all 0.2s ease'
   },
   activityCard: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(1.5),
     margin: theme.spacing(0.5),
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     border: '2px solid transparent',
+    borderRadius: theme.spacing(1),
     '&:hover': {
       transform: 'scale(1.02)',
-      borderColor: theme.palette.primary.main
+      boxShadow: theme.shadows[4]
     }
   },
   completedCard: {
@@ -74,35 +76,37 @@ const styles = theme => ({
     borderColor: '#4caf50'
   },
   progressBar: {
-    height: 8,
-    borderRadius: 4,
+    height: 10,
+    borderRadius: 5,
     marginTop: theme.spacing(1)
   },
   sectionTitle: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(2),
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    fontWeight: 600
   },
   loadingContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 200
+    minHeight: 400
   },
   errorCard: {
-    backgroundColor: '#ffebee',
-    color: '#c62828',
-    padding: theme.spacing(2),
     marginBottom: theme.spacing(2)
   },
-  debugInfo: {
-    backgroundColor: '#f5f5f5',
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
-    borderRadius: 4,
-    fontFamily: 'monospace',
-    fontSize: '12px'
+  emptyState: {
+    textAlign: 'center',
+    padding: theme.spacing(4),
+    color: theme.palette.text.secondary
+  },
+  cardIcon: {
+    marginRight: theme.spacing(1),
+    fontSize: 20
+  },
+  gradeChip: {
+    fontWeight: 600
   }
 });
 
@@ -118,8 +122,7 @@ class DashboardView extends React.Component {
       progress: [],
       loading: true,
       refreshingGrades: false,
-      error: null,
-      debugInfo: null
+      error: null
     };
   }
 
@@ -130,9 +133,8 @@ class DashboardView extends React.Component {
     } catch (error) {
       console.error('Error loading dashboard:', error);
       this.setState({ 
-        error: 'Error cargando el dashboard', 
-        loading: false,
-        debugInfo: error.message 
+        error: 'Error cargando el dashboard: ' + error.message, 
+        loading: false
       });
     }
   }
@@ -141,8 +143,7 @@ class DashboardView extends React.Component {
     try {
       const response = await fetch('/api/me');
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to load user data: ${response.status} - ${errorText}`);
+        throw new Error(`Failed to load user data: ${response.status}`);
       }
       const user = await response.json();
       this.setState({ user });
@@ -156,7 +157,7 @@ class DashboardView extends React.Component {
     try {
       const response = await fetch('/api/courses');
       if (!response.ok) {
-        console.warn('Courses API not available yet, showing basic info');
+        console.warn('Courses API not available yet');
         this.setState({ courses: [], loading: false });
         return;
       }
@@ -169,7 +170,6 @@ class DashboardView extends React.Component {
       }
     } catch (error) {
       console.error('Error loading courses:', error);
-      // Silently fail and show basic dashboard
       this.setState({ courses: [], loading: false });
     }
   };
@@ -238,8 +238,12 @@ class DashboardView extends React.Component {
       });
 
       if (response.ok) {
-        const grades = await response.json();
-        this.setState({ grades });
+        // Recargar notas después del refresh
+        const gradesResponse = await fetch(`/api/courses/${this.state.selectedCourse.id}/grades`);
+        if (gradesResponse.ok) {
+          const grades = await gradesResponse.json();
+          this.setState({ grades });
+        }
       } else {
         console.error('Failed to refresh grades');
       }
@@ -271,7 +275,9 @@ class DashboardView extends React.Component {
     if (!unitProgress || !unitProgress.meta.completed_card_ids) return [];
     
     try {
-      return JSON.parse(unitProgress.meta.completed_card_ids);
+      return typeof unitProgress.meta.completed_card_ids === 'string' 
+        ? JSON.parse(unitProgress.meta.completed_card_ids)
+        : unitProgress.meta.completed_card_ids;
     } catch (e) {
       return [];
     }
@@ -279,21 +285,33 @@ class DashboardView extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, debugInfo } = this.state;
+    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error } = this.state;
 
     if (loading) {
       return (
         <div className={classes.loadingContainer}>
           <CircularProgress size={60} />
+          <Typography variant="h6" style={{ marginLeft: 16 }}>
+            Cargando dashboard...
+          </Typography>
         </div>
       );
     }
 
+    if (error) {
+      return (
+        <div className={classes.root}>
+          <Alert severity="error" className={classes.errorCard}>
+            {error}
+          </Alert>
+        </div>
+      );
+    }
 
     return (
       <div className={classes.root}>
         {/* Header de Bienvenida */}
-        <Card className={classes.welcomeCard}>
+        <Card className={classes.welcomeCard} elevation={4}>
           <CardContent>
             <Box display="flex" alignItems="center" style={{ gap: 16 }}>
               <School fontSize="large" />
@@ -302,7 +320,7 @@ class DashboardView extends React.Component {
                   ¡Bienvenido, {user?.name || 'Estudiante'}!
                 </Typography>
                 <Typography variant="subtitle1" style={{ opacity: 0.9 }}>
-                  {selectedCourse ? selectedCourse.title : 'Selecciona un curso para comenzar'}
+                  {selectedCourse ? selectedCourse.title : 'Plataforma de Aprendizaje ICNPAIM'}
                 </Typography>
               </Box>
             </Box>
@@ -310,119 +328,141 @@ class DashboardView extends React.Component {
         </Card>
 
         {/* Cursos */}
-        <Typography variant="h5" className={classes.sectionTitle}>
-          <Assignment style={{ marginRight: 8 }} />
-          Mis Cursos
-        </Typography>
-        
-        <Grid container spacing={3}>
-          {courses.map(course => (
-            <Grid item xs={12} sm={6} md={4} key={course.id}>
-              <Card 
-                className={classes.courseCard}
-                onClick={() => this.selectCourse(course)}
-                elevation={selectedCourse?.id === course.id ? 8 : 2}
-              >
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {course.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {course.meta?.lms_context_label || 'Curso'}
-                  </Typography>
-                  {selectedCourse?.id === course.id && (
-                    <Chip 
-                      label="Seleccionado" 
-                      color="primary" 
-                      size="small" 
-                      style={{ marginTop: 8 }}
-                    />
-                  )}
-                </CardContent>
-              </Card>
+        {courses.length > 0 && (
+          <>
+            <Typography variant="h5" className={classes.sectionTitle}>
+              <Assignment className={classes.cardIcon} />
+              Mis Cursos
+            </Typography>
+            
+            <Grid container spacing={3}>
+              {courses.map(course => (
+                <Grid item xs={12} sm={6} md={4} key={course.id}>
+                  <Card 
+                    className={`${classes.courseCard} ${selectedCourse?.id === course.id ? classes.selectedCourse : ''}`}
+                    onClick={() => this.selectCourse(course)}
+                    elevation={selectedCourse?.id === course.id ? 8 : 2}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {course.title}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {course.meta?.lms_context_label || 'Curso'}
+                      </Typography>
+                      {selectedCourse?.id === course.id && (
+                        <Chip 
+                          label="Seleccionado" 
+                          color="primary" 
+                          size="small" 
+                          style={{ marginTop: 8 }}
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
+          </>
+        )}
 
         {/* Unidades y Cards */}
         {selectedCourse && (
           <>
             <Typography variant="h5" className={classes.sectionTitle}>
-              <TrendingUp style={{ marginRight: 8 }} />
+              <TrendingUp className={classes.cardIcon} />
               Unidades - {selectedCourse.title}
             </Typography>
 
-            {units.map(unit => {
-              const cards = unit.cards || [];
-              const completedCards = this.getCompletedCards(unit.id);
-              const progress = this.getProgressForUnit(unit.id);
+            {units.length === 0 ? (
+              <Card>
+                <CardContent className={classes.emptyState}>
+                  <Typography variant="h6" color="textSecondary">
+                    No hay unidades disponibles para este curso
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Las unidades se crearán automáticamente cuando el administrador configure el contenido
+                  </Typography>
+                </CardContent>
+              </Card>
+            ) : (
+              units.map(unit => {
+                const cards = unit.cards || [];
+                const completedCards = this.getCompletedCards(unit.id);
+                const progress = this.getProgressForUnit(unit.id);
 
-              return (
-                <Card key={unit.id} className={classes.unitCard}>
-                  <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
-                      <Typography variant="h6">{unit.title}</Typography>
-                      <Chip 
-                        label={`${progress}% completado`} 
-                        color={progress === 100 ? 'primary' : 'default'}
+                return (
+                  <Card key={unit.id} className={classes.unitCard} elevation={3}>
+                    <CardContent>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
+                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                        <Chip 
+                          label={`${progress}% completado`} 
+                          color={progress === 100 ? 'primary' : 'default'}
+                          className={classes.gradeChip}
+                        />
+                      </Box>
+                      
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={progress} 
+                        className={classes.progressBar}
+                        color="primary"
                       />
-                    </Box>
-                    
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={progress} 
-                      className={classes.progressBar}
-                    />
 
-                    <Box style={{ marginTop: 16 }}>
-                      <Grid container spacing={1}>
-                        {cards.map(card => {
-                          const isCompleted = completedCards.includes(card.id);
-                          return (
-                            <Grid item xs={12} sm={6} md={3} key={card.id}>
-                              <Card 
-                                className={`${classes.activityCard} ${isCompleted ? classes.completedCard : ''}`}
-                                onClick={() => {
-                                  if (card.url) {
-                                    window.open(card.url, '_blank');
-                                    if (!isCompleted) {
-                                      this.handleCardComplete(unit.id, card.id);
-                                    }
-                                  }
-                                }}
-                              >
-                                <CardContent style={{ padding: 12 }}>
-                                  <Box display="flex" alignItems="center" style={{ gap: 8 }}>
-                                    {isCompleted ? (
-                                      <CheckCircle style={{ color: '#4caf50', fontSize: 20 }} />
-                                    ) : (
-                                      <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 20 }} />
-                                    )}
-                                    <Typography variant="body2" style={{ fontWeight: 500 }}>
-                                      {card.title}
-                                    </Typography>
-                                  </Box>
-                                  <Chip 
-                                    label={card.tipoActividad || 'actividad'} 
-                                    size="small"
-                                    style={{ 
-                                      backgroundColor: card.color || this.getActivityTypeColor(card.tipoActividad),
-                                      color: 'white',
-                                      fontSize: 10,
-                                      marginTop: 4
+                      {cards.length > 0 && (
+                        <Box style={{ marginTop: 16 }}>
+                          <Grid container spacing={1}>
+                            {cards.map(card => {
+                              const isCompleted = completedCards.includes(card.id);
+                              return (
+                                <Grid item xs={12} sm={6} md={3} key={card.id}>
+                                  <Card 
+                                    className={`${classes.activityCard} ${isCompleted ? classes.completedCard : ''}`}
+                                    onClick={() => {
+                                      if (card.url) {
+                                        window.open(card.url, '_blank');
+                                        if (!isCompleted) {
+                                          this.handleCardComplete(unit.id, card.id);
+                                        }
+                                      }
                                     }}
-                                  />
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                          );
-                        })}
-                      </Grid>
-                    </Box>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                                    elevation={isCompleted ? 3 : 1}
+                                  >
+                                    <CardContent style={{ padding: 12 }}>
+                                      <Box display="flex" alignItems="center" justifyContent="space-between" style={{ marginBottom: 8 }}>
+                                        {isCompleted ? (
+                                          <CheckCircle style={{ color: '#4caf50', fontSize: 20 }} />
+                                        ) : (
+                                          <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 20 }} />
+                                        )}
+                                        <OpenInNew style={{ fontSize: 16, color: '#666' }} />
+                                      </Box>
+                                      <Typography variant="body2" style={{ fontWeight: 500, marginBottom: 4 }}>
+                                        {card.title}
+                                      </Typography>
+                                      <Chip 
+                                        label={card.tipoActividad || 'actividad'} 
+                                        size="small"
+                                        style={{ 
+                                          backgroundColor: card.color || this.getActivityTypeColor(card.tipoActividad),
+                                          color: 'white',
+                                          fontSize: 10
+                                        }}
+                                      />
+                                    </CardContent>
+                                  </Card>
+                                </Grid>
+                              );
+                            })}
+                          </Grid>
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
           </>
         )}
 
@@ -431,13 +471,13 @@ class DashboardView extends React.Component {
           <>
             <Box display="flex" justifyContent="space-between" alignItems="center" className={classes.sectionTitle}>
               <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
-                <School style={{ marginRight: 8 }} />
+                <School className={classes.cardIcon} />
                 Mis Notas
               </Typography>
               <Button
                 variant="contained"
                 color="secondary"
-                startIcon={refreshingGrades ? <CircularProgress size={20} /> : <Refresh />}
+                startIcon={refreshingGrades ? <CircularProgress size={20} color="inherit" /> : <Refresh />}
                 onClick={this.refreshGrades}
                 disabled={refreshingGrades}
               >
@@ -445,80 +485,89 @@ class DashboardView extends React.Component {
               </Button>
             </Box>
 
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell><strong>Actividad</strong></TableCell>
-                    <TableCell align="center"><strong>Nota</strong></TableCell>
-                    <TableCell align="center"><strong>Máximo</strong></TableCell>
-                    <TableCell align="center"><strong>Porcentaje</strong></TableCell>
-                    <TableCell align="center"><strong>Fecha</strong></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {grades.length === 0 ? (
+            <Card elevation={3}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        <Typography variant="body2" color="textSecondary">
-                          No hay notas disponibles. Haz clic en "Actualizar desde LMS" para sincronizar.
-                        </Typography>
-                      </TableCell>
+                      <TableCell><strong>Actividad</strong></TableCell>
+                      <TableCell align="center"><strong>Nota</strong></TableCell>
+                      <TableCell align="center"><strong>Máximo</strong></TableCell>
+                      <TableCell align="center"><strong>Porcentaje</strong></TableCell>
+                      <TableCell align="center"><strong>Fecha</strong></TableCell>
                     </TableRow>
-                  ) : (
-                    grades.map((grade, index) => {
-                      const scoreGiven = grade.meta?.score_given || 0;
-                      const scoreMaximum = grade.meta?.score_maximum || 100;
-                      const percentage = scoreMaximum > 0 ? Math.round((scoreGiven / scoreMaximum) * 100) : 0;
-                      const timestamp = grade.meta?.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
+                  </TableHead>
+                  <TableBody>
+                    {grades.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          <Box className={classes.emptyState}>
+                            <Typography variant="body2" color="textSecondary">
+                              No hay notas disponibles. Haz clic en "Actualizar desde LMS" para sincronizar.
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      grades.map((grade, index) => {
+                        const scoreGiven = grade.meta?.score_given || 0;
+                        const scoreMaximum = grade.meta?.score_maximum || 100;
+                        const percentage = scoreMaximum > 0 ? Math.round((scoreGiven / scoreMaximum) * 100) : 0;
+                        const timestamp = grade.meta?.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
 
-                      return (
-                        <TableRow key={index}>
-                          <TableCell>{grade.meta?.activity_title || 'Actividad'}</TableCell>
-                          <TableCell align="center">{scoreGiven}</TableCell>
-                          <TableCell align="center">{scoreMaximum}</TableCell>
-                          <TableCell align="center">
-                            <Chip 
-                              label={`${percentage}%`}
-                              color={percentage >= 70 ? 'primary' : percentage >= 50 ? 'default' : 'secondary'}
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="center">{timestamp}</TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                        return (
+                          <TableRow key={index} hover>
+                            <TableCell>{grade.meta?.activity_title || grade.title?.rendered || 'Actividad'}</TableCell>
+                            <TableCell align="center">{scoreGiven}</TableCell>
+                            <TableCell align="center">{scoreMaximum}</TableCell>
+                            <TableCell align="center">
+                              <Chip 
+                                label={`${percentage}%`}
+                                color={percentage >= 70 ? 'primary' : percentage >= 50 ? 'default' : 'secondary'}
+                                size="small"
+                                className={classes.gradeChip}
+                              />
+                            </TableCell>
+                            <TableCell align="center">{timestamp}</TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Card>
           </>
         )}
 
         {/* Estado sin curso seleccionado */}
         {!selectedCourse && courses.length > 0 && (
-          <Box textAlign="center" style={{ marginTop: 32 }}>
-            <Typography variant="h6" color="textSecondary">
-              Selecciona un curso arriba para ver las unidades y tu progreso
-            </Typography>
-          </Box>
+          <Card>
+            <CardContent className={classes.emptyState}>
+              <Typography variant="h6" color="textSecondary">
+                Selecciona un curso arriba para ver las unidades y tu progreso
+              </Typography>
+            </CardContent>
+          </Card>
         )}
 
         {/* Estado sin cursos */}
         {courses.length === 0 && !error && (
-          <Box textAlign="center" style={{ marginTop: 32 }}>
-            <Typography variant="h6" color="textSecondary">
-              Configurando tu experiencia de aprendizaje...
-            </Typography>
-            {user && (
-              <Box style={{ marginTop: 16 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Usuario: {user.name}<br />
-                  Curso: {user.context?.title || 'Cargando...'}
-                </Typography>
-              </Box>
-            )}
-          </Box>
+          <Card>
+            <CardContent className={classes.emptyState}>
+              <Typography variant="h6" color="textSecondary">
+                Configurando tu experiencia de aprendizaje...
+              </Typography>
+              {user && (
+                <Box style={{ marginTop: 16 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    Usuario: {user.name}<br />
+                    {user.context?.title && `Curso: ${user.context.title}`}
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
         )}
       </div>
     );

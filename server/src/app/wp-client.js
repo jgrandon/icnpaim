@@ -1,24 +1,39 @@
 import axios from 'axios';
-import config from '../config/config';
+import crypto from 'crypto';
 
-const WP_API_BASE = process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2';
-const WP_AUTH = {
-  username: process.env.WORDPRESS_API_USER,
-  password: process.env.WORDPRESS_API_PASSWORD
-};
+const baseURL = process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2';
+const BASIC_AUTH = process.env.WP_BASIC_AUTH;
+const JWT_TOKEN = process.env.WP_JWT;
+
+const shortHash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 class WordPressClient {
   constructor() {
     this.client = axios.create({
-      baseURL: 'https://icnpaim.cl/wp-json/wp/v2',
-      auth: {
-        username: 'admin',
-        password: 'admin'
-      },
+      baseURL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'
       }
+    });
+    
+    // Setup authentication
+    this.client.interceptors.request.use((config) => {
+      if (JWT_TOKEN) {
+        config.headers.Authorization = `Bearer ${JWT_TOKEN}`;
+      } else if (BASIC_AUTH) {
+        config.headers.Authorization = BASIC_AUTH.startsWith('Basic') ? BASIC_AUTH : `Basic ${BASIC_AUTH}`;
+      } else {
+        // Fallback to basic auth with env vars
+        const username = process.env.WORDPRESS_API_USER;
+        const password = process.env.WORDPRESS_API_PASSWORD;
+        if (username && password) {
+          const auth = Buffer.from(`${username}:${password}`).toString('base64');
+          config.headers.Authorization = `Basic ${auth}`;
+        }
+      }
+      return config;
     });
     
     // Interceptor para logging
@@ -59,64 +74,52 @@ class WordPressClient {
     );
   }
 
+  async getBySlug(type, slugValue) {
+    try {
+      const response = await this.client.get(`/${type}`, {
+        params: { slug: slugValue, per_page: 1 }
+      });
+      return Array.isArray(response.data) && response.data.length ? response.data[0] : null;
+    } catch (error) {
+      console.error(`Error getting ${type} by slug:`, error.message);
+      return null;
+    }
+  }
+
+  async create(type, payload) {
+    const response = await this.client.post(`/${type}`, payload);
+    return response.data;
+  }
+
+  async update(type, id, payload) {
+    const response = await this.client.post(`/${type}/${id}`, payload);
+    return response.data;
+  }
+
   async findOrCreateStudent({ sub, email, name }) {
     try {
-      // Primero intentar sincronizar via endpoint personalizado
-      try {
-        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/student', {
-          sub,
-          email,
-          name
-        }, {
-          auth: this.client.defaults.auth,
-          timeout: 5000
-        });
-        
-        console.log('Student sync response:', syncResponse.data);
-        
-        // Obtener el estudiante actualizado
-        const studentResponse = await this.client.get(`/student/${syncResponse.data.id}`);
-        return studentResponse.data;
-      } catch (syncError) {
-        console.warn('Sync endpoint failed, falling back to direct API:', syncError.message);
-      }
+      const slugValue = `student-${shortHash(sub)}`;
+      let post = await this.getBySlug('student', slugValue);
       
-      // Buscar por meta lms_sub (sin underscore inicial)
-      const searchResponse = await this.client.get('/student', {
-        params: {
-          meta_key: 'lms_sub',
-          meta_value: sub,
-          per_page: 1
-        }
-      });
-
-      if (searchResponse.data.length > 0) {
-        const student = searchResponse.data[0];
-        // Actualizar datos si han cambiado
-        await this.client.post(`/student/${student.id}`, {
-          title: name,
-          meta: {
-            lms_sub: sub,
-            email: email,
-            full_name: name
-          }
-        });
-        return student;
-      }
-
-      // Crear nuevo estudiante
-      const createResponse = await this.client.post('/student', {
-        title: name,
+      const payload = {
+        title: name || email || sub,
+        slug: slugValue,
         status: 'publish',
         meta: {
           lms_sub: sub,
-          email: email,
-          full_name: name,
-          course_ids: []
+          email: email || '',
+          full_name: name || '',
+          course_ids: post?.meta?.course_ids || '[]'
         }
-      });
-
-      return createResponse.data;
+      };
+      
+      if (post) {
+        post = await this.update('student', post.id, payload);
+      } else {
+        post = await this.create('student', payload);
+      }
+      
+      return post;
     } catch (error) {
       console.error('Error in findOrCreateStudent:', error.message);
       throw error;
@@ -125,62 +128,30 @@ class WordPressClient {
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
-      // Primero intentar sincronizar via endpoint personalizado
-      try {
-        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/course', {
-          contextId,
-          title,
-          label
-        }, {
-          auth: this.client.defaults.auth,
-          timeout: 5000
-        });
-        
-        console.log('Course sync response:', syncResponse.data);
-        
-        // Obtener el curso actualizado
-        const courseResponse = await this.client.get(`/course/${syncResponse.data.id}`);
-        return courseResponse.data;
-      } catch (syncError) {
-        console.warn('Course sync endpoint failed, falling back to direct API:', syncError.message);
-      }
+      const slugValue = `course-${shortHash(contextId)}`;
+      let post = await this.getBySlug('course', slugValue);
       
-      // Buscar por meta lms_context_id
-      const searchResponse = await this.client.get('/course', {
-        params: {
-          meta_key: 'lms_context_id',
-          meta_value: contextId,
-          per_page: 1
-        }
-      });
-
-      if (searchResponse.data.length > 0) {
-        const course = searchResponse.data[0];
-        // Actualizar datos si han cambiado
-        await this.client.post(`/course/${course.id}`, {
-          title: title,
-          meta: {
-            lms_context_id: contextId,
-            lms_context_label: label,
-            lms_context_title: title
-          }
-        });
-        return course;
-      }
-
-      // Crear nuevo curso
-      const createResponse = await this.client.post('/course', {
-        title: title,
+      const payload = {
+        title: title || label || contextId,
+        slug: slugValue,
         status: 'publish',
         meta: {
           lms_context_id: contextId,
           lms_context_label: label,
           lms_context_title: title,
-          student_ids: []
+          student_ids: post?.meta?.student_ids || '[]'
         }
-      });
+      };
+      
+      if (post) {
+        post = await this.update('course', post.id, payload);
+      } else {
+        post = await this.create('course', payload);
+        // Create sample units for new courses
+        await this.createSampleUnits(post.id);
+      }
 
-      return createResponse.data;
+      return post;
     } catch (error) {
       console.error('Error in findOrCreateCourse:', error.message);
       throw error;
@@ -189,37 +160,25 @@ class WordPressClient {
 
   async linkStudentToCourse(studentId, courseId) {
     try {
-      console.log('Linking student to course:', { studentId, courseId });
+      const [student, course] = await Promise.all([
+        this.client.get(`/student/${studentId}`),
+        this.client.get(`/course/${courseId}`)
+      ]);
       
-      // Obtener student actual
-      const studentResponse = await this.client.get(`/student/${studentId}`);
-      const student = studentResponse.data;
+      const sMeta = student.data.meta || {};
+      const cMeta = course.data.meta || {};
       
-      // Obtener course actual
-      const courseResponse = await this.client.get(`/course/${courseId}`);
-      const course = courseResponse.data;
-
-      // Actualizar relaciones bidireccionales
-      const studentCourseIds = student.meta.course_ids ? 
-        (typeof student.meta.course_ids === 'string' ? JSON.parse(student.meta.course_ids) : student.meta.course_ids) : [];
-      const courseStudentIds = course.meta.student_ids ? 
-        (typeof course.meta.student_ids === 'string' ? JSON.parse(course.meta.student_ids) : course.meta.student_ids) : [];
-
-      if (!studentCourseIds.includes(courseId)) {
-        studentCourseIds.push(courseId);
-        await this.client.post(`/student/${studentId}`, {
-          meta: { course_ids: JSON.stringify(studentCourseIds) }
-        });
-      }
-
-      if (!courseStudentIds.includes(studentId)) {
-        courseStudentIds.push(studentId);
-        await this.client.post(`/course/${courseId}`, {
-          meta: { student_ids: JSON.stringify(courseStudentIds) }
-        });
-      }
-
-      console.log('Student-Course link completed');
+      const courseIds = new Set([
+        ...(typeof sMeta.course_ids === 'string' ? JSON.parse(sMeta.course_ids) : (sMeta.course_ids || [])),
+        courseId
+      ]);
+      const studentIds = new Set([
+        ...(typeof cMeta.student_ids === 'string' ? JSON.parse(cMeta.student_ids) : (cMeta.student_ids || [])),
+        studentId
+      ]);
+      
+      await this.update('student', studentId, { meta: { ...sMeta, course_ids: JSON.stringify([...courseIds]) } });
+      await this.update('course', courseId, { meta: { ...cMeta, student_ids: JSON.stringify([...studentIds]) } });
       return { success: true };
     } catch (error) {
       console.error('Error in linkStudentToCourse:', error.message);
@@ -229,22 +188,22 @@ class WordPressClient {
 
   async getUnits(courseId) {
     try {
-      console.log('Getting units for course:', courseId);
-      
       const response = await this.client.get('/unit', {
         params: {
-          meta_key: 'course_id',
-          meta_value: courseId,
-          per_page: 100
+          per_page: 100,
+          orderby: 'menu_order',
+          order: 'asc'
         }
       });
 
-      return response.data.map(unit => ({
+      // Filter by course_id meta field
+      return response.data.filter(unit => {
+        const unitCourseId = unit.meta?.course_id;
+        return unitCourseId == courseId;
+      }).map(unit => ({
         ...unit,
-        cards: unit.meta.unit_cards ? 
-          (typeof unit.meta.unit_cards === 'string' ? JSON.parse(unit.meta.unit_cards) : unit.meta.unit_cards) : [],
-        settings: unit.meta.unit_settings ? 
-          (typeof unit.meta.unit_settings === 'string' ? JSON.parse(unit.meta.unit_settings) : unit.meta.unit_settings) : {}
+        cards: this.parseJsonMeta(unit.meta?.unit_cards) || [],
+        settings: this.parseJsonMeta(unit.meta?.unit_settings) || {}
       }));
     } catch (error) {
       console.error('Error in getUnits:', error.message);
@@ -254,62 +213,34 @@ class WordPressClient {
 
   async upsertProgress({ studentId, courseId, unitId, completedCardId }) {
     try {
-      // Buscar progreso existente
-      const searchResponse = await this.client.get('/progress', {
-        params: {
-          meta_key: 'student_id',
-          meta_value: studentId,
-          per_page: 1
-        }
-      });
-
-      let progress;
-      let completedCardIds = [];
+      const slugValue = `progress-${studentId}-${courseId}-${unitId}`;
+      let post = await this.getBySlug('progress', slugValue);
       
-      // Filtrar por course_id y unit_id
-      const existingProgress = searchResponse.data.find(p => 
-        p.meta.course_id == courseId && p.meta.unit_id == unitId
-      );
-      
-      if (existingProgress) {
-        progress = existingProgress;
-        completedCardIds = progress.meta.completed_card_ids ? 
-          (typeof progress.meta.completed_card_ids === 'string' ? JSON.parse(progress.meta.completed_card_ids) : progress.meta.completed_card_ids) : [];
-      }
-
-      // Añadir nueva card completada (evitar duplicados)
-      if (completedCardId && !completedCardIds.includes(completedCardId)) {
-        completedCardIds.push(completedCardId);
-      }
-
-      // Obtener total de cards de la unidad
       const unit = await this.client.get(`/unit/${unitId}`);
-      const unitCards = unit.data.meta.unit_cards ? 
-        (typeof unit.data.meta.unit_cards === 'string' ? JSON.parse(unit.data.meta.unit_cards) : unit.data.meta.unit_cards) : [];
+      const unitCards = this.parseJsonMeta(unit.data.meta?.unit_cards) || [];
       const totalCards = unitCards.length;
-      const percent = totalCards > 0 ? Math.round((completedCardIds.length / totalCards) * 100) : 0;
-
-      const progressData = {
-        title: `Progreso ${studentId}-${courseId}-${unitId}`,
-        status: 'publish',
-        meta: {
+      
+      if (!post) {
+        const meta = {
           student_id: studentId,
           course_id: courseId,
           unit_id: unitId,
-          completed_card_ids: JSON.stringify(completedCardIds),
-          percent: percent
-        }
-      };
-
-      if (progress) {
-        // Actualizar existente
-        await this.client.post(`/progress/${progress.id}`, progressData);
-        return { ...progress, meta: progressData.meta };
-      } else {
-        // Crear nuevo
-        const createResponse = await this.client.post('/progress', progressData);
-        return createResponse.data;
+          completed_card_ids: JSON.stringify([completedCardId]),
+          percent: totalCards ? Math.round((1 / totalCards) * 100) : 0
+        };
+        return await this.create('progress', { title: slugValue, slug: slugValue, status: 'publish', meta });
       }
+      
+      const meta = post.meta || {};
+      const completedCardIds = new Set([
+        ...(this.parseJsonMeta(meta.completed_card_ids) || []),
+        completedCardId
+      ]);
+      const percent = totalCards ? Math.round((completedCardIds.size / totalCards) * 100) : 0;
+
+      return await this.update('progress', post.id, {
+        meta: { ...meta, completed_card_ids: JSON.stringify([...completedCardIds]), percent }
+      });
     } catch (error) {
       console.error('Error in upsertProgress:', error.message);
       throw error;
@@ -320,14 +251,14 @@ class WordPressClient {
     try {
       const response = await this.client.get('/grade', {
         params: {
-          meta_key: 'student_id',
-          meta_value: studentId,
           per_page: 100
         }
       });
 
       // Filtrar por course_id
-      return response.data.filter(grade => grade.meta.course_id == courseId);
+      return response.data.filter(grade => 
+        grade.meta?.student_id == studentId && grade.meta?.course_id == courseId
+      );
     } catch (error) {
       console.error('Error in getGrades:', error.message);
       return [];
@@ -339,43 +270,34 @@ class WordPressClient {
       const results = [];
       
       for (const result of agsResults) {
-        const gradeData = {
-          title: `Nota ${result.lineItemId} - ${studentId}`,
+        const slugValue = `grade-${studentId}-${courseId}-${shortHash(result.lineItemId + (result.attemptId || ''))}`;
+        const existing = await this.getBySlug('grade', slugValue);
+        
+        const meta = {
+          student_id: studentId,
+          course_id: courseId,
+          lineitem_id: result.lineItemId,
+          score_given: result.scoreGiven || 0,
+          score_maximum: result.scoreMaximum || 100,
+          activity_title: result.activityTitle || 'Actividad',
+          attempt_id: result.attemptId || '',
+          timestamp: result.timestamp || new Date().toISOString(),
+          provenance: 'lms'
+        };
+        
+        const payload = {
+          title: meta.activity_title || slugValue,
+          slug: slugValue,
           status: 'publish',
-          meta: {
-            student_id: studentId,
-            course_id: courseId,
-            lineitem_id: result.lineItemId,
-            score_given: result.scoreGiven || 0,
-            score_maximum: result.scoreMaximum || 100,
-            activity_title: result.activityTitle || 'Actividad',
-            attempt_id: result.attemptId || null,
-            timestamp: result.timestamp || new Date().toISOString(),
-            provenance: 'lms'
-          }
+          meta
         };
 
-        // Buscar grade existente
-        const searchResponse = await this.client.get('/grade', {
-          params: {
-            meta_key: 'lineitem_id',
-            meta_value: result.lineItemId,
-            per_page: 1
-          }
-        });
-
-        const existingGrade = searchResponse.data.find(g => 
-          g.meta.student_id == studentId
-        );
-        
-        if (existingGrade) {
-          // Actualizar existente
-          await this.client.post(`/grade/${existingGrade.id}`, gradeData);
-          results.push({ ...existingGrade, meta: gradeData.meta });
+        if (existing) {
+          const updated = await this.update('grade', existing.id, payload);
+          results.push(updated);
         } else {
-          // Crear nuevo
-          const createResponse = await this.client.post('/grade', gradeData);
-          results.push(createResponse.data);
+          const created = await this.create('grade', payload);
+          results.push(created);
         }
       }
 
@@ -390,17 +312,16 @@ class WordPressClient {
     try {
       const response = await this.client.get('/progress', {
         params: {
-          meta_key: 'student_id',
-          meta_value: studentId,
           per_page: 100
         }
       });
 
       // Filtrar por course_id y opcionalmente unit_id
       return response.data.filter(progress => {
-        const matchesCourse = progress.meta.course_id == courseId;
-        const matchesUnit = unitId ? progress.meta.unit_id == unitId : true;
-        return matchesCourse && matchesUnit;
+        const matchesCourse = progress.meta?.course_id == courseId;
+        const matchesStudent = progress.meta?.student_id == studentId;
+        const matchesUnit = unitId ? progress.meta?.unit_id == unitId : true;
+        return matchesCourse && matchesStudent && matchesUnit;
       });
     } catch (error) {
       console.error('Error in getProgress:', error.message);
@@ -410,9 +331,6 @@ class WordPressClient {
 
   async createSampleUnits(courseId) {
     try {
-      console.log('=== CREANDO UNIDADES DE EJEMPLO ===');
-      console.log('Course ID:', courseId);
-      
       const sampleUnits = [
         {
           title: 'Unidad 1: Introducción',
@@ -472,7 +390,7 @@ class WordPressClient {
       ];
       
       for (const unitData of sampleUnits) {
-        const unitResponse = await this.client.post('/unit', {
+        const unitResponse = await this.create('unit', {
           title: unitData.title,
           status: 'publish',
           meta: {
@@ -481,14 +399,18 @@ class WordPressClient {
             unit_settings: JSON.stringify({})
           }
         });
-        
-        console.log('Unidad creada:', unitResponse.data);
       }
-      
-      console.log('=== UNIDADES CREADAS EXITOSAMENTE ===');
     } catch (error) {
       console.error('Error creando unidades:', error.message);
     }
+  }
+  
+  parseJsonMeta(value) {
+    if (!value) return null;
+    if (typeof value === 'string') {
+      try { return JSON.parse(value); } catch { return null; }
+    }
+    return value;
   }
 }
 

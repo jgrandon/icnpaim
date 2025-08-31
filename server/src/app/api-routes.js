@@ -1,7 +1,7 @@
 import express from 'express';
 import wpClient from './wp-client';
-import { getCachedLTIToken } from './lti-token-service';
 import { getAuthFromState } from '../database/db-utility';
+import { getCachedLTIToken } from './lti-token-service';
 import request from 'request';
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
   try {
-    const sessionId = req.cookies?.ltiState;
+    const sessionId = req.cookies?.ltiState || req.session?.ltiState;
     if (!sessionId) {
       return res.status(401).json({ error: 'No LTI session found' });
     }
@@ -21,7 +21,9 @@ const requireLTISession = async (req, res, next) => {
 
     req.ltiSession = {
       jwt: auth.jwt,
-      sessionId: sessionId
+      sessionId: sessionId,
+      wpStudentId: auth.wpStudentId,
+      wpCourseId: auth.wpCourseId
     };
     next();
   } catch (error) {
@@ -41,7 +43,9 @@ router.get('/me', requireLTISession, (req, res) => {
       given_name: jwt.body.given_name,
       family_name: jwt.body.family_name,
       roles: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles'] || [],
-      context: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'] || {}
+      context: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'] || {},
+      wpStudentId: req.ltiSession.wpStudentId,
+      wpCourseId: req.ltiSession.wpCourseId
     };
 
     res.json(user);
@@ -54,42 +58,23 @@ router.get('/me', requireLTISession, (req, res) => {
 // GET /api/courses - cursos del usuario
 router.get('/courses', requireLTISession, async (req, res) => {
   try {
-    const jwt = req.ltiSession.jwt;
-    const sub = jwt.body.sub;
-
-    // Buscar student en WP
-    const students = await wpClient.client.get('/student', {
-      params: {
-        meta_key: 'lms_sub',
-        meta_value: sub,
-        per_page: 1
-      }
-    });
-
-    if (students.data.length === 0) {
+    const wpCourseId = req.ltiSession.wpCourseId;
+    if (!wpCourseId) {
       return res.json([]);
     }
 
-    const student = students.data[0];
-    const courseIds = student.meta.course_ids ? 
-      JSON.parse(student.meta.course_ids) : [];
+    // Get the course from WordPress
+    const courseResponse = await wpClient.client.get(`/course/${wpCourseId}`);
+    const course = courseResponse.data;
 
-    if (courseIds.length === 0) {
-      return res.json([]);
-    }
-
-    // Obtener cursos
-    const courses = await wpClient.client.get('/course', {
-      params: {
-        include: courseIds.join(','),
-        per_page: 100
-      }
-    });
-
-    res.json(courses.data);
+    res.json([{
+      id: course.id,
+      title: course.title?.rendered || course.title,
+      meta: course.meta
+    }]);
   } catch (error) {
-    console.error('Error getting courses:', error);
-    res.status(500).json({ error: 'Failed to get courses' });
+    console.error('Error getting courses:', error.message);
+    res.json([]);
   }
 });
 
@@ -108,28 +93,17 @@ router.get('/courses/:courseId/units', requireLTISession, async (req, res) => {
 // GET /api/courses/:courseId/grades - notas del curso
 router.get('/courses/:courseId/grades', requireLTISession, async (req, res) => {
   try {
-    const jwt = req.ltiSession.jwt;
-    const sub = jwt.body.sub;
+    const wpStudentId = req.ltiSession.wpStudentId;
     const courseId = parseInt(req.params.courseId);
 
-    // Buscar student en WP
-    const students = await wpClient.client.get('/student', {
-      params: {
-        meta_key: 'lms_sub',
-        meta_value: sub,
-        per_page: 1
-      }
-    });
-
-    if (students.data.length === 0) {
+    if (!wpStudentId) {
       return res.json([]);
     }
 
-    const studentId = students.data[0].id;
-    const grades = await wpClient.getGrades(studentId, courseId);
+    const grades = await wpClient.getGrades(wpStudentId, courseId);
     res.json(grades);
   } catch (error) {
-    console.error('Error getting grades:', error);
+    console.error('Error getting grades:', error.message);
     res.status(500).json({ error: 'Failed to get grades' });
   }
 });
@@ -137,28 +111,17 @@ router.get('/courses/:courseId/grades', requireLTISession, async (req, res) => {
 // GET /api/progress - progreso del usuario
 router.get('/progress', requireLTISession, async (req, res) => {
   try {
-    const jwt = req.ltiSession.jwt;
-    const sub = jwt.body.sub;
+    const wpStudentId = req.ltiSession.wpStudentId;
     const { courseId, unitId } = req.query;
 
-    // Buscar student en WP
-    const students = await wpClient.client.get('/student', {
-      params: {
-        meta_key: 'lms_sub',
-        meta_value: sub,
-        per_page: 1
-      }
-    });
-
-    if (students.data.length === 0) {
+    if (!wpStudentId) {
       return res.json([]);
     }
 
-    const studentId = students.data[0].id;
-    const progress = await wpClient.getProgress(studentId, parseInt(courseId), unitId ? parseInt(unitId) : null);
+    const progress = await wpClient.getProgress(wpStudentId, parseInt(courseId), unitId ? parseInt(unitId) : null);
     res.json(progress);
   } catch (error) {
-    console.error('Error getting progress:', error);
+    console.error('Error in getProgress:', error.message);
     res.status(500).json({ error: 'Failed to get progress' });
   }
 });
@@ -166,26 +129,15 @@ router.get('/progress', requireLTISession, async (req, res) => {
 // POST /api/progress - actualizar progreso
 router.post('/progress', requireLTISession, async (req, res) => {
   try {
-    const jwt = req.ltiSession.jwt;
-    const sub = jwt.body.sub;
+    const wpStudentId = req.ltiSession.wpStudentId;
     const { unitId, completedCardId, courseId } = req.body;
 
-    // Buscar student en WP
-    const students = await wpClient.client.get('/student', {
-      params: {
-        meta_key: 'lms_sub',
-        meta_value: sub,
-        per_page: 1
-      }
-    });
-
-    if (students.data.length === 0) {
+    if (!wpStudentId) {
       return res.status(404).json({ error: 'Student not found' });
     }
 
-    const studentId = students.data[0].id;
     const progress = await wpClient.upsertProgress({
-      studentId,
+      studentId: wpStudentId,
       courseId: parseInt(courseId),
       unitId: parseInt(unitId),
       completedCardId
@@ -202,8 +154,8 @@ router.post('/progress', requireLTISession, async (req, res) => {
 router.post('/grades/refresh', requireLTISession, async (req, res) => {
   try {
     const jwt = req.ltiSession.jwt;
-    const sessionId = req.ltiSession.sessionId;
-    const sub = jwt.body.sub;
+    const wpStudentId = req.ltiSession.wpStudentId;
+    const wpCourseId = req.ltiSession.wpCourseId;
     const context = jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'];
     const agsEndpoint = jwt.body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
 
@@ -211,39 +163,13 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
       return res.status(400).json({ error: 'AGS not available in this context' });
     }
 
-    // Buscar student en WP
-    const students = await wpClient.client.get('/student', {
-      params: {
-        meta_key: 'lms_sub',
-        meta_value: sub,
-        per_page: 1
-      }
-    });
-
-    if (students.data.length === 0) {
+    if (!wpStudentId || !wpCourseId) {
       return res.status(404).json({ error: 'Student not found' });
     }
 
-    const studentId = students.data[0].id;
-
-    // Buscar course en WP
-    const courses = await wpClient.client.get('/course', {
-      params: {
-        meta_key: 'lms_context_id',
-        meta_value: context.id,
-        per_page: 1
-      }
-    });
-
-    if (courses.data.length === 0) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-
-    const courseId = courses.data[0].id;
-
     // Obtener token LTI para AGS
     const scope = 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly';
-    const token = await getCachedLTIToken(sessionId, jwt.body.aud, scope);
+    const token = await getCachedLTIToken(req.ltiSession.sessionId, jwt.body.aud, scope);
 
     // Obtener line items
     const lineItemsResponse = await new Promise((resolve, reject) => {
@@ -273,7 +199,7 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
         const resultsResponse = await new Promise((resolve, reject) => {
           const options = {
             method: 'GET',
-            uri: `${lineItem.id}/results?user_id=${sub}`,
+            uri: `${lineItem.id}/results?user_id=${jwt.body.sub}`,
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -308,14 +234,14 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
 
     // Guardar en WordPress
     const grades = await wpClient.upsertGradesFromAGS({
-      studentId,
-      courseId,
+      studentId: wpStudentId,
+      courseId: wpCourseId,
       agsResults
     });
 
     res.json(grades);
   } catch (error) {
-    console.error('Error refreshing grades:', error);
+    console.error('Error refreshing grades:', error.message);
     res.status(500).json({ error: 'Failed to refresh grades from LMS' });
   }
 });
