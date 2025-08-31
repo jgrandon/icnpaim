@@ -2,14 +2,14 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  mode: 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './public/src/app.js',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'public/dist')
   },
-  stats: 'errors-only',
-  devtool: 'source-map',
+  stats: process.env.NODE_ENV === 'production' ? 'errors-warnings' : 'errors-only',
+  devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
   module: {
     rules: [
       {

@@ -21,6 +21,9 @@ if (process.env.LTI_TEST_PROVIDER_DOMAIN) {
 if (process.env.LTI_TEST_PROVIDER_PORT) {
   configResult['provider_port'] = process.env.LTI_TEST_PROVIDER_PORT;
 }
+if (process.env.PORT) {
+  configResult['provider_port'] = process.env.PORT;
+}
 if (process.env.DATABASE_DIRECTORY) {
   configResult['database_directory'] = process.env.DATABASE_DIRECTORY;
 }

@@ -61,7 +61,7 @@
   "scripts": {
     "build-server": "babel server/src -d server/lib --source-maps",
     "build-public": "webpack",
-    "prestart": "npm install; npm run build-server; npm run build-public",
+    "prestart": "npm run build-server && npm run build-public",
     "start": "node server/lib/server.js"
   },
   "browserslist": [

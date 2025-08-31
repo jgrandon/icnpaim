@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-echo $HOST_ENTRY >>/etc/hosts
+if [ ! -z "$HOST_ENTRY" ]; then
+  echo $HOST_ENTRY >>/etc/hosts
+fi
 node server/lib/server.js

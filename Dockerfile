@@ -9,9 +9,10 @@ COPY . .
 
 RUN sed -i 's/\r$//' ./launch.sh && chmod +x ./launch.sh
 
-RUN npm run build-server && npm run build-public
+RUN npm run build-server
+RUN npm run build-public
 
-ENV PORT=3000
-EXPOSE 3000
+ENV PORT=8080
+EXPOSE 8080
 
 CMD ["sh", "-c", "./launch.sh"]

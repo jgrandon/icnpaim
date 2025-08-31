@@ -48,12 +48,12 @@ const DashboardWrapper = (props) => {
     const style = document.createElement('style');
     style.id = 'dashboard-hide-demo';
     style.textContent = `
-      .Dashboard-root-1 .MuiAppBar-root,
-      .Dashboard-root-1 .MuiDrawer-root,
-      .Dashboard-root-1 .Dashboard-appBarSpacer-13 {
+      body .MuiAppBar-root,
+      body .MuiDrawer-root,
+      body .Dashboard-appBarSpacer-13 {
         display: none !important;
       }
-      .Dashboard-root-1 .Dashboard-content-14 {
+      body .Dashboard-content-14 {
         margin-left: 0 !important;
         padding-top: 0 !important;
       }

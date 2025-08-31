@@ -344,7 +344,7 @@ module.exports = function (app) {
       res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
       await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
-      res.redirect('/dashboard');
+      res.redirect(`/dashboard?nonce=${state}`);
     }
   });
 
