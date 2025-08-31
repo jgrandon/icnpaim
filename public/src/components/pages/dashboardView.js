@@ -542,7 +542,7 @@ class DashboardView extends React.Component {
               <strong>Debug Info:</strong><br />
               Usuario LTI sub: {user?.sub || 'No disponible'}<br />
               Context ID: {user?.context?.id || 'No disponible'}<br />
-              Context Title: {user?.context?.title || 'No disponible'}<br />
+              Endpoint WP: https://icnpaim.cl/wp-json/wp/v2
               <br />
               <strong>Endpoints de verificación:</strong><br />
               • GET https://icnpaim.cl/wp-json/lti/v1/debug/student/{user?.sub}<br />

@@ -44,28 +44,25 @@ import DashboardView from './dashboardView'
 // Componente wrapper para ocultar el header demo en /dashboard
 const DashboardWrapper = (props) => {
   React.useEffect(() => {
-    // Ocultar elementos del demo cuando estamos en dashboard
-    const hideElements = () => {
-      const appBar = document.querySelector('.MuiAppBar-root');
-      const drawer = document.querySelector('.MuiDrawer-root');
-      const spacer = document.querySelector('[class*="appBarSpacer"]');
-      
-      if (appBar) appBar.style.display = 'none';
-      if (drawer) drawer.style.display = 'none';
-      if (spacer) spacer.style.display = 'none';
-    };
+    // Añadir CSS para ocultar header demo
+    const style = document.createElement('style');
+    style.id = 'dashboard-hide-demo';
+    style.textContent = `
+      .Dashboard-root-1 .MuiAppBar-root,
+      .Dashboard-root-1 .MuiDrawer-root,
+      .Dashboard-root-1 .Dashboard-appBarSpacer-13 {
+        display: none !important;
+      }
+      .Dashboard-root-1 .Dashboard-content-14 {
+        margin-left: 0 !important;
+        padding-top: 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
     
-    hideElements();
-    
-    // Cleanup al salir
     return () => {
-      const appBar = document.querySelector('.MuiAppBar-root');
-      const drawer = document.querySelector('.MuiDrawer-root');
-      const spacer = document.querySelector('[class*="appBarSpacer"]');
-      
-      if (appBar) appBar.style.display = '';
-      if (drawer) drawer.style.display = '';
-      if (spacer) spacer.style.display = '';
+      const styleEl = document.getElementById('dashboard-hide-demo');
+      if (styleEl) styleEl.remove();
     };
   }, []);
   

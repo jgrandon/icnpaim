@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * PAIM Learning Platform - LTI Integration Functions
- * Integración completa con Node.js LTI Tool
+ * Integración mínima con Node.js LTI Tool
  * 
  * @package PAIM
  * @version 1.0.0
@@ -223,115 +223,29 @@ function lti_register_meta_fields() {
 }
 add_action('init', 'lti_register_meta_fields');
 
-// Metabox para Unit Cards (mejorado)
-function lti_add_unit_metaboxes() {
-    add_meta_box(
-        'unit_cards_metabox',
-        'Cards de la Unidad',
-        'lti_unit_cards_metabox_callback',
-        'unit',
-        'normal',
-        'high'
-    );
+// Asegurar que los meta fields se muestren en REST
+function lti_ensure_meta_in_rest($response, $post, $request) {
+    $post_type = $post->post_type;
     
-    add_meta_box(
-        'unit_course_metabox',
-        'Configuración del Curso',
-        'lti_unit_course_metabox_callback',
-        'unit',
-        'side',
-        'default'
-    );
-}
-add_action('add_meta_boxes', 'lti_add_unit_metaboxes');
-
-function lti_unit_course_metabox_callback($post) {
-    wp_nonce_field('unit_course_nonce', 'unit_course_nonce');
-    
-    $course_id = get_post_meta($post->ID, 'course_id', true);
-    
-    // Obtener todos los cursos
-    $courses = get_posts(array(
-        'post_type' => 'course',
-        'posts_per_page' => -1,
-        'post_status' => 'publish'
-    ));
-    
-    echo '<p><label for="course_id"><strong>Curso:</strong></label></p>';
-    echo '<select name="course_id" id="course_id" style="width:100%">';
-    echo '<option value="">Seleccionar curso...</option>';
-    foreach ($courses as $course) {
-        $selected = ($course_id == $course->ID) ? 'selected' : '';
-        echo '<option value="' . $course->ID . '" ' . $selected . '>' . esc_html($course->post_title) . '</option>';
-    }
-    echo '</select>';
-}
-
-function lti_unit_cards_metabox_callback($post) {
-    wp_nonce_field('unit_cards_nonce', 'unit_cards_nonce');
-    
-    $cards = get_post_meta($post->ID, 'unit_cards', true);
-    $cards = $cards ? json_decode($cards, true) : array();
-    
-    echo '<div id="unit-cards-editor">';
-    echo '<p><strong>Cards JSON:</strong></p>';
-    echo '<textarea name="unit_cards" rows="15" style="width:100%; font-family:monospace">' . esc_textarea(json_encode($cards, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . '</textarea>';
-    echo '<p><em>Formato esperado por React:</em></p>';
-    echo '<pre style="background:#f0f0f0; padding:10px; font-size:12px">[
-  {
-    "id": "card-1",
-    "title": "Video Introducción",
-    "url": "https://youtube.com/watch?v=...",
-    "tipoActividad": "video",
-    "color": "#2dd4bf",
-    "peso": 1,
-    "estado": "pendiente"
-  },
-  {
-    "id": "card-2", 
-    "title": "Quiz Tema 1",
-    "url": "https://forms.gle/...",
-    "tipoActividad": "quiz",
-    "color": "#f59e0b",
-    "peso": 2,
-    "estado": "pendiente"
-  }
-]</pre>';
-    echo '</div>';
-}
-
-function lti_save_unit_metaboxes($post_id) {
-    // Verificar nonces
-    if (!isset($_POST['unit_course_nonce']) || !wp_verify_nonce($_POST['unit_course_nonce'], 'unit_course_nonce')) {
-        return;
-    }
-    
-    if (!isset($_POST['unit_cards_nonce']) || !wp_verify_nonce($_POST['unit_cards_nonce'], 'unit_cards_nonce')) {
-        return;
-    }
-
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-
-    if (!current_user_can('edit_post', $post_id)) {
-        return;
-    }
-
-    // Guardar course_id
-    if (isset($_POST['course_id'])) {
-        update_post_meta($post_id, 'course_id', intval($_POST['course_id']));
-    }
-
-    // Guardar cards
-    if (isset($_POST['unit_cards'])) {
-        $cards = json_decode(stripslashes($_POST['unit_cards']), true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($cards)) {
-            update_post_meta($post_id, 'unit_cards', json_encode($cards, JSON_UNESCAPED_UNICODE));
+    if (in_array($post_type, array('student', 'course', 'unit', 'progress', 'grade'))) {
+        $meta = get_post_meta($post->ID);
+        $response->data['meta'] = array();
+        
+        foreach ($meta as $key => $value) {
+            // Solo incluir meta fields que no empiecen con _
+            if (substr($key, 0, 1) !== '_') {
+                $response->data['meta'][$key] = $value[0];
+            }
         }
     }
+    
+    return $response;
 }
-add_action('save_post', 'lti_save_unit_metaboxes');
+add_filter('rest_prepare_student_response', 'lti_ensure_meta_in_rest', 10, 3);
+add_filter('rest_prepare_course_response', 'lti_ensure_meta_in_rest', 10, 3);
+add_filter('rest_prepare_unit_response', 'lti_ensure_meta_in_rest', 10, 3);
+add_filter('rest_prepare_progress_response', 'lti_ensure_meta_in_rest', 10, 3);
+add_filter('rest_prepare_grade_response', 'lti_ensure_meta_in_rest', 10, 3);
 
 // Endpoint REST personalizado para debug
 function lti_register_debug_endpoints() {
@@ -437,29 +351,5 @@ function lti_debug_course_endpoint($request) {
         }, $student_ids)
     );
 }
-
-// Asegurar que los meta fields se muestren en REST
-function lti_ensure_meta_in_rest($response, $post, $request) {
-    $post_type = $post->post_type;
-    
-    if (in_array($post_type, array('student', 'course', 'unit', 'progress', 'grade'))) {
-        $meta = get_post_meta($post->ID);
-        $response->data['meta'] = array();
-        
-        foreach ($meta as $key => $value) {
-            // Solo incluir meta fields que no empiecen con _
-            if (substr($key, 0, 1) !== '_') {
-                $response->data['meta'][$key] = $value[0];
-            }
-        }
-    }
-    
-    return $response;
-}
-add_filter('rest_prepare_student_response', 'lti_ensure_meta_in_rest', 10, 3);
-add_filter('rest_prepare_course_response', 'lti_ensure_meta_in_rest', 10, 3);
-add_filter('rest_prepare_unit_response', 'lti_ensure_meta_in_rest', 10, 3);
-add_filter('rest_prepare_progress_response', 'lti_ensure_meta_in_rest', 10, 3);
-add_filter('rest_prepare_grade_response', 'lti_ensure_meta_in_rest', 10, 3);
 
 ?>
