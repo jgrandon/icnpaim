@@ -125,25 +125,8 @@ class WordPressClient {
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
-      // Primero intentar sincronizar via endpoint personalizado
-      try {
-        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/course', {
-          contextId,
-          title,
-          label
-        }, {
-          auth: this.client.defaults.auth,
-          timeout: 5000
-        });
-        
-        console.log('Course sync response:', syncResponse.data);
-        
-        // Obtener el curso actualizado
-        const courseResponse = await this.client.get(`/course/${syncResponse.data.id}`);
-        return courseResponse.data;
-      } catch (syncError) {
-        console.warn('Course sync endpoint failed, falling back to direct API:', syncError.message);
-      }
+      console.log('=== BUSCANDO/CREANDO CURSO ===');
+      console.log('Datos:', { contextId, title, label });
       
       // Buscar por meta lms_context_id
       const searchResponse = await this.client.get('/course', {
@@ -153,9 +136,12 @@ class WordPressClient {
           per_page: 1
         }
       });
+      
+      console.log('Course search response:', searchResponse.data);
 
       if (searchResponse.data.length > 0) {
         const course = searchResponse.data[0];
+        console.log('Curso encontrado, actualizando:', course.id);
         // Actualizar datos si han cambiado
         await this.client.post(`/course/${course.id}`, {
           title: title,
@@ -165,9 +151,14 @@ class WordPressClient {
             lms_context_title: title
           }
         });
-        return course;
+        
+        // Obtener datos actualizados
+        const updatedResponse = await this.client.get(`/course/${course.id}`);
+        console.log('Curso actualizado:', updatedResponse.data);
+        return updatedResponse.data;
       }
 
+      console.log('Curso no encontrado, creando nuevo...');
       // Crear nuevo curso
       const createResponse = await this.client.post('/course', {
         title: title,
@@ -176,13 +167,20 @@ class WordPressClient {
           lms_context_id: contextId,
           lms_context_label: label,
           lms_context_title: title,
-          student_ids: []
+          student_ids: JSON.stringify([])
         }
       });
 
+      console.log('Nuevo curso creado:', createResponse.data);
+      
+      // Crear unidades de ejemplo para el nuevo curso
+      await this.createSampleUnits(createResponse.data.id);
+      
       return createResponse.data;
     } catch (error) {
-      console.error('Error in findOrCreateCourse:', error.message);
+      console.error('=== ERROR CREANDO CURSO ===');
+      console.error('Error:', error.message);
+      console.error('Response data:', error.response?.data);
       throw error;
     }
   }

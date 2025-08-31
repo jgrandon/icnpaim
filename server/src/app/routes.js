@@ -346,6 +346,9 @@ module.exports = function (app) {
   // Función para upsert en WordPress
   const upsertWpEntities = async (jwtPayload, state) => {
     try {
+      console.log('=== INICIANDO SINCRONIZACIÓN CON WORDPRESS ===');
+      console.log('JWT Payload:', JSON.stringify(jwtPayload.body, null, 2));
+      
       const user = {
         sub: jwtPayload.body.sub,
         email: jwtPayload.body.email,
@@ -359,15 +362,24 @@ module.exports = function (app) {
         label: context.label
       };
 
-      console.log('Upserting WordPress entities:', { user: user.sub, course: course.contextId });
+      console.log('=== DATOS A SINCRONIZAR ===');
+      console.log('User:', user);
+      console.log('Course:', course);
       
       const student = await wpClient.findOrCreateStudent(user);
+      console.log('Student result:', student);
+      
       const courseWP = await wpClient.findOrCreateCourse(course);
+      console.log('Course result:', courseWP);
+      
       await wpClient.linkStudentToCourse(student.id, courseWP.id);
       
-      console.log('WordPress upsert completed successfully');
+      console.log('=== SINCRONIZACIÓN COMPLETADA ===');
+      console.log(`Student ID: ${student.id}, Course ID: ${courseWP.id}`);
     } catch (error) {
-      console.error('WordPress upsert failed:', error.message);
+      console.error('=== ERROR EN SINCRONIZACIÓN ===');
+      console.error('Error:', error.message);
+      console.error('Stack:', error.stack);
       // No bloquear el flujo si WP falla
     }
   };
