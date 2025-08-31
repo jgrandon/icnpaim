@@ -21,7 +21,6 @@ import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
-import { testWordPressConnection } from './test-wp-connection';
 
 const contentitem_key = 'contentItemData';
 
@@ -617,13 +616,20 @@ module.exports = function (app) {
     res.send(data);
   });
 
-  // Test endpoint para verificar conexión con WordPress
+  // Simple test endpoint para verificar conexión con WordPress
   app.get('/test-wp', async (req, res) => {
     console.log('-------------------\ntest-wp');
     try {
-      await testWordPressConnection();
-      res.json({ status: 'success', message: 'WordPress connection test completed. Check console logs.' });
+      // Test básico de conectividad
+      const response = await wpClient.client.get('/');
+      console.log('WordPress connection test successful');
+      res.json({ 
+        status: 'success', 
+        message: 'WordPress connection working',
+        wp_version: response.data.description || 'unknown'
+      });
     } catch (error) {
+      console.error('WordPress connection test failed:', error.message);
       res.status(500).json({ 
         status: 'error', 
         message: error.message,

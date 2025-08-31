@@ -60,8 +60,3 @@ async function testWordPressConnection() {
 
 // Export for use in routes or run directly
 export { testWordPressConnection };
-
-// Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  testWordPressConnection();
-}

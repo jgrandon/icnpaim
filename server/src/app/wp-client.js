@@ -4,6 +4,8 @@ import crypto from 'crypto';
 const baseURL = process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2';
 const BASIC_AUTH = process.env.WP_BASIC_AUTH;
 const JWT_TOKEN = process.env.WP_JWT;
+const WP_USER = process.env.WORDPRESS_API_USER;
+const WP_PASS = process.env.WORDPRESS_API_PASSWORD;
 
 const shortHash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -27,17 +29,12 @@ class WordPressClient {
       } else if (BASIC_AUTH) {
         config.headers.Authorization = BASIC_AUTH.startsWith('Basic') ? BASIC_AUTH : `Basic ${BASIC_AUTH}`;
         console.log('Using Basic Auth');
+      } else if (WP_USER && WP_PASS) {
+        const auth = Buffer.from(`${WP_USER}:${WP_PASS}`).toString('base64');
+        config.headers.Authorization = `Basic ${auth}`;
+        console.log('Using Basic Auth with env vars');
       } else {
-        // Fallback to basic auth with env vars
-        const username = process.env.WORDPRESS_API_USER;
-        const password = process.env.WORDPRESS_API_PASSWORD;
-        if (username && password) {
-          const auth = Buffer.from(`${username}:${password}`).toString('base64');
-          config.headers.Authorization = `Basic ${auth}`;
-          console.log('Using fallback Basic Auth with env vars');
-        } else {
-          console.warn('No WordPress authentication configured!');
-        }
+        console.warn('No WordPress authentication configured!');
       }
       return config;
     });
