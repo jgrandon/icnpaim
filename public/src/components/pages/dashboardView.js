@@ -15,8 +15,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
-  Alert
+  CircularProgress
 } from '@material-ui/core';
 import { 
   School, 
@@ -81,6 +80,12 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: 200
+  },
+  errorCard: {
+    backgroundColor: '#ffebee',
+    color: '#c62828',
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   }
 });
 
@@ -251,7 +256,13 @@ class DashboardView extends React.Component {
     if (error) {
       return (
         <Box className={classes.root}>
-          <Alert severity="error">{error}</Alert>
+          <Card className={classes.errorCard}>
+            <CardContent>
+              <Typography variant="h6" style={{ color: '#c62828' }}>
+                ⚠️ {error}
+              </Typography>
+            </CardContent>
+          </Card>
         </Box>
       );
     }
@@ -261,7 +272,7 @@ class DashboardView extends React.Component {
         {/* Header de Bienvenida */}
         <Card className={classes.welcomeCard}>
           <CardContent>
-            <Box display="flex" alignItems="center" gap={2}>
+            <Box display="flex" alignItems="center" style={{ gap: 16 }}>
               <School fontSize="large" />
               <Box>
                 <Typography variant="h4" component="h1">
@@ -326,7 +337,7 @@ class DashboardView extends React.Component {
               return (
                 <Card key={unit.id} className={classes.unitCard}>
                   <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
                       <Typography variant="h6">{unit.title}</Typography>
                       <Chip 
                         label={`${progress}% completado`} 
@@ -340,7 +351,7 @@ class DashboardView extends React.Component {
                       className={classes.progressBar}
                     />
 
-                    <Box mt={2}>
+                    <Box style={{ marginTop: 16 }}>
                       <Grid container spacing={1}>
                         {cards.map(card => {
                           const isCompleted = completedCards.includes(card.id);
@@ -358,7 +369,7 @@ class DashboardView extends React.Component {
                                 }}
                               >
                                 <CardContent style={{ padding: 12 }}>
-                                  <Box display="flex" alignItems="center" gap={1}>
+                                  <Box display="flex" alignItems="center" style={{ gap: 8 }}>
                                     {isCompleted ? (
                                       <CheckCircle style={{ color: '#4caf50', fontSize: 20 }} />
                                     ) : (
@@ -463,7 +474,7 @@ class DashboardView extends React.Component {
 
         {/* Estado sin curso seleccionado */}
         {!selectedCourse && courses.length > 0 && (
-          <Box textAlign="center" mt={4}>
+          <Box textAlign="center" style={{ marginTop: 32 }}>
             <Typography variant="h6" color="textSecondary">
               Selecciona un curso arriba para ver las unidades y tu progreso
             </Typography>
@@ -472,7 +483,7 @@ class DashboardView extends React.Component {
 
         {/* Estado sin cursos */}
         {courses.length === 0 && (
-          <Box textAlign="center" mt={4}>
+          <Box textAlign="center" style={{ marginTop: 32 }}>
             <Typography variant="h6" color="textSecondary">
               No tienes cursos asignados en este momento
             </Typography>

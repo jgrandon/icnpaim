@@ -152,6 +152,7 @@ class Dashboard extends React.Component {
                 component={AssignGradesView}
               />
               <Route path="/lti_custom_app" component={CustomLtiApp}/>
+              <Route path="/dashboard" component={DashboardView}/>
             </main>
             <SnackBar/>
           </ErrorBoundary>
