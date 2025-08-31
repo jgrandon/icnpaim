@@ -41,6 +41,37 @@ import { styles } from "../../common/styles/styles";
 import TestPage from './testPage'
 import DashboardView from './dashboardView'
 
+// Componente wrapper para ocultar el header demo en /dashboard
+const DashboardWrapper = (props) => {
+  React.useEffect(() => {
+    // Ocultar elementos del demo cuando estamos en dashboard
+    const hideElements = () => {
+      const appBar = document.querySelector('.MuiAppBar-root');
+      const drawer = document.querySelector('.MuiDrawer-root');
+      const spacer = document.querySelector('[class*="appBarSpacer"]');
+      
+      if (appBar) appBar.style.display = 'none';
+      if (drawer) drawer.style.display = 'none';
+      if (spacer) spacer.style.display = 'none';
+    };
+    
+    hideElements();
+    
+    // Cleanup al salir
+    return () => {
+      const appBar = document.querySelector('.MuiAppBar-root');
+      const drawer = document.querySelector('.MuiDrawer-root');
+      const spacer = document.querySelector('[class*="appBarSpacer"]');
+      
+      if (appBar) appBar.style.display = '';
+      if (drawer) drawer.style.display = '';
+      if (spacer) spacer.style.display = '';
+    };
+  }, []);
+  
+  return <DashboardView {...props} />;
+};
+
 class Dashboard extends React.Component {
   state = {
     darkMode: false,
@@ -152,7 +183,7 @@ class Dashboard extends React.Component {
                 component={AssignGradesView}
               />
               <Route path="/lti_custom_app" component={CustomLtiApp}/>
-              <Route path="/dashboard" component={DashboardView}/>
+              <Route path="/dashboard" component={DashboardWrapper}/>
             </main>
             <SnackBar/>
           </ErrorBoundary>

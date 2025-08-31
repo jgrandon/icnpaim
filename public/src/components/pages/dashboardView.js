@@ -29,7 +29,17 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   root: {
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
+    // Ocultar el header del dashboard demo
+    '& .MuiAppBar-root': {
+      display: 'none !important'
+    },
+    '& .MuiDrawer-root': {
+      display: 'none !important'
+    },
+    '& .Dashboard-appBarSpacer-13': {
+      display: 'none !important'
+    }
   },
   welcomeCard: {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -72,8 +82,7 @@ const styles = theme => ({
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(2),
     display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(1)
+    alignItems: 'center'
   },
   loadingContainer: {
     display: 'flex',
@@ -86,6 +95,14 @@ const styles = theme => ({
     color: '#c62828',
     padding: theme.spacing(2),
     marginBottom: theme.spacing(2)
+  },
+  debugInfo: {
+    backgroundColor: '#f5f5f5',
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    borderRadius: 4,
+    fontFamily: 'monospace',
+    fontSize: '12px'
   }
 });
 
@@ -101,7 +118,8 @@ class DashboardView extends React.Component {
       progress: [],
       loading: true,
       refreshingGrades: false,
-      error: null
+      error: null,
+      debugInfo: null
     };
   }
 
@@ -111,14 +129,21 @@ class DashboardView extends React.Component {
       await this.loadCourses();
     } catch (error) {
       console.error('Error loading dashboard:', error);
-      this.setState({ error: 'Error cargando el dashboard', loading: false });
+      this.setState({ 
+        error: 'Error cargando el dashboard', 
+        loading: false,
+        debugInfo: error.message 
+      });
     }
   }
 
   loadUserData = async () => {
     try {
       const response = await fetch('/api/me');
-      if (!response.ok) throw new Error('Failed to load user data');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to load user data: ${response.status} - ${errorText}`);
+      }
       const user = await response.json();
       this.setState({ user });
     } catch (error) {
@@ -130,7 +155,10 @@ class DashboardView extends React.Component {
   loadCourses = async () => {
     try {
       const response = await fetch('/api/courses');
-      if (!response.ok) throw new Error('Failed to load courses');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to load courses: ${response.status} - ${errorText}`);
+      }
       const courses = await response.json();
       this.setState({ courses, loading: false });
       
@@ -140,7 +168,11 @@ class DashboardView extends React.Component {
       }
     } catch (error) {
       console.error('Error loading courses:', error);
-      this.setState({ error: 'Error cargando cursos', loading: false });
+      this.setState({ 
+        error: 'Error cargando cursos', 
+        loading: false,
+        debugInfo: error.message 
+      });
     }
   };
 
@@ -232,19 +264,24 @@ class DashboardView extends React.Component {
   };
 
   getProgressForUnit = (unitId) => {
-    const unitProgress = this.state.progress.find(p => p.meta._unit_id == unitId);
-    return unitProgress ? unitProgress.meta.percent || 0 : 0;
+    const unitProgress = this.state.progress.find(p => p.meta && p.meta.unit_id == unitId);
+    return unitProgress ? (unitProgress.meta.percent || 0) : 0;
   };
 
   getCompletedCards = (unitId) => {
-    const unitProgress = this.state.progress.find(p => p.meta._unit_id == unitId);
-    return unitProgress ? (unitProgress.meta.completed_card_ids ? 
-      JSON.parse(unitProgress.meta.completed_card_ids) : []) : [];
+    const unitProgress = this.state.progress.find(p => p.meta && p.meta.unit_id == unitId);
+    if (!unitProgress || !unitProgress.meta.completed_card_ids) return [];
+    
+    try {
+      return JSON.parse(unitProgress.meta.completed_card_ids);
+    } catch (e) {
+      return [];
+    }
   };
 
   render() {
     const { classes } = this.props;
-    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error } = this.state;
+    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, debugInfo } = this.state;
 
     if (loading) {
       return (
@@ -262,6 +299,19 @@ class DashboardView extends React.Component {
               <Typography variant="h6" style={{ color: '#c62828' }}>
                 ⚠️ {error}
               </Typography>
+              {debugInfo && (
+                <div className={classes.debugInfo}>
+                  <strong>Debug Info:</strong><br />
+                  {debugInfo}
+                </div>
+              )}
+              <Box style={{ marginTop: 16 }}>
+                <Typography variant="body2">
+                  <strong>Usuario LTI:</strong> {user?.sub || 'No disponible'}<br />
+                  <strong>Context:</strong> {user?.context?.id || 'No disponible'}<br />
+                  <strong>Endpoint WP:</strong> {process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2'}
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
         </Box>
@@ -289,7 +339,7 @@ class DashboardView extends React.Component {
 
         {/* Cursos */}
         <Typography variant="h5" className={classes.sectionTitle}>
-          <Assignment />
+          <Assignment style={{ marginRight: 8 }} />
           Mis Cursos
         </Typography>
         
@@ -306,7 +356,7 @@ class DashboardView extends React.Component {
                     {course.title}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {course.meta?._lms_context_label || 'Curso'}
+                    {course.meta?.lms_context_label || 'Curso'}
                   </Typography>
                   {selectedCourse?.id === course.id && (
                     <Chip 
@@ -326,7 +376,7 @@ class DashboardView extends React.Component {
         {selectedCourse && (
           <>
             <Typography variant="h5" className={classes.sectionTitle}>
-              <TrendingUp />
+              <TrendingUp style={{ marginRight: 8 }} />
               Unidades - {selectedCourse.title}
             </Typography>
 
@@ -408,8 +458,8 @@ class DashboardView extends React.Component {
         {selectedCourse && (
           <>
             <Box display="flex" justifyContent="space-between" alignItems="center" className={classes.sectionTitle}>
-              <Typography variant="h5" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <School />
+              <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
+                <School style={{ marginRight: 8 }} />
                 Mis Notas
               </Typography>
               <Button
@@ -445,14 +495,14 @@ class DashboardView extends React.Component {
                     </TableRow>
                   ) : (
                     grades.map((grade, index) => {
-                      const scoreGiven = grade.meta.score_given || 0;
-                      const scoreMaximum = grade.meta.score_maximum || 100;
+                      const scoreGiven = grade.meta?.score_given || 0;
+                      const scoreMaximum = grade.meta?.score_maximum || 100;
                       const percentage = scoreMaximum > 0 ? Math.round((scoreGiven / scoreMaximum) * 100) : 0;
-                      const timestamp = grade.meta.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
+                      const timestamp = grade.meta?.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
 
                       return (
                         <TableRow key={index}>
-                          <TableCell>{grade.meta.activity_title || 'Actividad'}</TableCell>
+                          <TableCell>{grade.meta?.activity_title || 'Actividad'}</TableCell>
                           <TableCell align="center">{scoreGiven}</TableCell>
                           <TableCell align="center">{scoreMaximum}</TableCell>
                           <TableCell align="center">
@@ -483,14 +533,21 @@ class DashboardView extends React.Component {
         )}
 
         {/* Estado sin cursos */}
-        {courses.length === 0 && (
+        {courses.length === 0 && !error && (
           <Box textAlign="center" style={{ marginTop: 32 }}>
             <Typography variant="h6" color="textSecondary">
               No tienes cursos asignados en este momento. Verifica que el curso esté vinculado en WordPress.
             </Typography>
-            <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
-              Debug: Usuario LTI sub = {user?.sub}
-            </Typography>
+            <div className={classes.debugInfo}>
+              <strong>Debug Info:</strong><br />
+              Usuario LTI sub: {user?.sub || 'No disponible'}<br />
+              Context ID: {user?.context?.id || 'No disponible'}<br />
+              Context Title: {user?.context?.title || 'No disponible'}<br />
+              <br />
+              <strong>Endpoints de verificación:</strong><br />
+              • GET https://icnpaim.cl/wp-json/lti/v1/debug/student/{user?.sub}<br />
+              • GET https://icnpaim.cl/wp-json/lti/v1/debug/course/{user?.context?.id}
+            </div>
           </Box>
         )}
       </div>
