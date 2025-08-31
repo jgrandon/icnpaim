@@ -20,10 +20,13 @@ class WordPressClient {
     
     // Setup authentication
     this.client.interceptors.request.use((config) => {
+      console.log('WP API Request URL:', config.baseURL + config.url);
       if (JWT_TOKEN) {
         config.headers.Authorization = `Bearer ${JWT_TOKEN}`;
+        console.log('Using JWT authentication');
       } else if (BASIC_AUTH) {
         config.headers.Authorization = BASIC_AUTH.startsWith('Basic') ? BASIC_AUTH : `Basic ${BASIC_AUTH}`;
+        console.log('Using Basic Auth');
       } else {
         // Fallback to basic auth with env vars
         const username = process.env.WORDPRESS_API_USER;
@@ -31,6 +34,9 @@ class WordPressClient {
         if (username && password) {
           const auth = Buffer.from(`${username}:${password}`).toString('base64');
           config.headers.Authorization = `Basic ${auth}`;
+          console.log('Using fallback Basic Auth with env vars');
+        } else {
+          console.warn('No WordPress authentication configured!');
         }
       }
       return config;
@@ -98,6 +104,7 @@ class WordPressClient {
 
   async findOrCreateStudent({ sub, email, name }) {
     try {
+      console.log('Creating/updating student:', { sub, email, name });
       const slugValue = `student-${shortHash(sub)}`;
       let post = await this.getBySlug('student', slugValue);
       
@@ -114,20 +121,25 @@ class WordPressClient {
       };
       
       if (post) {
+        console.log('Updating existing student:', post.id);
         post = await this.update('student', post.id, payload);
       } else {
+        console.log('Creating new student with payload:', payload);
         post = await this.create('student', payload);
       }
       
+      console.log('Student operation result:', post);
       return post;
     } catch (error) {
       console.error('Error in findOrCreateStudent:', error.message);
+      console.error('Full error:', error.response?.data || error);
       throw error;
     }
   }
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
+      console.log('Creating/updating course:', { contextId, title, label });
       const slugValue = `course-${shortHash(contextId)}`;
       let post = await this.getBySlug('course', slugValue);
       
@@ -144,16 +156,20 @@ class WordPressClient {
       };
       
       if (post) {
+        console.log('Updating existing course:', post.id);
         post = await this.update('course', post.id, payload);
       } else {
+        console.log('Creating new course with payload:', payload);
         post = await this.create('course', payload);
         // Create sample units for new courses
         await this.createSampleUnits(post.id);
       }
 
+      console.log('Course operation result:', post);
       return post;
     } catch (error) {
       console.error('Error in findOrCreateCourse:', error.message);
+      console.error('Full error:', error.response?.data || error);
       throw error;
     }
   }

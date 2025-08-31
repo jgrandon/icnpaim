@@ -9,6 +9,14 @@ if (!defined('ABSPATH')) exit;
  * @version 1.0.0
  */
 
+// Activar logging para debug
+if (!defined('WP_DEBUG')) {
+    define('WP_DEBUG', true);
+}
+if (!defined('WP_DEBUG_LOG')) {
+    define('WP_DEBUG_LOG', true);
+}
+
 // Habilitar logging para debug
 function lti_log($message, $data = null) {
     $log_entry = date('Y-m-d H:i:s') . ' [LTI] ' . $message;
@@ -18,8 +26,12 @@ function lti_log($message, $data = null) {
     error_log($log_entry);
 }
 
+// Log cuando se carga este archivo
+lti_log("LTI functions loaded successfully");
+
 // Register todos los CPTs necesarios
 function lti_register_all_cpts() {
+    lti_log("Registering all CPTs");
     
     // Student CPT
     register_post_type('student', array(
@@ -155,11 +167,15 @@ function lti_register_all_cpts() {
         'menu_icon' => 'dashicons-welcome-learn-more',
         'menu_position' => 24
     ));
+    
+    lti_log("All CPTs registered successfully");
 }
 add_action('init', 'lti_register_all_cpts');
 
 // Registrar meta fields para todos los CPTs (SIN underscore inicial)
 function lti_register_meta_fields() {
+    lti_log("Registering meta fields");
+    
     // Meta fields para Student
     register_meta('student', 'lms_sub', array(
         'type' => 'string',
@@ -339,8 +355,32 @@ function lti_register_meta_fields() {
         'show_in_rest' => true,
         'description' => 'Origen: lms|app'
     ));
+    
+    lti_log("All meta fields registered successfully");
 }
 add_action('init', 'lti_register_meta_fields');
+
+// Verificar que los CPTs están registrados
+function lti_verify_cpts() {
+    $cpts = ['student', 'course', 'unit', 'progress', 'grade'];
+    $registered = [];
+    $missing = [];
+    
+    foreach ($cpts as $cpt) {
+        if (post_type_exists($cpt)) {
+            $registered[] = $cpt;
+        } else {
+            $missing[] = $cpt;
+        }
+    }
+    
+    lti_log("CPT Status Check", array(
+        'registered' => $registered,
+        'missing' => $missing,
+        'total_expected' => count($cpts)
+    ));
+}
+add_action('wp_loaded', 'lti_verify_cpts');
 
 // Asegurar que los meta fields se muestren en REST
 function lti_ensure_meta_in_rest($response, $post, $request) {
@@ -509,6 +549,8 @@ function lti_ping_endpoint() {
         'wordpress_version' => get_bloginfo('version'),
         'cpts_registered' => array('student', 'course', 'unit', 'progress', 'grade'),
         'rest_url' => rest_url('wp/v2/'),
+        'site_url' => get_site_url(),
+        'admin_email' => get_option('admin_email'),
         'debug_endpoints' => array(
             'ping' => rest_url('lti/v1/ping'),
             'debug_student' => rest_url('lti/v1/debug/student/{sub}'),

@@ -21,6 +21,7 @@ import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
+import { testWordPressConnection } from './test-wp-connection';
 
 const contentitem_key = 'contentItemData';
 
@@ -351,6 +352,9 @@ module.exports = function (app) {
   // Función para upsert en WordPress
   const upsertWpEntities = async (jwtPayload, state) => {
     try {
+      console.log('=== STARTING WORDPRESS SYNC ===');
+      console.log('JWT Payload body:', JSON.stringify(jwtPayload.body, null, 2));
+      
       const user = {
         sub: jwtPayload.body.sub,
         email: jwtPayload.body.email,
@@ -364,9 +368,17 @@ module.exports = function (app) {
         label: context.label
       };
 
+      console.log('Extracted user data:', user);
+      console.log('Extracted course data:', course);
+      
       const student = await wpClient.findOrCreateStudent(user);
+      console.log('Student created/updated:', student.id);
+      
       const courseWP = await wpClient.findOrCreateCourse(course);
+      console.log('Course created/updated:', courseWP.id);
+      
       await wpClient.linkStudentToCourse(student.id, courseWP.id);
+      console.log('Student-Course link completed');
       
       console.log(`WordPress sync completed - Student ID: ${student.id}, Course ID: ${courseWP.id}`);
       
@@ -376,6 +388,7 @@ module.exports = function (app) {
       };
     } catch (error) {
       console.error('Error:', error.message);
+      console.error('Full WordPress sync error:', error.response?.data || error);
       // No bloquear el flujo si WP falla
       return { wpStudentId: null, wpCourseId: null };
     }
@@ -602,6 +615,21 @@ module.exports = function (app) {
     console.log('-------------------\nversion');
     const data = fs.readFileSync('version.json', 'utf8');
     res.send(data);
+  });
+
+  // Test endpoint para verificar conexión con WordPress
+  app.get('/test-wp', async (req, res) => {
+    console.log('-------------------\ntest-wp');
+    try {
+      await testWordPressConnection();
+      res.json({ status: 'success', message: 'WordPress connection test completed. Check console logs.' });
+    } catch (error) {
+      res.status(500).json({ 
+        status: 'error', 
+        message: error.message,
+        details: error.response?.data 
+      });
+    }
   });
 
   //=======================================================
