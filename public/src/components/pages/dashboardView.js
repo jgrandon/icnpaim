@@ -16,7 +16,7 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  Snackbar
+  CardActions
 } from '@material-ui/core';
 import { 
   School, 
@@ -25,7 +25,9 @@ import {
   CheckCircle, 
   Refresh,
   TrendingUp,
-  OpenInNew
+  OpenInNew,
+  Visibility,
+  BarChart
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
@@ -58,7 +60,8 @@ const styles = theme => ({
   },
   unitCard: {
     marginBottom: theme.spacing(2),
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s ease',
+    height: '100%'
   },
   activityCard: {
     padding: theme.spacing(1.5),
@@ -105,6 +108,19 @@ const styles = theme => ({
   },
   gradeChip: {
     fontWeight: 600
+  },
+  statsCard: {
+    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    color: 'white'
+  },
+  progressCard: {
+    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    color: 'white'
+  },
+  unitProgressCard: {
+    minHeight: 300,
+    display: 'flex',
+    flexDirection: 'column'
   }
 });
 
@@ -120,7 +136,8 @@ class DashboardView extends React.Component {
       progress: [],
       loading: true,
       refreshingGrades: false,
-      error: null
+      error: null,
+      overallProgress: 0
     };
   }
 
@@ -188,6 +205,7 @@ class DashboardView extends React.Component {
       if (gradesResponse.ok) {
         const grades = await gradesResponse.json();
         this.setState({ grades });
+        this.calculateOverallProgress(grades);
       }
 
       // Cargar progreso
@@ -199,6 +217,22 @@ class DashboardView extends React.Component {
     } catch (error) {
       console.error('Error loading course data:', error);
     }
+  };
+
+  calculateOverallProgress = (grades) => {
+    if (grades.length === 0) {
+      this.setState({ overallProgress: 0 });
+      return;
+    }
+
+    const totalScore = grades.reduce((sum, grade) => {
+      const scoreGiven = grade.meta?.score_given || 0;
+      const scoreMaximum = grade.meta?.score_maximum || 100;
+      return sum + (scoreMaximum > 0 ? (scoreGiven / scoreMaximum) * 100 : 0);
+    }, 0);
+
+    const averageProgress = Math.round(totalScore / grades.length);
+    this.setState({ overallProgress: averageProgress });
   };
 
   handleCardComplete = async (unitId, cardId) => {
@@ -226,6 +260,7 @@ class DashboardView extends React.Component {
       }
     } catch (error) {
       console.error('Error updating progress:', error);
+      openSnackbar({ message: 'Error actualizando progreso' });
     }
   };
 
@@ -242,16 +277,14 @@ class DashboardView extends React.Component {
         if (gradesResponse.ok) {
           const grades = await gradesResponse.json();
           this.setState({ grades });
+          this.calculateOverallProgress(grades);
         }
-      } else {
-        openSnackbar({ message: 'Error actualizando progreso' });
         openSnackbar({ message: 'Notas actualizadas desde el LMS' });
-        console.error('Failed to refresh grades');
-      }
+      } else {
         openSnackbar({ message: 'Error actualizando notas desde el LMS' });
+      }
     } catch (error) {
       console.error('Error refreshing grades:', error);
-      openSnackbar({ message: 'Error de conexión' });
       openSnackbar({ message: 'Error de conexión con el LMS' });
     } finally {
       this.setState({ refreshingGrades: false });
@@ -287,9 +320,19 @@ class DashboardView extends React.Component {
     }
   };
 
+  viewUnitProgress = (unit) => {
+    // Navegar a página de progreso de la unidad
+    const params = new URLSearchParams({
+      courseId: this.state.selectedCourse.id,
+      unitId: unit.id,
+      unitTitle: unit.title?.rendered || unit.title
+    });
+    window.location.href = `/unit-progress?${params.toString()}`;
+  };
+
   render() {
     const { classes } = this.props;
-    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error } = this.state;
+    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, overallProgress } = this.state;
 
     if (loading) {
       return (
@@ -319,19 +362,88 @@ class DashboardView extends React.Component {
         {/* Header de Bienvenida */}
         <Card className={classes.welcomeCard} elevation={4}>
           <CardContent>
-            <Box display="flex" alignItems="center" style={{ gap: 16 }}>
-              <School fontSize="large" />
-              <Box>
-                <Typography variant="h4" component="h1">
-                  ¡Bienvenido, {user?.name || 'Estudiante'}!
-                </Typography>
-                <Typography variant="subtitle1" style={{ opacity: 0.9 }}>
-                  {selectedCourse ? selectedCourse.title : 'Plataforma de Aprendizaje ICNPAIM'}
-                </Typography>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box display="flex" alignItems="center" style={{ gap: 16 }}>
+                <School fontSize="large" />
+                <Box>
+                  <Typography variant="h4" component="h1">
+                    ¡Bienvenido, {user?.name || 'Estudiante'}!
+                  </Typography>
+                  <Typography variant="subtitle1" style={{ opacity: 0.9 }}>
+                    {selectedCourse ? selectedCourse.title : 'Plataforma de Aprendizaje ICNPAIM'}
+                  </Typography>
+                </Box>
               </Box>
+              {selectedCourse && (
+                <Box textAlign="center">
+                  <Typography variant="h3" style={{ fontWeight: 'bold' }}>
+                    {overallProgress}%
+                  </Typography>
+                  <Typography variant="body2" style={{ opacity: 0.9 }}>
+                    Progreso General
+                  </Typography>
+                </Box>
+              )}
             </Box>
           </CardContent>
         </Card>
+
+        {/* Estadísticas del Curso */}
+        {selectedCourse && (
+          <Grid container spacing={3} style={{ marginBottom: 24 }}>
+            <Grid item xs={12} sm={4}>
+              <Card className={classes.statsCard} elevation={4}>
+                <CardContent>
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {units.length}
+                      </Typography>
+                      <Typography variant="body2" style={{ opacity: 0.9 }}>
+                        Unidades Totales
+                      </Typography>
+                    </Box>
+                    <Assignment fontSize="large" />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card className={classes.progressCard} elevation={4}>
+                <CardContent>
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {grades.length}
+                      </Typography>
+                      <Typography variant="body2" style={{ opacity: 0.9 }}>
+                        Evaluaciones
+                      </Typography>
+                    </Box>
+                    <BarChart fontSize="large" />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card elevation={4} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
+                <CardContent>
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {overallProgress}%
+                      </Typography>
+                      <Typography variant="body2" style={{ opacity: 0.9 }}>
+                        Promedio Notas
+                      </Typography>
+                    </Box>
+                    <TrendingUp fontSize="large" />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        )}
 
         {/* Cursos */}
         {courses.length > 0 && (
@@ -372,7 +484,7 @@ class DashboardView extends React.Component {
           </>
         )}
 
-        {/* Unidades y Cards */}
+        {/* Unidades como Cards */}
         {selectedCourse && (
           <>
             <Typography variant="h5" className={classes.sectionTitle}>
@@ -387,87 +499,106 @@ class DashboardView extends React.Component {
                     No hay unidades disponibles para este curso
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Las unidades se crearán automáticamente cuando el administrador configure el contenido
+                    Las unidades se crearán automáticamente cuando el administrador configure el contenido en WordPress
                   </Typography>
                 </CardContent>
               </Card>
             ) : (
-              units.map(unit => {
-                const cards = unit.cards || [];
-                const completedCards = this.getCompletedCards(unit.id);
-                const progress = this.getProgressForUnit(unit.id);
+              <Grid container spacing={3}>
+                {units.map(unit => {
+                  const cards = unit.cards || [];
+                  const completedCards = this.getCompletedCards(unit.id);
+                  const progress = this.getProgressForUnit(unit.id);
+                  const totalCards = cards.length;
+                  const completedCount = completedCards.length;
 
-                return (
-                  <Card key={unit.id} className={classes.unitCard} elevation={3}>
-                    <CardContent>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
-                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                        <Chip 
-                          label={`${progress}% completado`} 
-                          color={progress === 100 ? 'primary' : 'default'}
-                          className={classes.gradeChip}
-                        />
-                      </Box>
-                      
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={progress} 
-                        className={classes.progressBar}
-                        color="primary"
-                      />
+                  return (
+                    <Grid item xs={12} sm={6} md={4} key={unit.id}>
+                      <Card className={classes.unitProgressCard} elevation={3}>
+                        <CardContent style={{ flexGrow: 1 }}>
+                          <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
+                            <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                            <Chip 
+                              label={`${progress}%`} 
+                              color={progress === 100 ? 'primary' : 'default'}
+                              className={classes.gradeChip}
+                            />
+                          </Box>
+                          
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={progress} 
+                            className={classes.progressBar}
+                            color="primary"
+                          />
 
-                      {cards.length > 0 && (
-                        <Box style={{ marginTop: 16 }}>
-                          <Grid container spacing={1}>
-                            {cards.map(card => {
-                              const isCompleted = completedCards.includes(card.id);
-                              return (
-                                <Grid item xs={12} sm={6} md={3} key={card.id}>
-                                  <Card 
-                                    className={`${classes.activityCard} ${isCompleted ? classes.completedCard : ''}`}
-                                    onClick={() => {
-                                      if (card.url) {
-                                        window.open(card.url, '_blank');
-                                        if (!isCompleted) {
-                                          this.handleCardComplete(unit.id, card.id);
-                                        }
-                                      }
-                                    }}
-                                    elevation={isCompleted ? 3 : 1}
-                                  >
-                                    <CardContent style={{ padding: 12 }}>
-                                      <Box display="flex" alignItems="center" justifyContent="space-between" style={{ marginBottom: 8 }}>
-                                        {isCompleted ? (
-                                          <CheckCircle style={{ color: '#4caf50', fontSize: 20 }} />
-                                        ) : (
-                                          <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 20 }} />
-                                        )}
-                                        <OpenInNew style={{ fontSize: 16, color: '#666' }} />
-                                      </Box>
-                                      <Typography variant="body2" style={{ fontWeight: 500, marginBottom: 4 }}>
-                                        {card.title}
-                                      </Typography>
-                                      <Chip 
-                                        label={card.tipoActividad || 'actividad'} 
-                                        size="small"
-                                        style={{ 
-                                          backgroundColor: card.color || this.getActivityTypeColor(card.tipoActividad),
-                                          color: 'white',
-                                          fontSize: 10
-                                        }}
-                                      />
-                                    </CardContent>
-                                  </Card>
-                                </Grid>
-                              );
-                            })}
-                          </Grid>
-                        </Box>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })
+                          <Box style={{ marginTop: 16, marginBottom: 16 }}>
+                            <Typography variant="body2" color="textSecondary">
+                              {completedCount} de {totalCards} actividades completadas
+                            </Typography>
+                          </Box>
+
+                          {/* Preview de las primeras 3 cards */}
+                          {cards.slice(0, 3).map(card => {
+                            const isCompleted = completedCards.includes(card.id);
+                            return (
+                              <Box 
+                                key={card.id}
+                                display="flex" 
+                                alignItems="center" 
+                                style={{ 
+                                  padding: 8, 
+                                  marginBottom: 8, 
+                                  backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
+                                  borderRadius: 8,
+                                  border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
+                                }}
+                              >
+                                {isCompleted ? (
+                                  <CheckCircle style={{ color: '#4caf50', fontSize: 16, marginRight: 8 }} />
+                                ) : (
+                                  <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 16, marginRight: 8 }} />
+                                )}
+                                <Typography variant="body2" style={{ flexGrow: 1, fontSize: 12 }}>
+                                  {card.title}
+                                </Typography>
+                                <Chip 
+                                  label={card.tipoActividad || 'actividad'} 
+                                  size="small"
+                                  style={{ 
+                                    backgroundColor: card.color || this.getActivityTypeColor(card.tipoActividad),
+                                    color: 'white',
+                                    fontSize: 9,
+                                    height: 20
+                                  }}
+                                />
+                              </Box>
+                            );
+                          })}
+
+                          {cards.length > 3 && (
+                            <Typography variant="body2" color="textSecondary" style={{ textAlign: 'center', marginTop: 8 }}>
+                              +{cards.length - 3} actividades más...
+                            </Typography>
+                          )}
+                        </CardContent>
+
+                        <CardActions>
+                          <Button 
+                            size="small" 
+                            color="primary" 
+                            startIcon={<Visibility />}
+                            onClick={() => this.viewUnitProgress(unit)}
+                            fullWidth
+                          >
+                            Ver Progreso
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
             )}
           </>
         )}
@@ -568,8 +699,18 @@ class DashboardView extends React.Component {
                 <Box style={{ marginTop: 16 }}>
                   <Typography variant="body2" color="textSecondary">
                     Usuario: {user.name}<br />
-                    {user.context?.title && `Curso: ${user.context.title}`}
+                    {user.context?.title && `Curso: ${user.context.title}`}<br />
+                    <strong>Nota:</strong> Los CPTs de WordPress deben estar registrados para ver el contenido.
                   </Typography>
+                  <Box style={{ marginTop: 16 }}>
+                    <Button 
+                      variant="outlined" 
+                      color="primary"
+                      onClick={() => window.open('/test-wp', '_blank')}
+                    >
+                      Verificar Conexión WordPress
+                    </Button>
+                  </Box>
                 </Box>
               )}
             </CardContent>
@@ -578,6 +719,21 @@ class DashboardView extends React.Component {
       </div>
     );
   }
+
+  viewUnitProgress = (unit) => {
+    // Por ahora, mostrar alert con información de la unidad
+    // Más tarde se puede crear una página separada
+    const cards = unit.cards || [];
+    const completedCards = this.getCompletedCards(unit.id);
+    const progress = this.getProgressForUnit(unit.id);
+    
+    alert(`Unidad: ${unit.title?.rendered || unit.title}
+Progreso: ${progress}%
+Actividades: ${cards.length}
+Completadas: ${completedCards.length}
+
+Próximamente: página dedicada de progreso por unidad`);
+  };
 }
 
 export default withStyles(styles)(DashboardView);

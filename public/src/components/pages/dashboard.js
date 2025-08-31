@@ -40,6 +40,7 @@ import { fullListItems } from "../page_objects/listItems";
 import { styles } from "../../common/styles/styles";
 import TestPage from './testPage'
 import DashboardView from './dashboardView'
+import UnitProgressView from './unitProgressView'
 
 // Componente wrapper para ocultar el header demo en /dashboard
 const DashboardWrapper = (props) => {
@@ -181,6 +182,7 @@ class Dashboard extends React.Component {
               />
               <Route path="/lti_custom_app" component={CustomLtiApp}/>
               <Route path="/dashboard" component={DashboardWrapper}/>
+              <Route path="/unit-progress" component={UnitProgressView}/>
             </main>
             <SnackBar/>
           </ErrorBoundary>
