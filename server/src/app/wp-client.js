@@ -125,8 +125,25 @@ class WordPressClient {
 
   async findOrCreateCourse({ contextId, title, label }) {
     try {
-      console.log('=== BUSCANDO/CREANDO CURSO ===');
-      console.log('Datos:', { contextId, title, label });
+      // Primero intentar sincronizar via endpoint personalizado
+      try {
+        const syncResponse = await axios.post('https://icnpaim.cl/wp-json/lti/v1/sync/course', {
+          contextId,
+          title,
+          label
+        }, {
+          auth: this.client.defaults.auth,
+          timeout: 5000
+        });
+        
+        console.log('Course sync response:', syncResponse.data);
+        
+        // Obtener el curso actualizado
+        const courseResponse = await this.client.get(`/course/${syncResponse.data.id}`);
+        return courseResponse.data;
+      } catch (syncError) {
+        console.warn('Course sync endpoint failed, falling back to direct API:', syncError.message);
+      }
       
       // Buscar por meta lms_context_id
       const searchResponse = await this.client.get('/course', {
@@ -136,12 +153,9 @@ class WordPressClient {
           per_page: 1
         }
       });
-      
-      console.log('Course search response:', searchResponse.data);
 
       if (searchResponse.data.length > 0) {
         const course = searchResponse.data[0];
-        console.log('Curso encontrado, actualizando:', course.id);
         // Actualizar datos si han cambiado
         await this.client.post(`/course/${course.id}`, {
           title: title,
@@ -151,14 +165,9 @@ class WordPressClient {
             lms_context_title: title
           }
         });
-        
-        // Obtener datos actualizados
-        const updatedResponse = await this.client.get(`/course/${course.id}`);
-        console.log('Curso actualizado:', updatedResponse.data);
-        return updatedResponse.data;
+        return course;
       }
 
-      console.log('Curso no encontrado, creando nuevo...');
       // Crear nuevo curso
       const createResponse = await this.client.post('/course', {
         title: title,
@@ -167,20 +176,13 @@ class WordPressClient {
           lms_context_id: contextId,
           lms_context_label: label,
           lms_context_title: title,
-          student_ids: JSON.stringify([])
+          student_ids: []
         }
       });
 
-      console.log('Nuevo curso creado:', createResponse.data);
-      
-      // Crear unidades de ejemplo para el nuevo curso
-      await this.createSampleUnits(createResponse.data.id);
-      
       return createResponse.data;
     } catch (error) {
-      console.error('=== ERROR CREANDO CURSO ===');
-      console.error('Error:', error.message);
-      console.error('Response data:', error.response?.data);
+      console.error('Error in findOrCreateCourse:', error.message);
       throw error;
     }
   }
@@ -403,6 +405,89 @@ class WordPressClient {
     } catch (error) {
       console.error('Error in getProgress:', error.message);
       return [];
+    }
+  }
+
+  async createSampleUnits(courseId) {
+    try {
+      console.log('=== CREANDO UNIDADES DE EJEMPLO ===');
+      console.log('Course ID:', courseId);
+      
+      const sampleUnits = [
+        {
+          title: 'Unidad 1: Introducción',
+          cards: [
+            {
+              id: 'card-1-1',
+              title: 'Video: Bienvenida al curso',
+              url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+              tipoActividad: 'video',
+              color: '#e53e3e',
+              peso: 1,
+              estado: 'pendiente'
+            },
+            {
+              id: 'card-1-2',
+              title: 'Lectura: Conceptos básicos',
+              url: 'https://example.com/lectura1',
+              tipoActividad: 'lectura',
+              color: '#3182ce',
+              peso: 2,
+              estado: 'pendiente'
+            },
+            {
+              id: 'card-1-3',
+              title: 'Quiz: Evaluación inicial',
+              url: 'https://forms.gle/example1',
+              tipoActividad: 'quiz',
+              color: '#d69e2e',
+              peso: 3,
+              estado: 'pendiente'
+            }
+          ]
+        },
+        {
+          title: 'Unidad 2: Desarrollo',
+          cards: [
+            {
+              id: 'card-2-1',
+              title: 'Video: Conceptos avanzados',
+              url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+              tipoActividad: 'video',
+              color: '#e53e3e',
+              peso: 1,
+              estado: 'pendiente'
+            },
+            {
+              id: 'card-2-2',
+              title: 'Recurso: Documentación',
+              url: 'https://example.com/docs',
+              tipoActividad: 'recurso',
+              color: '#38a169',
+              peso: 2,
+              estado: 'pendiente'
+            }
+          ]
+        }
+      ];
+      
+      for (const unitData of sampleUnits) {
+        const unitResponse = await this.client.post('/unit', {
+          title: unitData.title,
+          status: 'publish',
+          meta: {
+            course_id: courseId,
+            unit_cards: JSON.stringify(unitData.cards),
+            unit_settings: JSON.stringify({})
+          }
+        });
+        
+        console.log('Unidad creada:', unitResponse.data);
+      }
+      
+      console.log('=== UNIDADES CREADAS EXITOSAMENTE ===');
+    } catch (error) {
+      console.error('Error creando unidades:', error.message);
     }
   }
 }

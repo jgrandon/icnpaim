@@ -853,75 +853,12 @@ add_filter('rest_request_after_callbacks', 'lti_log_all_rest_requests', 10, 3);
 
 // Crear datos de ejemplo al activar el tema (solo una vez)
 function lti_create_sample_data() {
-    if (get_option('lti_sample_data_created')) {
-        return;
-    }
-    
-    // Crear curso de ejemplo con el context_id real
-    $course_id = wp_insert_post(array(
-        'post_title' => 'Biología Molecular 101',
-        'post_type' => 'course',
-        'post_status' => 'publish'
-    ));
-    
-    if ($course_id) {
-        update_post_meta($course_id, 'lms_context_id', '928daab4dcd0484688289d341c718bb5');
-        update_post_meta($course_id, 'lms_context_label', 'BIO101');
-        update_post_meta($course_id, 'lms_context_title', 'Biología Molecular 101');
-        update_post_meta($course_id, 'student_ids', json_encode(array()));
-        
-        // Crear unidades de ejemplo
-        lti_create_sample_units($course_id);
-        
-        lti_log("Sample Data Created", array('course_id' => $course_id));
-    }
-    
-    update_option('lti_sample_data_created', true);
+    // Los datos se crean automáticamente cuando llega el LTI launch
+    // No crear datos de ejemplo estáticos
+    lti_log("Theme activated - waiting for LTI launch to create real data");
 }
 add_action('after_switch_theme', 'lti_create_sample_data');
 
-// Crear estudiante de ejemplo con el sub real
-function lti_create_sample_student() {
-    if (get_option('lti_sample_student_created')) {
-        return;
-    }
-    
-    $student_id = wp_insert_post(array(
-        'post_title' => 'Martín Castillo',
-        'post_type' => 'student',
-        'post_status' => 'publish'
-    ));
-    
-    if ($student_id) {
-        update_post_meta($student_id, 'lms_sub', '6e727098c2564c2291f9a578bc41047d');
-        update_post_meta($student_id, 'email', 'martin@example.com');
-        update_post_meta($student_id, 'full_name', 'Martín Castillo');
-        
-        // Buscar el curso de ejemplo y vincularlo
-        $courses = get_posts(array(
-            'post_type' => 'course',
-            'meta_key' => 'lms_context_id',
-            'meta_value' => '928daab4dcd0484688289d341c718bb5',
-            'posts_per_page' => 1
-        ));
-        
-        if (!empty($courses)) {
-            $course_id = $courses[0]->ID;
-            update_post_meta($student_id, 'course_ids', json_encode(array($course_id)));
-            
-            // Actualizar el curso para incluir este estudiante
-            $course_student_ids = get_post_meta($course_id, 'student_ids', true);
-            $course_student_ids = $course_student_ids ? json_decode($course_student_ids, true) : array();
-            $course_student_ids[] = $student_id;
-            update_post_meta($course_id, 'student_ids', json_encode($course_student_ids));
-        }
-        
-        lti_log("Sample Student Created", array('student_id' => $student_id, 'sub' => '6e727098c2564c2291f9a578bc41047d'));
-    }
-    
-    update_option('lti_sample_student_created', true);
-}
-add_action('after_switch_theme', 'lti_create_sample_student');
 
 // Enqueue scripts and styles
 add_action('wp_enqueue_scripts', 'paim_enqueue_scripts');
