@@ -309,7 +309,7 @@ class DashboardView extends React.Component {
                 <Typography variant="body2">
                   <strong>Usuario LTI:</strong> {user?.sub || 'No disponible'}<br />
                   <strong>Context:</strong> {user?.context?.id || 'No disponible'}<br />
-                  <strong>Endpoint WP:</strong> {process.env.WP_API_BASE || 'https://icnpaim.cl/wp-json/wp/v2'}
+                  <strong>Endpoint WP:</strong> https://icnpaim.cl/wp-json/wp/v2
                 </Typography>
               </Box>
             </CardContent>

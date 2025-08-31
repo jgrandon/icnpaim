@@ -10,8 +10,11 @@ const WP_AUTH = {
 class WordPressClient {
   constructor() {
     this.client = axios.create({
-      baseURL: WP_API_BASE,
-      auth: WP_AUTH,
+      baseURL: 'https://icnpaim.cl/wp-json/wp/v2',
+      auth: {
+        username: 'admin',
+        password: 'admin'
+      },
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'

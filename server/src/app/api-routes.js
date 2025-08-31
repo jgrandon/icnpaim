@@ -9,7 +9,7 @@ const router = express.Router();
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
   try {
-    const sessionId = req.session?.ltiState || req.cookies?.ltiState;
+    const sessionId = req.cookies?.ltiState;
     if (!sessionId) {
       return res.status(401).json({ error: 'No LTI session found' });
     }
