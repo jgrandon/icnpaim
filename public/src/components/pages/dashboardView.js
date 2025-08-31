@@ -16,7 +16,7 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  Alert
+  Snackbar
 } from '@material-ui/core';
 import { 
   School, 
@@ -28,6 +28,7 @@ import {
   OpenInNew
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
+import { openSnackbar } from '../page_objects/snackbar';
 
 const styles = theme => ({
   root: {
@@ -92,9 +93,6 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: 400
-  },
-  errorCard: {
-    marginBottom: theme.spacing(2)
   },
   emptyState: {
     textAlign: 'center',
@@ -224,6 +222,7 @@ class DashboardView extends React.Component {
           const progress = await progressResponse.json();
           this.setState({ progress });
         }
+        openSnackbar({ message: 'Progreso actualizado correctamente' });
       }
     } catch (error) {
       console.error('Error updating progress:', error);
@@ -245,10 +244,15 @@ class DashboardView extends React.Component {
           this.setState({ grades });
         }
       } else {
+        openSnackbar({ message: 'Error actualizando progreso' });
+        openSnackbar({ message: 'Notas actualizadas desde el LMS' });
         console.error('Failed to refresh grades');
       }
+        openSnackbar({ message: 'Error actualizando notas desde el LMS' });
     } catch (error) {
       console.error('Error refreshing grades:', error);
+      openSnackbar({ message: 'Error de conexión' });
+      openSnackbar({ message: 'Error de conexión con el LMS' });
     } finally {
       this.setState({ refreshingGrades: false });
     }
@@ -301,9 +305,11 @@ class DashboardView extends React.Component {
     if (error) {
       return (
         <div className={classes.root}>
-          <Alert severity="error" className={classes.errorCard}>
-            {error}
-          </Alert>
+          <Card style={{ marginBottom: 16, backgroundColor: '#ffebee' }}>
+            <CardContent>
+              <Typography color="error">{error}</Typography>
+            </CardContent>
+          </Card>
         </div>
       );
     }
