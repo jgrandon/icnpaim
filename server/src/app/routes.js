@@ -619,9 +619,14 @@ module.exports = function (app) {
   // Simple test endpoint para verificar conexión con WordPress
   app.get('/test-wp', async (req, res) => {
     console.log('-------------------\ntest-wp');
+    console.log('Environment check:');
+    console.log('WP_USER:', process.env.WORDPRESS_API_USER);
+    console.log('WP_PASS configured:', !!process.env.WORDPRESS_API_PASSWORD);
+    console.log('WP_API_BASE:', process.env.WP_API_BASE);
+    
     try {
       // Test completo de conectividad y permisos
-      console.log('Testing WordPress connection with credentials:', process.env.WORDPRESS_API_USER);
+      console.log('Testing WordPress connection...');
       
       // Test 1: Conectividad básica
       const basicResponse = await wpClient.client.get('/');
@@ -688,9 +693,43 @@ module.exports = function (app) {
         suggestions: [
           'Verify WordPress credentials are correct',
           'Check that user has Editor or Administrator role',
-          'Ensure Application Passwords are enabled',
+          'Create an Application Password (not regular password)',
           'Verify the PHP functions are loaded in WordPress'
         ]
+      });
+    }
+  });
+
+  app.get('/test-wp-auth', async (req, res) => {
+    console.log('-------------------\ntest-wp-auth');
+    try {
+      console.log('Testing with credentials:');
+      console.log('User:', process.env.WORDPRESS_API_USER);
+      console.log('Password configured:', !!process.env.WORDPRESS_API_PASSWORD);
+      
+      const auth = Buffer.from(`${process.env.WORDPRESS_API_USER}:${process.env.WORDPRESS_API_PASSWORD}`).toString('base64');
+      console.log('Auth header created, length:', auth.length);
+      
+      const response = await axios.get('https://icnpaim.cl/wp-json/wp/v2/users/me', {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      res.json({
+        success: true,
+        user: response.data.name,
+        roles: response.data.roles,
+        id: response.data.id
+      });
+    } catch (error) {
+      console.error('Auth test failed:', error.response?.data);
+      res.status(500).json({
+        error: error.message,
+        details: error.response?.data,
+        status: error.response?.status,
+        suggestion: error.response?.status === 401 ? 'Need Application Password, not regular password' : 'Check WordPress configuration'
       });
     }
   });
