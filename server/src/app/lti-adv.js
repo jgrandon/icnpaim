@@ -10,6 +10,13 @@ import config from '../config/config';
 
 export const applicationInfo = (client_id) => {
   const info = getAppById(client_id);
+  
+  if (!info || !info.setup) {
+    console.error('❌ No application found for client_id:', client_id);
+    console.error('Available apps:', getAllApplications());
+    throw new Error(`Application not found for client_id: ${client_id}`);
+  }
+  
   return {
     appName: info.setup.name,
     appId: info.id,

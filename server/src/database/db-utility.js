@@ -15,9 +15,20 @@ export const getAllApplications = () => {
 export const getAppById = (appId) => {
   //console.log("Asking the database for this application: " + appId)
   try {
+    if (!apps.exists('.applications-data')) {
+      console.error('❌ No applications database found');
+      return null;
+    }
+    
     const appIndex = apps.getIndex('.applications-data', appId);
+    if (appIndex === -1) {
+      console.error('❌ Application not found:', appId);
+      return null;
+    }
+    
     return apps.getData(`.applications-data[${appIndex}]`);
   } catch (error) {
+    console.error('❌ Error getting app by ID:', error.message);
     return error;
   }
 };
