@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL =  process.env.WP_API_BASE
+const baseURL =  process.env.WORDPRESS_URL
 const WP_USER =  process.env.WORDPRESS_API_USER
 const WP_PASS =  process.env.WORDPRESS_API_PASSWORD
 
