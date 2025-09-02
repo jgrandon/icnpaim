@@ -9,6 +9,6 @@ export async function getUnits( courseId ) {
 		id: u.id,
 		status: u.status,
 		title: u.title.rendered,
-		content: u.title.rendered
+		content: u.content.rendered
 	}))
 }
