@@ -1,9 +1,14 @@
 import WordPressApi from './wordpress'
 
 export async function getUnits( courseId ) {
-const response = await WordPressApi.client.get(
-	`/unit/?post=${courseId}`
-);
-	const { data : units } = response
-	return units
+	const response = await WordPressApi.client.get(
+		`/unit/?post=${courseId}`
+	)
+
+	return response.data.map( u => ({
+		id: u.id,
+		status: u.status,
+		title: u.title.rendered,
+		content: u.title.rendered
+	}))
 }
