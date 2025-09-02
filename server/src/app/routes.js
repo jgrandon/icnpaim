@@ -21,6 +21,7 @@ import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
+import { getUnits } from './handlers/units'
 
 const contentitem_key = 'contentItemData';
 
@@ -620,7 +621,7 @@ module.exports = function (app) {
   app.get('/test-wp', async (req, res) => {
     console.log('-------------------\ntest-wp');
     console.log('Environment check:');
-    console.log('WP_USER:', process.env.WORDPRESS_API_USER);
+    console.log('WORDPRESS_API_USER:', process.env.WORDPRESS_API_USER);
     console.log('WP_PASS configured:', !!process.env.WORDPRESS_API_PASSWORD);
     console.log('WP_API_BASE:', process.env.WP_API_BASE);
     
@@ -631,7 +632,7 @@ module.exports = function (app) {
       // Test 1: Conectividad básica
       const basicResponse = await wpClient.client.get('/');
       console.log('✓ Basic WordPress REST API accessible');
-      
+      /*
       // Test 2: Autenticación
       const userResponse = await wpClient.client.get('/users/me');
       console.log('✓ Authentication successful, user:', userResponse.data.name);
@@ -642,7 +643,7 @@ module.exports = function (app) {
       
       for (const cpt of cpts) {
         try {
-          const cptResponse = await wpClient.client.get(`/${cpt}?per_page=1`);
+          const cptResponse = await wpClient.client.get(`/debug/${cpt}?per_page=1`);
           cptStatus[cpt] = { status: 'ok', count: cptResponse.data.length };
         } catch (error) {
           cptStatus[cpt] = { 
@@ -664,6 +665,7 @@ module.exports = function (app) {
           message: 'PHP functions not loaded' 
         };
       }
+      */
       
       res.json({
         status: 'success',
@@ -683,6 +685,7 @@ module.exports = function (app) {
           }
         }
       });
+      
     } catch (error) {
       console.error('WordPress connection test failed:', error.message);
       console.error('Error details:', error.response?.data);
@@ -733,6 +736,30 @@ module.exports = function (app) {
       });
     }
   });
+
+  
+  app.get('/units',async (req, res) => {
+    console.log('-------------------\nunits');
+    try {
+      const courseId = /*req.query?.courseId ??*/ 50;
+      const units = await getUnits(courseId)
+
+      return res.json({
+        success: true,
+        units
+      });
+    } catch (error) {
+      console.error('Auth test failed:', error.response?.data);
+      return res.status(500).json({
+        error: error.message,
+        details: error.response?.data,
+        status: error.response?.status,
+        suggestion: error.response?.status === 401 ? 'WordPress API Auth error ' : 'Unknown WordPress API error'
+      });
+    }
+  })
+
+
 
   //=======================================================
   // Catch all
