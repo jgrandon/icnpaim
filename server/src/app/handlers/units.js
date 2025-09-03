@@ -2,7 +2,7 @@ import WordPressApi from './wordpress'
 
 export async function getUnits( courseId ) {
 	const response = await WordPressApi.client.get(
-		`/unit/?post=${courseId}`
+		`/unit/?search=${courseId}`
 	)
 
 	return response.data.map( u => ({
