@@ -194,7 +194,7 @@ class DashboardView extends React.Component {
     
     try {
       // Cargar unidades
-      const unitsResponse = await fetch(`/units/${course.title}`);
+      const unitsResponse = await fetch(`/units?courseName=${course.title}`);
       if (unitsResponse.success) {
         const { units } = await unitsResponse.json();
         this.setState({ units });
