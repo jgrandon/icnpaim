@@ -22,6 +22,7 @@ import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
 import { getUnits } from './handlers/units'
+import { getCourse } from './handlers/course'
 
 const contentitem_key = 'contentItemData';
 
@@ -741,15 +742,22 @@ module.exports = function (app) {
   app.get('/units',async (req, res) => {
     console.log('-------------------\nunits');
     try {
-      const courseId = /*req.query?.courseId ??*/ 50;
-      const units = await getUnits(courseId)
+      const courseName = req.query.courseName
+      // const courseId = /*req.query?.courseId ??*/ 50;
+      // const course = (await getCourse(courseName))[0]
+      const courseKey = courseName.split(' ')
+                                  .splice(0,2)
+                                  .join(' ')
+      // const { id : courseId } = course
+      // const units = await getUnits(courseId)
+      const units = await getUnits(courseKey)
 
       return res.json({
         success: true,
         units
       });
     } catch (error) {
-      console.error('Auth test failed:', error.response?.data);
+      console.error('get Units failed:', error.response?.data);
       return res.status(500).json({
         error: error.message,
         details: error.response?.data,

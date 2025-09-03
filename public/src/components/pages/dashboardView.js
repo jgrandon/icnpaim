@@ -194,12 +194,12 @@ class DashboardView extends React.Component {
     
     try {
       // Cargar unidades
-      const unitsResponse = await fetch(`/api/courses/${course.id}/units`);
-      if (unitsResponse.ok) {
-        const units = await unitsResponse.json();
+      const unitsResponse = await fetch(`/units/${course.title}`);
+      if (unitsResponse.success) {
+        const { units } = await unitsResponse.json();
         this.setState({ units });
       }
-
+/*
       // Cargar notas
       const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
       if (gradesResponse.ok) {
@@ -214,6 +214,7 @@ class DashboardView extends React.Component {
         const progress = await progressResponse.json();
         this.setState({ progress });
       }
+    */
     } catch (error) {
       console.error('Error loading course data:', error);
     }
