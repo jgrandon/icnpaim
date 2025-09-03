@@ -197,8 +197,8 @@ class DashboardView extends React.Component {
       const unitsResponse = await fetch(`/units?courseName=${course.title}`);
       console.log('unitsResponse => ', unitsResponse )
       if (unitsResponse.success) {
-      console.log('unitsResponse success => ', unitsResponse.json() )
-        const { units } = await unitsResponse.json();
+      console.log('unitsResponse success => ', unitsResponse )
+        const { units } = unitsResponse;
         this.setState({ units });
       }
 /*
