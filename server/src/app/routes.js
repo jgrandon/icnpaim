@@ -742,7 +742,7 @@ module.exports = function (app) {
   app.get('/units',async (req, res) => {
     console.log('-------------------\nunits');
     try {
-      const courseName = req.query.courseName
+      const courseName = req.query.code
       // const courseId = /*req.query?.courseId ??*/ 50;
       // const course = (await getCourse(courseName))[0]
       const courseKey = courseName.split(' ')
