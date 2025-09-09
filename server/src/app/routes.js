@@ -752,7 +752,6 @@ module.exports = function (app) {
       */
 
       // const { id : courseId } = course
-      // const units = await getUnits(courseId)
       const units = await getUnitsByCourse(courseId)
 
       return res.json({
