@@ -100,9 +100,12 @@ class UnitProgressView extends React.Component {
   loadUnitData = async (courseId, unitId) => {
     try {
       // Cargar datos de la unidad
-      const unitsResponse = await fetch(`/api/courses/${courseId}/units`);
+      const unitsResponse = await fetch(`/api/courses/${courseId}/units/${unitId}`);
+      console.log('UnitProgressView => loadUnitData => unitsResponse', unitsResponse)
       if (unitsResponse.ok) {
+        console.log('UnitProgressView => loadUnitData => ok')
         const units = await unitsResponse.json();
+        console.log('UnitProgressView => loadUnitData => units', units)
         const unit = units.find(u => u.id == unitId);
         
         if (unit) {

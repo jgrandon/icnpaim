@@ -8,6 +8,16 @@ async function getUnits() {
 	return response.data.map( u => getUnitData(u))
 }
 
+export async function getUnit (unitId, courseId) {
+		const response = await WordPressApi.client.get(
+		`/unit/${unitId}`
+	)
+	const retrievedUnit = getUnitData(response.data[0])
+	return retrievedUnit.courseId === courseId
+		? retrievedUnit
+		: null
+}
+
 /* Translates attributes from WordPress to ICNPAIM context */
 function getUnitData (unit) {
 		const { id, status, title } = unit

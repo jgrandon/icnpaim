@@ -3,6 +3,7 @@ import wpClient from './wp-client';
 import { getAuthFromState } from '../database/db-utility';
 import { getCachedLTIToken } from './lti-token-service';
 import request from 'request';
+import { getUnit } from './handlers/units'
 
 const router = express.Router();
 
@@ -79,10 +80,12 @@ router.get('/courses', requireLTISession, async (req, res) => {
 });
 
 // GET /api/courses/:courseId/units - unidades del curso
-router.get('/courses/:courseId/units', requireLTISession, async (req, res) => {
+router.get('/courses/:courseId/units/:unitId', requireLTISession, async (req, res) => {
   try {
     const courseId = parseInt(req.params.courseId);
-    const units = await wpClient.getUnits(courseId);
+    const unitId = parseInt(req.params.unitId);
+    const units = await getUnit(unitId, courseId);
+    
     res.json(units);
   } catch (error) {
     console.error('Error getting units:', error);
