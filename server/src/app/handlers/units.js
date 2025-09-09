@@ -42,6 +42,6 @@ function getUnitCode ( title ) {
 }
 
 export async function getUnitsByCourse (searchedCourse) {
-	const units = getUnits()
+	const units = await getUnits()
 	return units.filter(u => u.courseId === searchedCourse )
 }
