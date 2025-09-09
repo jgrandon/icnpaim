@@ -36,7 +36,7 @@ function getUnitData (unit) {
 			status,
 			title,
 			content: unit.content.rendered,
-			courseId: unit.meta.course_id,
+			courseId: parseInt(unit.meta.course_id),
 			cards
 		}
 }
