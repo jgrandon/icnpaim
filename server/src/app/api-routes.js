@@ -84,12 +84,12 @@ router.get('/courses/:courseId/units/:unitId', requireLTISession, async (req, re
   try {
     const courseId = parseInt(req.params.courseId);
     const unitId = parseInt(req.params.unitId);
-    const units = await getUnit(unitId, courseId);
-    
-    res.json(units);
+    const unit = await getUnit(unitId, courseId);
+
+    res.json(unit);
   } catch (error) {
-    console.error('Error getting units:', error);
-    res.status(500).json({ error: 'Failed to get units' });
+    console.error('Error getting unit:', error);
+    res.status(500).json({ error: 'Failed to get course unit' });
   }
 });
 

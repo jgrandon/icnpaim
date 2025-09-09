@@ -9,11 +9,15 @@ async function getUnits() {
 }
 
 export async function getUnit (unitId, courseId) {
-		const response = await WordPressApi.client.get(
+	console.log('getUnit => unitId', unitId)
+	console.log('getUnit => courseId', courseId)
+
+	const response = await WordPressApi.client.get(
 		`/unit/${unitId}`
 	)
 	console.log('getUnit => response.data', response.data)
-	const retrievedUnit = getUnitData(response.data[0])
+	const retrievedUnit = getUnitData(response.data)
+	console.log('getUnit => retrievedUnit', retrievedUnit)
 	return retrievedUnit.courseId === courseId
 		? retrievedUnit
 		: null
