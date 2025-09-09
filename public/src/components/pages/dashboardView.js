@@ -198,7 +198,7 @@ class DashboardView extends React.Component {
     console.log('loadBBCourseId')
     const response = await fetch(`jwtPayloadData?nonce=${params.getNonce()}`)
     const jwtResponse = await response.json()
-    const bbCourseId = getBBCourseId(jwtResponse)
+    const bbCourseId = this.getBBCourseId(jwtResponse)
     this.setState({
       bbCourseId
     })
