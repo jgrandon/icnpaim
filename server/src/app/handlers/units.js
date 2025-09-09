@@ -2,43 +2,28 @@ import WordPressApi from './wordpress'
 
 async function getUnits() {
 	const response = await WordPressApi.client.get(
-		//`/unit/?search=${courseId}`
-		`/unit`
+		`/unit?orderby=id&order=asc`
 	)
 
-	return response.data.map( u => ({
-		id: u.id,
-		//courseCode: getCourseCode(u.title),
-		status: u.status,
-		title: u.title,
-		content: u.content.rendered,
-		courseId: u.meta.course_id
-		//unitCode: getUnitCode(u.title)
-	}))
+	return response.data.map( u => getUnitData(u))
 }
 
-function getTitle ( title) {
-	const maskedTitle =
-		title.rendered
-			.replaceAll('| ', '')
-			.split(' ')
-			.splice(3)
-			.join(' ')
-	return maskedTitle
-}
+/* Translates attributes from WordPress to ICNPAIM context */
+function getUnitData (unit) {
+		const { id, status, title } = unit
+		const cards =
+			unit.meta.unit_cards.length>0
+			? JSON.parse(unit.meta.unit_cards)
+			: {}
 
-function getCourseCode ( title ) {
-	return title.rendered.split(' ').splice(0,2).join(' ')
-}
-
-function getUnitCode ( title ) {
-	const code =
-		title.rendered
-			.replaceAll('| ', '')
-			.split(' ')
-			.splice(0,3)
-			.join(' ')
-	return code
+		return {
+			id,
+			status,
+			title,
+			content: unit.content.rendered,
+			courseId: unit.meta.course_id,
+			cards
+		}
 }
 
 export async function getUnitsByCourse (searchedCourse) {
