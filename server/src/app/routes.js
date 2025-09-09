@@ -21,8 +21,7 @@ import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
-import { getUnits } from './handlers/units'
-import { getCourse } from './handlers/course'
+import { getUnitsByCourse } from './handlers/units'
 
 const contentitem_key = 'contentItemData';
 

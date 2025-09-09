@@ -1,6 +1,6 @@
 import WordPressApi from './wordpress'
 
-export async function getUnits() {
+async function getUnits() {
 	const response = await WordPressApi.client.get(
 		//`/unit/?search=${courseId}`
 		`/unit`
