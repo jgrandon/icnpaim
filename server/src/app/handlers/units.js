@@ -12,7 +12,7 @@ export async function getUnit (unitId, courseId) {
 		const response = await WordPressApi.client.get(
 		`/unit/${unitId}`
 	)
-	const retrievedUnit = getUnitData(response.data[0])
+	const retrievedUnit = getUnitData(response.data)
 	return retrievedUnit.courseId === courseId
 		? retrievedUnit
 		: null
