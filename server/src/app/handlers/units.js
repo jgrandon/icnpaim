@@ -12,7 +12,7 @@ async function getUnits() {
 		status: u.status,
 		title: getTitle(u.title),
 		content: u.content.rendered,
-		courseId: meta.course_id
+		courseId: u.meta.course_id
 		//unitCode: getUnitCode(u.title)
 	}))
 }
