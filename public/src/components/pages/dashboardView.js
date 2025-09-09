@@ -31,7 +31,10 @@ import {
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
+import parameters from '../../util/parameters';
 
+const params = parameters.getInstance();
+ 
 const styles = theme => ({
   root: {
     padding: theme.spacing(3),
@@ -137,7 +140,8 @@ class DashboardView extends React.Component {
       loading: true,
       refreshingGrades: false,
       error: null,
-      overallProgress: 0
+      overallProgress: 0,
+      bbCourseId: null
     };
   }
 
@@ -145,6 +149,7 @@ class DashboardView extends React.Component {
     try {
       await this.loadUserData();
       await this.loadCourses();
+      await this.loadBBCourseId();
     } catch (error) {
       console.error('Error loading dashboard:', error);
       this.setState({ 
@@ -189,12 +194,29 @@ class DashboardView extends React.Component {
     }
   };
 
+  loadBBCourseId = async () => {
+    console.log('loadBBCourseId')
+    const response = await fetch(`jwtPayloadData?nonce=${params.getNonce()}`)
+    const jwtResponse = await response.json()
+    const bbCourseId = getBBCourseId(jwtResponse)
+    this.setState({
+      bbCourseId
+    })
+  }
+
+  getBBCourseId(jwtPayload) {
+    return jwtPayload.return_url
+      .split('?')[1]
+      .split('&')[0]
+      .replace('course_id=','')
+  }
+
   selectCourse = async (course) => {
     this.setState({ selectedCourse: course, units: [], grades: [], progress: [] });
     
     try {
       // Cargar unidades
-      const unitsResponse = await fetch(`/units?code=${course.title}`);
+      const unitsResponse = await fetch(`/units?courseId=${course.id}`);
       console.log('unitsResponse => ', unitsResponse )
       const responseBody = await unitsResponse.json();
       console.log('responseBody => ', responseBody )

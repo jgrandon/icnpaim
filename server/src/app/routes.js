@@ -742,15 +742,19 @@ module.exports = function (app) {
   app.get('/units',async (req, res) => {
     console.log('-------------------\nunits');
     try {
-      const courseName = req.query.code
+      const { courseId } = req.query
       // const courseId = /*req.query?.courseId ??*/ 50;
       // const course = (await getCourse(courseName))[0]
+
+      /*
       const courseKey = courseName.split(' ')
                                   .splice(0,2)
                                   .join(' ')
+      */
+
       // const { id : courseId } = course
       // const units = await getUnits(courseId)
-      const units = await getUnits(courseKey)
+      const units = await getUnitsByCourse(courseId)
 
       return res.json({
         success: true,

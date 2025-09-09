@@ -1,17 +1,19 @@
 import WordPressApi from './wordpress'
 
-export async function getUnits( courseId ) {
+export async function getUnits() {
 	const response = await WordPressApi.client.get(
-		`/unit/?search=${courseId}`
+		//`/unit/?search=${courseId}`
+		`/unit`
 	)
 
 	return response.data.map( u => ({
 		id: u.id,
-		courseCode: getCourseCode(u.title),
+		//courseCode: getCourseCode(u.title),
 		status: u.status,
 		title: getTitle(u.title),
 		content: u.content.rendered,
-		unitCode: getUnitCode(u.title)
+		courseId: meta.course_id
+		//unitCode: getUnitCode(u.title)
 	}))
 }
 
@@ -37,4 +39,9 @@ function getUnitCode ( title ) {
 			.splice(0,3)
 			.join(' ')
 	return code
+}
+
+export async function getUnitsByCourse (searchedCourse) {
+	const units = getUnits()
+	return units.filter(u => u.courseId === searchedCourse )
 }
