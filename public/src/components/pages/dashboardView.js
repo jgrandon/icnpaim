@@ -604,7 +604,7 @@ class DashboardView extends React.Component {
                                 )}
                                 <Link
                                   to={card.url}
-                                  onClick={this.notifyContentProgress(unit,card)}
+                                  onClick={(event) => this.notifyContentProgress(unit,card)}
                                   target="_blank"
                                 >
                                   <Typography variant="body2" style={{ flexGrow: 1, fontSize: 12 }}>
