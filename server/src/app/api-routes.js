@@ -255,7 +255,7 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
   }
 });
 
-router.post('/units', requireLTISession, async (req, res) => {
+router.get('/units', requireLTISession, async (req, res) => {
   console.log('-------------------\nunits');
   const studentId = req.ltiSession.wpStudentId;
   try {
