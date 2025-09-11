@@ -583,7 +583,7 @@ class DashboardView extends React.Component {
 
                           {/* Preview de las primeras 3 cards */}
                           {cards.slice(0, 3).map(card => {
-                            const isCompleted = completedCards.includes(card.id);
+                            const isCompleted = card.completed ?? completedCards.includes(card.id);
                             return (
                               <Box 
                                 key={card.id}
