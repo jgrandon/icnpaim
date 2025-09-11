@@ -8,8 +8,7 @@ export async function getProgressByUnits ( studentId, courseId ) {
     let progressByUnits = []
     let iUnits = Object.keys(response.data).length
     for (let i = 0; i < iUnits; i++) {
-        const rawProgress = response.data[i].meta
-        const unitId = rawProgress[i].meta.unit_id
+        const { unit_id: unitId } = response.data[i].meta
         const completedCards = safeJsonParse(rawProgress[i].meta.completed_card_ids)
         progressByUnits[unitId] = completedCards
     }
