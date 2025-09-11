@@ -37,7 +37,7 @@ function getUnitData (unit) {
 		}
 }
 
-export async function getCourseUnit (searchedCourse) {
+export async function getCourseUnits (searchedCourse) {
 	const units = await getUnits()
 	return units.filter(
 		u => u.courseId == searchedCourse
