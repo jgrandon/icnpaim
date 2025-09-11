@@ -1,4 +1,5 @@
 import WordPressApi from './wordpress'
+import safeJsonParse from './../lib/safeJsonParse'
 
 async function getUnits() {
 	const response = await WordPressApi.client.get(
@@ -26,18 +27,13 @@ export async function getUnit (unitId, courseId) {
 /* Translates attributes from WordPress to ICNPAIM context */
 function getUnitData (unit) {
 		const { id, status, title } = unit
-		const cards =
-			unit.meta.unit_cards.length>0
-			? JSON.parse(unit.meta.unit_cards)
-			: {}
-
 		return {
 			id,
 			status,
 			title,
 			content: unit.content.rendered,
 			courseId: parseInt(unit.meta.course_id),
-			cards
+			cards: safeJsonParse(unit.meta.unit_cards)
 		}
 }
 
