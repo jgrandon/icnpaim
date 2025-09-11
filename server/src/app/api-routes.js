@@ -285,7 +285,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         cards: u.cards.map(c => ({
           ...c,
           completed:
-            progress[u.id].find(cardId => cardId == c.ic) > 0
+            progress[u.id].find(cardId => cardId == c.id) > 0
         }))
       }))
       console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
