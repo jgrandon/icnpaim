@@ -239,7 +239,7 @@ class WordPressClient {
       const unit = await this.client.get(`/unit/${unitId}`);
       const unitCards = this.parseJsonMeta(unit.data.meta?.unit_cards) || [];
       const totalCards = unitCards.length;
-      
+      console.log('upsertProgress post => ', post)
       if (!post) {
         const meta = {
           student_id: studentId,
@@ -248,7 +248,13 @@ class WordPressClient {
           completed_card_ids: JSON.stringify([completedCardId]),
           percent: totalCards ? Math.round((1 / totalCards) * 100) : 0
         };
-        return await this.create('progress', { title: slugValue, slug: slugValue, status: 'publish', meta });
+        console.log('upsertProgress create meta => ', meta)
+        return await this.create('progress', {
+          title: slugValue,
+          slug: slugValue,
+          status: 'publish',
+          meta
+        });
       }
       
       const meta = post.meta || {};
@@ -257,6 +263,8 @@ class WordPressClient {
         completedCardId
       ]);
       const percent = totalCards ? Math.round((completedCardIds.size / totalCards) * 100) : 0;
+        console.log('upsertProgress update meta => ', meta)
+        console.log('upsertProgress update completedCardIds => ', completedCardIds)
 
       return await this.update('progress', post.id, {
         meta: { ...meta, completed_card_ids: JSON.stringify([...completedCardIds]), percent }
