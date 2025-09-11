@@ -19,7 +19,7 @@ export async function getUnit (unitId, courseId) {
 	console.log('getUnit => response.data', response.data)
 	const retrievedUnit = getUnitData(response.data)
 	console.log('getUnit => retrievedUnit', retrievedUnit)
-	return retrievedUnit.courseId === courseId
+	return retrievedUnit.courseId == courseId
 		? retrievedUnit
 		: null
 }
@@ -32,12 +32,14 @@ function getUnitData (unit) {
 			status,
 			title,
 			content: unit.content.rendered,
-			courseId: parseInt(unit.meta.course_id),
+			courseId: unit.meta.course_id,
 			cards: safeJsonParse(unit.meta.unit_cards)
 		}
 }
 
 export async function getUnitsByCourse (searchedCourse) {
 	const units = await getUnits()
-	return units.filter(u => u.courseId === searchedCourse )
+	return units.filter(
+		u => u.courseId == searchedCourse
+	)
 }
