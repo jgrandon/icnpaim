@@ -218,7 +218,7 @@ class DashboardView extends React.Component {
     
     try {
       // Cargar unidades
-      const unitsResponse = await fetch(`/units?courseId=${course.id}`);
+      const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
       console.log('unitsResponse => ', unitsResponse )
       const responseBody = await unitsResponse.json();
       console.log('responseBody => ', responseBody )

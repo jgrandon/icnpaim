@@ -33,11 +33,11 @@ function getUnitData (unit) {
 			title,
 			content: unit.content.rendered,
 			courseId: unit.meta.course_id,
-			cards: safeJsonParse(unit.meta.unit_cards)
+			cards: safeJsonParse(unit.meta.unit_cards) ?? []
 		}
 }
 
-export async function getUnitsByCourse (searchedCourse) {
+export async function getCourseUnit (searchedCourse) {
 	const units = await getUnits()
 	return units.filter(
 		u => u.courseId == searchedCourse

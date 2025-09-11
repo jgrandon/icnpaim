@@ -4,6 +4,8 @@ import { getAuthFromState } from '../database/db-utility';
 import { getCachedLTIToken } from './lti-token-service';
 import request from 'request';
 import { getUnit } from './handlers/units'
+import { getCourseUnits } from './handlers/units'
+import { getProgressByUnits } from './handlers/progress'
 
 const router = express.Router();
 
@@ -252,5 +254,46 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
     res.status(500).json({ error: 'Failed to refresh grades from LMS' });
   }
 });
+
+router.post('/units', requireLTISession, async (req, res) => {
+  console.log('-------------------\nunits');
+  const studentId = req.ltiSession.wpStudentId;
+  try {
+    const { courseId } = req.query
+    // const courseId = /*req.query?.courseId ??*/ 50;
+    // const course = (await getCourse(courseName))[0]
+
+    /*
+    const courseKey = courseName.split(' ')
+                                .splice(0,2)
+                                .join(' ')
+    */
+
+      // const { id : courseId } = course
+      const units = await getCourseUnits(courseId)
+      const progress = await getProgressByUnits(studentId, courseId)
+      const studentUnits = units.map(u => ({
+        ...u,
+        cards: u.cards.map(c => ({
+          ...c,
+          completed:
+            progress[u.id].find(cardId => cardId == c.ic) > 0
+        }))
+      }))
+
+      return res.json({
+        success: true,
+        units: studentUnits
+      });
+    } catch (error) {
+      console.error('get Units failed:', error.response?.data);
+      return res.status(500).json({
+        error: error.message,
+        details: error.response?.data,
+        status: error.response?.status,
+        suggestion: error.response?.status === 401 ? 'WordPress API Auth error ' : 'Unknown WordPress API error'
+      });
+    }
+  })
 
 export default router;

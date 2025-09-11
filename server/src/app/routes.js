@@ -21,7 +21,6 @@ import { deepLinkContent } from './deep-linking';
 import { URL } from 'url';
 import apiRoutes from './api-routes';
 import wpClient from './wp-client';
-import { getUnitsByCourse } from './handlers/units'
 
 const contentitem_key = 'contentItemData';
 
@@ -736,40 +735,6 @@ module.exports = function (app) {
       });
     }
   });
-
-  
-  app.get('/units',async (req, res) => {
-    console.log('-------------------\nunits');
-    try {
-      const { courseId } = req.query
-      // const courseId = /*req.query?.courseId ??*/ 50;
-      // const course = (await getCourse(courseName))[0]
-
-      /*
-      const courseKey = courseName.split(' ')
-                                  .splice(0,2)
-                                  .join(' ')
-      */
-
-      // const { id : courseId } = course
-      const units = await getUnitsByCourse(courseId)
-
-      return res.json({
-        success: true,
-        units
-      });
-    } catch (error) {
-      console.error('get Units failed:', error.response?.data);
-      return res.status(500).json({
-        error: error.message,
-        details: error.response?.data,
-        status: error.response?.status,
-        suggestion: error.response?.status === 401 ? 'WordPress API Auth error ' : 'Unknown WordPress API error'
-      });
-    }
-  })
-
-
 
   //=======================================================
   // Catch all
