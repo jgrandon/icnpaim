@@ -257,8 +257,10 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
 
 router.get('/units', requireLTISession, async (req, res) => {
   console.log('-------------------\nunits');
-  const studentId = req.ltiSession.wpStudentId;
   try {
+    const studentId = req.ltiSession.wpStudentId;
+    console.log('>>>>>>>>>>>> /units > studentId =>',studentId)
+
     const { courseId } = req.query
     // const courseId = /*req.query?.courseId ??*/ 50;
     // const course = (await getCourse(courseName))[0]
@@ -270,8 +272,14 @@ router.get('/units', requireLTISession, async (req, res) => {
     */
 
       // const { id : courseId } = course
+      console.log('>>>>>>>>>>>> /units > courseId =>',courseId)
+
       const units = await getCourseUnits(courseId)
+      console.log('>>>>>>>>>>>> /units > units =>', units)
+
       const progress = await getProgressByUnits(studentId, courseId)
+      console.log('>>>>>>>>>>>> /units > progress =>', progress)
+
       const studentUnits = units.map(u => ({
         ...u,
         cards: u.cards.map(c => ({
@@ -280,6 +288,8 @@ router.get('/units', requireLTISession, async (req, res) => {
             progress[u.id].find(cardId => cardId == c.ic) > 0
         }))
       }))
+      console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
+      
 
       return res.json({
         success: true,
