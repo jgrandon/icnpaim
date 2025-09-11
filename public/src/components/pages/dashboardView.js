@@ -586,9 +586,14 @@ class DashboardView extends React.Component {
                                 ) : (
                                   <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 16, marginRight: 8 }} />
                                 )}
+                                <a
+                                  href={card.url}
+                                  target='_blank'
+                                >
                                 <Typography variant="body2" style={{ flexGrow: 1, fontSize: 12 }}>
                                   {card.title}
                                 </Typography>
+                                </a>
                                 <Chip 
                                   label={card.tipoActividad || 'actividad'} 
                                   size="small"
