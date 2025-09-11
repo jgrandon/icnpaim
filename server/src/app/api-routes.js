@@ -134,7 +134,11 @@ router.post('/progress', requireLTISession, async (req, res) => {
   try {
     const wpStudentId = req.ltiSession.wpStudentId;
     const { unitId, completedCardId, courseId } = req.body;
-
+    console.log('/progress wpStudentId => ',wpStudentId) 
+    console.log('/progress courseId => ', courseId) 
+    console.log('/progress unitId => ', unitId) 
+    console.log('/progress completedCardId => ', completedCardId) 
+    
     if (!wpStudentId) {
       return res.status(404).json({ error: 'Student not found' });
     }

@@ -349,6 +349,13 @@ class DashboardView extends React.Component {
     }
   };
 
+  notifyContentProgress = (unit, content) => {
+    alert('Notificando Progreso unidad:' + unit.id + ' contenido:' + content.id)
+    console.log('notifyContentProgress unit => ', unit)
+    console.log('notifyContentProgress content => ', content)
+    this.handleCardComplete(unit.id, content.id)
+  }
+
   viewUnitProgress = (unit) => {
     // Navegar a página de progreso de la unidad
     const params = new URLSearchParams({
@@ -597,6 +604,7 @@ class DashboardView extends React.Component {
                                 )}
                                 <Link
                                   to={card.url}
+                                  onClick={this.notifyContentProgress(unit,card)}
                                   target="_blank"
                                 >
                                   <Typography variant="body2" style={{ flexGrow: 1, fontSize: 12 }}>
