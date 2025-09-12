@@ -283,6 +283,23 @@ class DashboardView extends React.Component {
       if (response.ok) {
         // Recargar progreso
         console.log('handleCardComplete => response OK')
+        const newUnits = this.state.units.map(u => {
+          if (unitId != u.id) return u
+          const newCards = u.cards.map(c => {
+            if (cardId != c.id) return c
+            return {
+              ...c,
+              completed: true
+            }
+          })
+          return {
+            ...u,
+            cards: newCards
+          }
+        })
+        console.log('handleCardComplete => newUnits => ', newUnits)
+
+        this.setState({ units: newUnits })
         /*
         // const progressResponse = await fetch(`/api/progress?courseId=${this.state.selectedCourse.id}`);
         // const rawProgress = await progressResponse.json();
@@ -299,7 +316,7 @@ class DashboardView extends React.Component {
           }
         });
         */
-        this.selectCourse(this.state.selectedCourse)
+        //this.selectCourse(this.state.selectedCourse)
         //}
         console.log('handleCardComplete => openSnackbar')
 
