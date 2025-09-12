@@ -1,6 +1,8 @@
 import React from 'react';
+import Typography from '@material-ui/core/Typography';
 import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
+import { Link } from 'react-router-dom'
 
 
 const _DEFAULT_COLORS = {
