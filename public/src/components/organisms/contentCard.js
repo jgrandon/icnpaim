@@ -51,7 +51,7 @@ export const ContentCard = (props) => {
 				}} />
 			)}
 			<Link
-				to={card.url}
+				to={{ pathname: card.url }}
 				onClick={onClick}
 				target="_blank"
 			>
