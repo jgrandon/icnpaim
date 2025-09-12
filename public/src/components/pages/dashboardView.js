@@ -606,7 +606,6 @@ class DashboardView extends React.Component {
                               card={card}
                               onClick={() => this.notifyContentProgress()}
                               isCompleted={card.completed ?? completedCards.includes(card.id)}
-                              activityColor={this.getActivityTypeColor(card.tipoActividad)}
                             />
                           ))}
                           {/*
