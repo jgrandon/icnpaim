@@ -288,7 +288,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           return {
             ...c,
             completed:
-              progress[u.id].find(cardId => cardId == c.id).length > 0
+              progress[u.id]?.find(cardId => cardId == c.id)?.length > 0
           }
         })
       }))
