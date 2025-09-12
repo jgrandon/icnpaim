@@ -32,8 +32,6 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
-//import UnitsDashboard from '../organisms/unitsDashboard';
-import { Link } from 'react-router-dom'
 import { ContentCard } from '../organisms/contentCard';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -621,7 +619,7 @@ class DashboardView extends React.Component {
                             <ContentCard
                               key={uuidv4()}
                               card={card}
-                              onClick={() => this.notifyContentProgress()}
+                              onClick={() => this.notifyContentProgress(unit, card)}
                               isCompleted={card.completed ?? completedCards.includes(card.id)}
                             />
                           ))}
