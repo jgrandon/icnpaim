@@ -584,9 +584,10 @@ class DashboardView extends React.Component {
                           {/* Preview de las primeras 3 cards */}
                           {cards.slice(0, 3).map(card => {
                             const isCompleted = card.completed ?? completedCards.includes(card.id);
+                            const key = Math.floor(Math.random()*100000)
                             return (
                               <Box 
-                                key={card.id}
+                                key={key}
                                 display="flex" 
                                 alignItems="center" 
                                 style={{ 
