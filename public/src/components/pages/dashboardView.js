@@ -280,15 +280,25 @@ class DashboardView extends React.Component {
 
       if (response.ok) {
         // Recargar progreso
-        const progressResponse = await fetch(`/api/progress?courseId=${this.state.selectedCourse.id}`);
         console.log('handleCardComplete => response OK')
-        const progress = await progressResponse.json();
+        /*
+        // const progressResponse = await fetch(`/api/progress?courseId=${this.state.selectedCourse.id}`);
+        // const rawProgress = await progressResponse.json();
         console.log('handleCardComplete => progress', progress)
-
-        if (progressResponse.ok) {
+        const oldUnits = this.state.units.filter(u => u.id == unitId)[0]
+        const otherUnits = this.state.units.filter(u => u.id != unitId)
+        const newUnit = cardId
+        const progress = this.state.units.filter
+        //if (progressResponse.ok) {
           console.log('handleCardComplete => set state')
-          this.setState({ progress });
-        }
+        this.setState({ 
+          units: {
+            ...otherUnits
+          }
+        });
+        */
+        this.selectCourse(this.state.selectedCourse)
+        //}
         console.log('handleCardComplete => openSnackbar')
 
         openSnackbar({ message: 'Progreso actualizado correctamente' });
