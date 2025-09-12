@@ -35,6 +35,7 @@ import parameters from '../../util/parameters';
 //import UnitsDashboard from '../organisms/unitsDashboard';
 import { Link } from 'react-router-dom'
 import { ContentCard } from '../organisms/contentCard';
+import { v4 as uuidv4 } from 'uuid';
 
 const params = parameters.getInstance();
  
@@ -601,6 +602,7 @@ class DashboardView extends React.Component {
                           {/* Preview de las primeras 3 cards */}
                           {cards.slice(0, 3).map(card => (
                             <ContentCard
+                              key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress()}
                               isCompleted={card.completed ?? completedCards.includes(card.id)}

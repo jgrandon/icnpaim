@@ -1,6 +1,6 @@
+import React from 'react';
 import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
-import { v4 as uuidv4 } from 'uuid';
 
 export const ContentCard = (props) => {
 	const { 
@@ -11,8 +11,7 @@ export const ContentCard = (props) => {
 		onCardCompleted = () => {}
 	} = props
 	return (
-		<Box 
-			key={uuidv4()}
+		<Box
 			display="flex"
 			alignItems="center" 
 			style={{ 
