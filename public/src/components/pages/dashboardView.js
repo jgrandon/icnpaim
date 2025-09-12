@@ -281,10 +281,16 @@ class DashboardView extends React.Component {
       if (response.ok) {
         // Recargar progreso
         const progressResponse = await fetch(`/api/progress?courseId=${this.state.selectedCourse.id}`);
+        console.log('handleCardComplete => response OK')
+        const progress = await progressResponse.json();
+        console.log('handleCardComplete => progress', progress)
+
         if (progressResponse.ok) {
-          const progress = await progressResponse.json();
+          console.log('handleCardComplete => set state')
           this.setState({ progress });
         }
+        console.log('handleCardComplete => openSnackbar')
+
         openSnackbar({ message: 'Progreso actualizado correctamente' });
       }
     } catch (error) {
@@ -588,7 +594,7 @@ class DashboardView extends React.Component {
                             return (
                               <Box 
                                 key={key}
-                                display="flex" 
+                                display="flex"
                                 alignItems="center" 
                                 style={{ 
                                   padding: 8, 
