@@ -34,6 +34,7 @@ import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
 //import UnitsDashboard from '../organisms/unitsDashboard';
 import { Link } from 'react-router-dom'
+import { ContentCard } from '../organisms/contentCard';
 
 const params = parameters.getInstance();
  
@@ -598,7 +599,16 @@ class DashboardView extends React.Component {
                           </Box>
 
                           {/* Preview de las primeras 3 cards */}
-                          {cards.slice(0, 3).map(card => {
+                          {cards.slice(0, 3).map(card => (
+                            <ContentCard
+                              card={card}
+                              onClick={() => this.notifyContentProgress()}
+                              isCompleted={card.completed ?? completedCards.includes(card.id)}
+                              activityColor={this.getActivityTypeColor(card.tipoActividad)}
+                            />
+                          ))}
+                          {/*
+                          {
                             const isCompleted = card.completed ?? completedCards.includes(card.id);
                             const key = Math.floor(Math.random()*100000)
                             return (
@@ -640,7 +650,9 @@ class DashboardView extends React.Component {
                                 />
                               </Box>
                             );
-                          })}
+                          }
+                          */}
+                          
 
                           {cards.length > 3 && (
                             <Typography variant="body2" color="textSecondary" style={{ textAlign: 'center', marginTop: 8 }}>
