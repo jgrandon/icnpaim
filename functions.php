@@ -478,16 +478,10 @@ function lti_unit_column_metabox_callback($post)
 
     $course_id = get_post_meta($post->ID, 'column_id', true);
 
-    // Obtener todos los cursos
-    $courses = get_posts(array(
-        'post_type' => 'course',
-        'posts_per_page' => -1,
-        'post_status' => 'publish'
-    ));
 
     echo '<div id="unit-column-id-editor">';
     echo '<p><strong>Column_id de evaluacion:</strong></p>';
-    echo '<textarea name="unit_cards" rows="15" style="width:100%; font-family:monospace">' . esc_textarea($course_id) . '</textarea>';
+    echo '<textarea name="column_id" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($course_id) . '</textarea>';
     echo '</div>';
 }
 
@@ -510,7 +504,7 @@ function lti_save_unit_metaboxes($post_id)
     }
     if (isset($_POST['unit_column_nonce']) && wp_verify_nonce($_POST['unit_column_nonce'], 'unit_column_nonce')) {
         if (isset($_POST['column_id'])) {
-            update_post_meta($post_id, 'column_id', intval($_POST['column_id']));
+            update_post_meta($post_id, 'column_id', $_POST['column_id']);
         }
     }
 }
