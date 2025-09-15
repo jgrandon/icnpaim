@@ -227,15 +227,17 @@ class DashboardView extends React.Component {
         console.log('responseBody success => ',responseBody )
         this.setState({ units });
       }
-/*
-      // Cargar notas
-      const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
-      if (gradesResponse.ok) {
-        const grades = await gradesResponse.json();
-        this.setState({ grades });
-        this.calculateOverallProgress(grades);
-      }
 
+      // Cargar notas
+      
+      // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
+      const gradesResponse = await fetch(`/api/evaluationGrade`);
+      console.log('grade =>' , gradesResponse)
+      const grade = await gradesResponse.json();
+      console.log('grade =>' , grade)
+      //this.setState({ grades });
+      //this.calculateOverallProgress(grades);
+/*
       // Cargar progreso
       const progressResponse = await fetch(`/api/progress?courseId=${course.id}`);
       if (progressResponse.ok) {
@@ -383,9 +385,6 @@ class DashboardView extends React.Component {
   };
 
   notifyContentProgress = (unit, content) => {
-    alert('Notificando Progreso unidad:' + unit.id + ' contenido:' + content.id)
-    console.log('notifyContentProgress unit => ', unit)
-    console.log('notifyContentProgress content => ', content)
     this.handleCardComplete(unit.id, content.id)
   }
 

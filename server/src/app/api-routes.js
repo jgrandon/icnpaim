@@ -6,6 +6,9 @@ import request from 'request';
 import { getUnit } from './handlers/units'
 import { getCourseUnits } from './handlers/units'
 import { getProgressByUnits } from './handlers/progress'
+import BlackBoardApiClient from './clients/blackboard';
+import { getColumnByContent } from './handlers/columns'
+import { getUserEvaluationGrade } from './handlers/grades'
 
 const router = express.Router();
 
@@ -139,7 +142,7 @@ router.post('/progress', requireLTISession, async (req, res) => {
     console.log('/progress wpStudentId => ',wpStudentId) 
     console.log('/progress courseId => ', courseId) 
     console.log('/progress unitId => ', unitId) 
-    console.log('/progress completedCardId => ', completedCardId) 
+    console.log('/progress completedCardId => ', completedCardId)
     
     if (!wpStudentId) {
       return res.status(404).json({ error: 'Student not found' });
@@ -160,6 +163,7 @@ router.post('/progress', requireLTISession, async (req, res) => {
 });
 
 // POST /api/grades/refresh - actualizar notas desde LMS
+// ??
 router.post('/grades/refresh', requireLTISession, async (req, res) => {
   try {
     const jwt = req.ltiSession.jwt;
@@ -299,6 +303,36 @@ router.get('/units', requireLTISession, async (req, res) => {
       return res.json({
         success: true,
         units: studentUnits
+      });
+    } catch (error) {
+      console.error('get Units failed:', error.response?.data);
+      return res.status(500).json({
+        error: error.message,
+        details: error.response?.data,
+        status: error.response?.status,
+        suggestion: error.response?.status === 401 ? 'WordPress API Auth error ' : 'Unknown WordPress API error'
+      });
+    }
+  })
+
+  
+router.get('/evaluationGrade', requireLTISession, async (req, res) => {
+  console.log('-------------------\nunits');
+  try {
+    const studentId = req.ltiSession.wpStudentId;
+    console.log('>>>>>>>>>>>> /units > studentId =>',studentId)
+    const jwt = req.ltiSession.jwt;
+
+    const { courseId } = req.query
+    const { contentId } = req.query
+    
+    const column = await getColumnByContent(contentId)
+    const columnId = column.contentHandler?.gradeColumnId
+
+    const grade = await getUserEvaluationGrade(courseId, columnId, studentId)
+      return res.json({
+        success: true,
+        grade
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);

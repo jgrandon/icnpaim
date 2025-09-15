@@ -1,4 +1,4 @@
-import WordPressApi from './wordpress'
+import WordPressApi from '../clients/wordpress'
 import safeJsonParse from './../lib/safeJsonParse'
 
 export async function getProgressByUnits ( studentId, courseId ) {
