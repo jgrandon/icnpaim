@@ -248,6 +248,13 @@ function lti_register_meta_fields()
         'description' => 'JSON de configuración de la unidad'
     ));
 
+    register_post_meta('unit', 'column_id', array(
+        'type' => 'string',
+        'single' => true,
+        'show_in_rest' => true,
+        'description' => 'ID de la columna (evaluacion) en BlackBoard que determina la ruta de aprendizaje'
+    ));
+
     // Meta fields para Progress
     register_post_meta('progress', 'student_id', array(
         'type' => 'integer',
