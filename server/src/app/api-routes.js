@@ -180,6 +180,7 @@ router.post('/grades/refresh', requireLTISession, async (req, res) => {
     const scope = 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly';
     const token = await getCachedLTIToken(req.ltiSession.sessionId, jwt.body.aud, scope);
 
+    console.log('/grades/refresh => token: ', token )
     // Obtener line items
     const lineItemsResponse = await new Promise((resolve, reject) => {
       const options = {
