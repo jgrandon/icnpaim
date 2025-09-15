@@ -377,28 +377,9 @@ function lti_ensure_meta_in_rest($response, $post, $request)
     return $response;
 }
 
-function lti_ensure_unit_meta_in_rest($response, $post, $request)
-{
-
-    $course_id = get_post_meta($post->ID, 'course_id', false);
-    $units_cards = get_post_meta($post->ID, 'units_cards', true);
-    $response->data['extra'] = array();
-    $response->data['extra']['course_id'] = $course_id;
-    $response->data['extra']['units_cards'] = $units_cards;
-    $response->data['course_id'] = $course_id;
-    $response->data['units_cards'] = $units_cards;
-    /*
-	$response->data['test'] = 'test';
-	$response->data['meta']['test'] = 'test';
-	*/
-    return $response;
-}
-
 add_filter('rest_prepare_student', 'lti_ensure_meta_in_rest', 10, 3);
 add_filter('rest_prepare_course', 'lti_ensure_meta_in_rest', 10, 3);
 add_filter('rest_prepare_unit', 'lti_ensure_meta_in_rest', 10, 3);
-// add_filter('rest_prepare_unit', 'lti_ensure_unit_meta_in_rest', 10, 3);
-
 add_filter('rest_prepare_progress', 'lti_ensure_meta_in_rest', 10, 3);
 add_filter('rest_prepare_grade', 'lti_ensure_meta_in_rest', 10, 3);
 
