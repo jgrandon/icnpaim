@@ -403,6 +403,15 @@ function lti_add_unit_metaboxes()
         'side',
         'default'
     );
+
+    add_meta_box(
+        'unit_column_metabox',
+        'Columna de Blackboard',
+        'lti_unit_column_metabox_callback',
+        'unit',
+        'side',
+        'default'
+    );
 }
 add_action('add_meta_boxes', 'lti_add_unit_metaboxes');
 
@@ -463,6 +472,25 @@ function lti_unit_cards_metabox_callback($post)
     echo '</div>';
 }
 
+function lti_unit_column_metabox_callback($post)
+{
+    wp_nonce_field('unit_column_nonce', 'unit_column_nonce');
+
+    $course_id = get_post_meta($post->ID, 'column_id', true);
+
+    // Obtener todos los cursos
+    $courses = get_posts(array(
+        'post_type' => 'course',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+
+    echo '<div id="unit-column-id-editor">';
+    echo '<p><strong>Column_id de evaluacion:</strong></p>';
+    echo '<textarea name="unit_cards" rows="15" style="width:100%; font-family:monospace">' . esc_textarea($course_id) . '</textarea>';
+    echo '</div>';
+}
+
 function lti_save_unit_metaboxes($post_id)
 {
     // Verificar nonces
@@ -480,8 +508,15 @@ function lti_save_unit_metaboxes($post_id)
             }
         }
     }
+    if (isset($_POST['unit_column_nonce']) && wp_verify_nonce($_POST['unit_column_nonce'], 'unit_column_nonce')) {
+        if (isset($_POST['column_id'])) {
+            update_post_meta($post_id, 'column_id', intval($_POST['column_id']));
+        }
+    }
 }
 add_action('save_post', 'lti_save_unit_metaboxes');
+
+
 
 // Endpoints REST personalizados con logging detallado
 function lti_register_debug_endpoints()
