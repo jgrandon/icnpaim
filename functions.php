@@ -222,7 +222,7 @@ function lti_register_meta_fields()
     ));
 
     // Meta fields para Unit
-    register_meta('unit', 'course_id', array(
+    register_post_meta('unit', 'course_id', array(
         'type' => 'integer',
         'single' => true,
         'show_in_rest' => array(
@@ -234,14 +234,14 @@ function lti_register_meta_fields()
         'description' => 'ID del curso'
     ));
 
-    register_meta('unit', 'unit_cards', array(
+    register_post_meta('unit', 'unit_cards', array(
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
         'description' => 'JSON de cards de la unidad'
     ));
 
-    register_meta('unit', 'unit_settings', array(
+    register_post_meta('unit', 'unit_settings', array(
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
