@@ -248,11 +248,11 @@ function lti_register_meta_fields()
         'description' => 'JSON de configuración de la unidad'
     ));
 
-    register_post_meta('unit', 'column_id', array(
+    register_post_meta('unit', 'content_id', array(
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
-        'description' => 'ID de la columna (evaluacion) en BlackBoard que determina la ruta de aprendizaje'
+        'description' => 'ID del Contenido (evaluacion) en BlackBoard que determina la ruta de aprendizaje'
     ));
 
     // Meta fields para Progress
@@ -405,9 +405,9 @@ function lti_add_unit_metaboxes()
     );
 
     add_meta_box(
-        'unit_column_metabox',
-        'Columna de Blackboard',
-        'lti_unit_column_metabox_callback',
+        'unit_content_metabox',
+        'Contenido en Blackboard',
+        'lti_unit_content_metabox_callback',
         'unit',
         'side',
         'default'
@@ -472,16 +472,16 @@ function lti_unit_cards_metabox_callback($post)
     echo '</div>';
 }
 
-function lti_unit_column_metabox_callback($post)
+function lti_unit_content_metabox_callback($post)
 {
-    wp_nonce_field('unit_column_nonce', 'unit_column_nonce');
+    wp_nonce_field('unit_content_nonce', 'unit_content_nonce');
 
-    $course_id = get_post_meta($post->ID, 'column_id', true);
+    $content_id = get_post_meta($post->ID, 'content_id', true);
 
 
-    echo '<div id="unit-column-id-editor">';
-    echo '<p><strong>Column_id de evaluacion:</strong></p>';
-    echo '<textarea name="column_id" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($course_id) . '</textarea>';
+    echo '<div id="unit-content-id-editor">';
+    echo '<p><strong>content_id de evaluacion:</strong></p>';
+    echo '<textarea name="content_id" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($content_id) . '</textarea>';
     echo '</div>';
 }
 
@@ -502,9 +502,9 @@ function lti_save_unit_metaboxes($post_id)
             }
         }
     }
-    if (isset($_POST['unit_column_nonce']) && wp_verify_nonce($_POST['unit_column_nonce'], 'unit_column_nonce')) {
-        if (isset($_POST['column_id'])) {
-            update_post_meta($post_id, 'column_id', $_POST['column_id']);
+    if (isset($_POST['unit_content_nonce']) && wp_verify_nonce($_POST['unit_content_nonce'], 'unit_content_nonce')) {
+        if (isset($_POST['content_id'])) {
+            update_post_meta($post_id, 'content_id', $_POST['content_id']);
         }
     }
 }
