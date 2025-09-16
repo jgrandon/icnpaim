@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
 import { Link } from 'react-router-dom'
-
+import { v4 as uuidv4 } from 'uuid';
 
 const _DEFAULT_COLORS = {
 	video: '#e53e3e',
@@ -37,6 +37,7 @@ export const ContentCard = (props) => {
 			}}
 		>
 			<Box
+				key={uuidv4()}
 				style={{ 
 					backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
 					border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
