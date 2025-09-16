@@ -256,17 +256,23 @@ class DashboardView extends React.Component {
 
 
   updateUnits(rawUnits) {
+    console.log('updateUnits => rawUnits => ', rawUnits)
+    
     const { learningEvaluation } = this.state
+    console.log('updateUnits => learningEvaluation => ', learningEvaluation)
+
     const units = rawUnits.map( u => {
+      console.log('updateUnits => map units => ', u)
       const studentLearningRoutes = u.learningRoutes.filter((u, index) => 
         index < learningEvaluation
       )
+      console.log('updateUnits => studentLearningRoutes => ', studentLearningRoutes)
       return {
       ...u,
       studentLearningEvaluation: learningEvaluation,
       studentLearningRoutes
     }})
-
+    console.log('updateUnits => units => ', units)
     this.setState({ units });
   }
   
@@ -434,6 +440,7 @@ class DashboardView extends React.Component {
 
 
   updateLearningEvaluation(newEvaluation) {
+    console.log('updateLearningEvaluation', newEvaluation)
     this.setState({ learningEvaluation: newEvaluation })
     this.updateUnits(this.state.units)
   }
