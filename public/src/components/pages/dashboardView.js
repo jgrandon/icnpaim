@@ -229,7 +229,7 @@ class DashboardView extends React.Component {
         this.updateUnits(units)
       }
 
-
+/*
       // Cargar notas
       const contentId = units.contentId
       // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
@@ -237,7 +237,7 @@ class DashboardView extends React.Component {
       console.log('grade =>' , gradesResponse)
       const grade = await gradesResponse.json();
       console.log('grade =>' , grade)
-
+*/
 
       //this.setState({ grades });
       //this.calculateOverallProgress(grades);
@@ -622,10 +622,10 @@ class DashboardView extends React.Component {
             ) : (
               <Grid container spacing={3}>
                 <Card className={classes.unitProgressCard} elevation={3}>
-                  <Button 
+                  <Button
                     key={uuidv4()}
-                    size="small" 
-                    color="primary" 
+                    size="small"
+                    color="primary"
                     startIcon={<Visibility />}
                     onClick={() => this.updateLearningEvaluation(1)}
                     fullWidth
