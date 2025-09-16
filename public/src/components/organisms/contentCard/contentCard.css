@@ -1,14 +1,40 @@
-.contentCard_main {
+.main {
     display: flex;
     align-items: center;
 }
 
-.contentCard_indicator {
+.indicator {
     height: -webkit-fill-available;
+    display: flex;
+    align-items: center;
 }
 
-.contentCard_link {
+.link {
     border-radius: 8;
     padding: 8;
     margin-bottom: 8;
+}
+
+.indicatorNode {
+    height: 10px;
+    width: 10px;
+    border: 2px solid white;
+    border-radius: 5px;
+}
+
+.indicatorPipe {
+    width: 5px;
+    height: -webkit-fill-available;
+}
+
+.indicatorPipe:first-child {
+    width: 5px;
+    height: -webkit-fill-available / 2;
+    top: 50%;
+}
+
+.indicatorPipe:last-child {
+    width: 5px;
+    height: -webkit-fill-available / 2;
+    top: -50%;
 }

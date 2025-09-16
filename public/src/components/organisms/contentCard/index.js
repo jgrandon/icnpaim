@@ -4,7 +4,7 @@ import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
 import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
-import './contentCard.css'; // Import the CSS file
+import styles from './contentCard.css'; // Import the CSS file
 
 const _DEFAULT_COLORS = {
 	video: '#e53e3e',
@@ -27,7 +27,7 @@ export const ContentCard = (props) => {
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
 	return (
 		<div
-			className="contentCard_main"
+			className={styles.main}
 			style={{
 				backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
 				border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
@@ -35,14 +35,18 @@ export const ContentCard = (props) => {
 		>
 			<div
 				key={uuidv4()}
-				className='contentCard_indicator'
+				className={styles.indicator}
 				style={{ 
 					backgroundColor: isCompleted ? '#4caf50' : '#aaaaaaff',
 					border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`
 				}}
-			/>
+			>
+				<div className={styles.indicatorNode}/>
+				<div className={styles.indicatorPipe}/>
+
+			</div>
 			<Link
-				className="contentCard_link"
+				className={styles.link}
 				to={{ pathname: card.url }}
 				onClick={onClick}
 				target="_blank"
