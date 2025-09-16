@@ -623,6 +623,7 @@ class DashboardView extends React.Component {
               <Grid container spacing={3}>
                 <Card className={classes.unitProgressCard} elevation={3}>
                   <Button 
+                    key={uuidv4()}
                     size="small" 
                     color="primary" 
                     startIcon={<Visibility />}
@@ -633,6 +634,7 @@ class DashboardView extends React.Component {
                   </Button>
 
                   <Button 
+                    key={uuidv4()}
                     size="small" 
                     color="primary" 
                     startIcon={<Visibility />}
@@ -643,6 +645,7 @@ class DashboardView extends React.Component {
                   </Button>
 
                   <Button 
+                    key={uuidv4()}
                     size="small" 
                     color="primary" 
                     startIcon={<Visibility />}
@@ -692,6 +695,8 @@ class DashboardView extends React.Component {
                             <Box 
                               key={uuidv4()}
                               style={{
+                                marginTop: 16,
+                                marginBottom: 16,
                                 backgroundColor: this.getLearningRouteColor(learningRoute)
                               }}
                             >
