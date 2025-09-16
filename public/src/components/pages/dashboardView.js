@@ -291,7 +291,7 @@ class DashboardView extends React.Component {
       red : 'rgb(250, 112, 154)'
     }
     const id = learningRoute[0]?.learningRoute
-    if (id == '1') return color.green
+    if (id == '1') return colors.green
     else if (id == '2') return colors.blue
     return colors.red
 
