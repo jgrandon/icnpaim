@@ -284,6 +284,19 @@ class DashboardView extends React.Component {
     this.setState({ overallProgress: averageProgress });
   };
 
+  getLearningRouteColor (learningRoute) {
+    const colors = {
+      green : '#43e97b',
+      blue : '#4facfe',
+      red : 'rgb(250, 112, 154)'
+    }
+    const id = learningRoute[0]?.learningRoute
+    if (id == '1') return color.green
+    else if (id == '2') return colors.blue
+    return colors.red
+
+  }
+
   handleCardComplete = async (unitId, cardId) => {
     try {
       const response = await fetch('/api/progress', {
