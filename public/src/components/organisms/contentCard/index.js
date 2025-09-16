@@ -4,6 +4,7 @@ import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
 import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
+import './contentCard.css'; // Import the CSS file
 
 const _DEFAULT_COLORS = {
 	video: '#e53e3e',
@@ -25,42 +26,40 @@ export const ContentCard = (props) => {
 	} = props
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
 	return (
-		<Box
-			display="flex"
-			alignItems="center" 
-			style={{ 
-				padding: 8,
-				marginBottom: 8,
+		<div
+			className="contentCard_main"
+			style={{
 				backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
-				borderRadius: 8,
 				border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
 			}}
 		>
-			<Box
+			<div
 				key={uuidv4()}
+				className='contentCard_indicator'
 				style={{ 
-					backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
-					border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
+					backgroundColor: isCompleted ? '#4caf50' : '#aaaaaaff',
+					border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`
 				}}
 			/>
-			{isCompleted ? (
-				<CheckCircle style={{
-					color: '#4caf50',
-					fontSize: 16,
-					marginRight: 8
-				}} />
-			) : (
-				<PlayArrow style={{
-					color: cardColor,
-					fontSize: 16,
-					marginRight: 8
-				}} />
-			)}
 			<Link
+				className="contentCard_link"
 				to={{ pathname: card.url }}
 				onClick={onClick}
 				target="_blank"
-			>
+				>
+				{isCompleted ? (
+					<CheckCircle style={{
+						color: '#4caf50',
+						fontSize: 16,
+						marginRight: 8
+					}} />
+				) : (
+					<PlayArrow style={{
+						color: cardColor,
+						fontSize: 16,
+						marginRight: 8
+					}} />
+				)}
 				<Typography
 					variant="body2"
 					style={{
@@ -70,17 +69,17 @@ export const ContentCard = (props) => {
 				>
 				{card.title}
 				</Typography>
+				<Chip
+					label={card.tipoActividad || 'actividad'} 
+					size="small"
+					style={{ 
+						backgroundColor: cardColor,
+						color: 'white',
+						fontSize: 9,
+						height: 20
+					}}
+				/>
 			</Link>
-			<Chip
-				label={card.tipoActividad || 'actividad'} 
-				size="small"
-				style={{ 
-					backgroundColor: cardColor,
-					color: 'white',
-					fontSize: 9,
-					height: 20
-				}}
-			/>
-		</Box>
+		</div>
 	)
 }

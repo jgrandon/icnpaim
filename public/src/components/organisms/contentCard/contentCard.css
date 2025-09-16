@@ -1,0 +1,14 @@
+.contentCard_main {
+    display: flex;
+    align-items: center;
+}
+
+.contentCard_indicator {
+    height: -webkit-fill-available;
+}
+
+.contentCard_link {
+    border-radius: 8;
+    padding: 8;
+    margin-bottom: 8;
+}

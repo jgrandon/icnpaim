@@ -32,7 +32,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
-import { ContentCard } from '../organisms/contentCard';
+import { ContentCard } from '../organisms/contentCard/';
 import { v4 as uuidv4 } from 'uuid';
 
 const params = parameters.getInstance();
@@ -332,9 +332,21 @@ class DashboardView extends React.Component {
               completed: true
             }
           })
+
+          const studentLearningRoutes = u.studentLearningRoutes.map(
+            route => route.map(card => {
+              const completed = u.cards.find(c => c.id === card.id)[0]?.completed ?? false
+              return {
+                ...card,
+                completed
+              }
+            })
+          )
+
           return {
             ...u,
-            cards: newCards
+            cards: newCards,
+            studentLearningRoutes
           }
         })
         console.log('handleCardComplete => newUnits => ', newUnits)
@@ -702,8 +714,7 @@ class DashboardView extends React.Component {
                             <Box 
                               key={uuidv4()}
                               style={{
-                                marginTop: 16,
-                                marginBottom: 16,
+                                padding: 10,
                                 backgroundColor: this.getLearningRouteColor(learningRoute)
                               }}
                             >
