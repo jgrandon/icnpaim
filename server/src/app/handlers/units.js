@@ -41,7 +41,7 @@ function getUnitData (unit) {
 		}
 }
 
-function getLearningRoutes(cards) {
+export function getLearningRoutes(cards) {
 	let routes = []
 	const iCards = cards.length
 	for (let i = 0; i < iCards; i++) {

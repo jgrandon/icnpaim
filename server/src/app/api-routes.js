@@ -4,7 +4,7 @@ import { getAuthFromState } from '../database/db-utility';
 import { getCachedLTIToken } from './lti-token-service';
 import request from 'request';
 import { getUnit } from './handlers/units'
-import { getCourseUnits } from './handlers/units'
+import { getCourseUnits, getLearningRoutes } from './handlers/units'
 import { getProgressByUnits } from './handlers/progress'
 import { getColumnByContent } from './handlers/columns'
 import { getUserEvaluationGrade } from './handlers/grades'
@@ -296,12 +296,16 @@ router.get('/units', requireLTISession, async (req, res) => {
           }
         })
       }))
+
+      const bUnits = studentUnits.map(u => ({
+        learningRoutes: getLearningRoutes(u)
+      }))
       console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
       
 
       return res.json({
         success: true,
-        units: studentUnits
+        units: bUnits
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);
