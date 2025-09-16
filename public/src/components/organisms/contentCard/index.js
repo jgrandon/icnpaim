@@ -4,7 +4,7 @@ import { Box, Chip } from '@material-ui/core';
 import { PlayArrow, CheckCircle } from '@material-ui/icons';
 import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
-import styles from './contentCard.css'; // Import the CSS file
+import styles from './contentCard.module.css'; // Import the CSS file
 
 const _DEFAULT_COLORS = {
 	video: '#e53e3e',
