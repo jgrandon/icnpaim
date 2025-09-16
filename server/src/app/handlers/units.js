@@ -28,7 +28,7 @@ export async function getUnit (unitId, courseId) {
 function getUnitData (unit) {
 		const { id, status, title } = unit
 		const allCards = safeJsonParse(unit.meta.unit_cards) ?? []
-
+		console.log('getUnitData => cars number =>', allCards.length)
 		return {
 			id,
 			status,
@@ -45,21 +45,23 @@ function getLearningRoutes(cards) {
 	let routes = []
 	const iCards = cards.length
 	for (let i = 0; i < iCards; i++) {
+		console.log('getLearningRoutes => inside for', i)
 		const currentCard = cards[i]
 		const routeId = getRouteId(currentCard)
 		const oldRoutes = routes[routeId]
 		const newRoutes = [...oldRoutes, currentCard]
 		routes[routeId] = sortCardsByWeight(newRoutes)
 	}
+	return routes
 }
 
 function getRouteId (card) {
 	try {
-		const id = parseInt(card.learningRoute)
-		return id > 0 ? id : 1
+		const id = parseInt(card.learningRoute) - 1
+		return id > 0 ? id : 0
 	} catch (e) {
 		console.warn('Error parsing learningRoute', card, error)
-		return 1
+		return 0
 	} 
 }
 
