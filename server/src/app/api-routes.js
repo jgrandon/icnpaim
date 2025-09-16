@@ -6,7 +6,6 @@ import request from 'request';
 import { getUnit } from './handlers/units'
 import { getCourseUnits } from './handlers/units'
 import { getProgressByUnits } from './handlers/progress'
-import BlackBoardApiClient from './clients/blackboard';
 import { getColumnByContent } from './handlers/columns'
 import { getUserEvaluationGrade } from './handlers/grades'
 
@@ -323,10 +322,9 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     console.log('>>>>>>>>>>>> /units > studentId =>',studentId)
     const jwt = req.ltiSession.jwt;
 
-    const { courseId } = req.query
-    const { contentId } = req.query
+    const { courseId, contentId } = req.query
     
-    const column = await getColumnByContent(contentId)
+    const column = await getColumnByContent(courseId, contentId)
     const columnId = column.contentHandler?.gradeColumnId
 
     const grade = await getUserEvaluationGrade(courseId, columnId, studentId)
