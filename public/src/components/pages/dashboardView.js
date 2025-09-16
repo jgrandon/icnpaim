@@ -136,7 +136,7 @@ class DashboardView extends React.Component {
       user: null,
       courses: [],
       selectedCourse: null,
-      learningEvaluation: 1,
+      learningEvaluation: 3,
       units: [],
       grades: [],
       progress: [],
@@ -229,13 +229,16 @@ class DashboardView extends React.Component {
         this.updateUnits(units)
       }
 
+
       // Cargar notas
-      
+      const contentId = units.contentId
       // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
-      const gradesResponse = await fetch(`/api/evaluationGrade`);
+      const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${course.id}&contenId=${contentId}`);
       console.log('grade =>' , gradesResponse)
       const grade = await gradesResponse.json();
       console.log('grade =>' , grade)
+
+
       //this.setState({ grades });
       //this.calculateOverallProgress(grades);
 /*
@@ -429,6 +432,13 @@ class DashboardView extends React.Component {
     window.location.href = `/unit-progress?${params.toString()}`;
   };
 
+
+  updateLearningEvaluation(newEvaluation) {
+    this.setState({ learningEvaluation: newEvaluation })
+    this.updateUnits(this.state.units)
+  }
+
+  learningEvaluation
   render() {
     const { classes } = this.props;
     const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, overallProgress } = this.state;
@@ -611,6 +621,38 @@ class DashboardView extends React.Component {
               </Card>
             ) : (
               <Grid container spacing={3}>
+                <Card className={classes.unitProgressCard} elevation={3}>
+                  <Button 
+                    size="small" 
+                    color="primary" 
+                    startIcon={<Visibility />}
+                    onClick={() => this.updateLearningEvaluation(1)}
+                    fullWidth
+                  >
+                    Ruta 1
+                  </Button>
+
+                  <Button 
+                    size="small" 
+                    color="primary" 
+                    startIcon={<Visibility />}
+                    onClick={() => this.updateLearningEvaluation(2)}
+                    fullWidth
+                  >
+                    Ruta 2
+                  </Button>
+
+                  <Button 
+                    size="small" 
+                    color="primary" 
+                    startIcon={<Visibility />}
+                    onClick={() => this.updateLearningEvaluation(3)}
+                    fullWidth
+                  >
+                    Ruta 3
+                  </Button>
+                </Card>
+
                 {units.map(unit => {
                   const cards = unit.cards || [];
                   const completedCards = this.getCompletedCards(unit.id);
@@ -647,7 +689,9 @@ class DashboardView extends React.Component {
 
                           {
                             unit.studentLearningRoutes?.map(learningRoute => (
-                            <Box style={{
+                            <Box 
+                              key={uuidv4()}
+                              style={{
                                 backgroundColor: this.getLearningRouteColor(learningRoute)
                               }}
                             >
@@ -725,14 +769,10 @@ class DashboardView extends React.Component {
                           */}
                           
 
-                          {cards.length > 3 && (
-                            <Typography variant="body2" color="textSecondary" style={{ textAlign: 'center', marginTop: 8 }}>
-                              +{cards.length - 3} actividades más...
-                            </Typography>
-                          )}
                         </CardContent>
 
                         <CardActions>
+                          {/*
                           <Button 
                             size="small" 
                             color="primary" 
@@ -742,6 +782,7 @@ class DashboardView extends React.Component {
                           >
                             Ver Progreso
                           </Button>
+                          */}
                         </CardActions>
                       </Card>
                     </Grid>
