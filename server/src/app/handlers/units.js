@@ -27,14 +27,44 @@ export async function getUnit (unitId, courseId) {
 /* Translates attributes from WordPress to ICNPAIM context */
 function getUnitData (unit) {
 		const { id, status, title } = unit
+		const allCards = safeJsonParse(unit.meta.unit_cards) ?? []
+
 		return {
 			id,
 			status,
 			title,
 			content: unit.content.rendered,
 			courseId: unit.meta.course_id,
-			cards: safeJsonParse(unit.meta.unit_cards) ?? []
+			cards: allCards,
+			learningRoutes: getLearningRoutes(allCards),
+			contentId: unit.meta?.content_id ?? 0,
 		}
+}
+
+function getLearningRoutes(cards) {
+	let routes = []
+	const iCards = cards.length
+	for (let i = 0; i < iCards; i++) {
+		const currentCard = cards[i]
+		const routeId = getRouteId(currentCard)
+		const oldRoutes = routes[routeId]
+		const newRoutes = [...oldRoutes, currentCard]
+		routes[routeId] = sortCardsByWeight(newRoutes)
+	}
+}
+
+function getRouteId (card) {
+	try {
+		const id = parseInt(card.learningRoute)
+		return id > 0 ? id : 1
+	} catch (e) {
+		console.warn('Error parsing learningRoute', card, error)
+		return 1
+	} 
+}
+
+function sortCardsByWeight (cards) {
+	return cards.sort((a,b) => a.peso - b.peso)
 }
 
 export async function getCourseUnits (searchedCourse) {

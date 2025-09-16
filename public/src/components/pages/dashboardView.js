@@ -136,6 +136,7 @@ class DashboardView extends React.Component {
       user: null,
       courses: [],
       selectedCourse: null,
+      learningEvaluation: 1,
       units: [],
       grades: [],
       progress: [],
@@ -225,7 +226,7 @@ class DashboardView extends React.Component {
       if (responseBody.success) {
         const { units } = responseBody
         console.log('responseBody success => ',responseBody )
-        this.setState({ units });
+        this.updateUnits(units)
       }
 
       // Cargar notas
@@ -249,6 +250,23 @@ class DashboardView extends React.Component {
       console.error('Error loading course data:', error);
     }
   };
+
+
+  updateUnits(rawUnits) {
+    const { learningEvaluation } = this.state
+    const units = rawUnits.map( u => {
+      const studentLearningRoutes = u.learningRoutes.filter((u, index) => 
+        index < learningEvaluation
+      )
+      return {
+      ...u,
+      studentLearningEvaluation: learningEvaluation,
+      studentLearningRoutes
+    }})
+
+    this.setState({ units });
+  }
+  
 
   calculateOverallProgress = (grades) => {
     if (grades.length === 0) {
@@ -613,15 +631,40 @@ class DashboardView extends React.Component {
                             </Typography>
                           </Box>
 
+
+                          {
+                            unit.studentLearningRoutes?.map(learningRoute => (
+                            <Box style={{
+                                backgroundColor: this.getLearningRouteColor(learningRoute)
+                              }}
+                            >
+                              {
+                                learningRoute.map(card => (
+                                  <ContentCard
+                                    key={uuidv4()}
+                                    card={card}
+                                    onClick={() => this.notifyContentProgress(unit, card)}
+                                    isCompleted={card.completed ?? completedCards.includes(card.id)}
+                                  />
+                                ))
+                              }
+                            </Box>
+                            ))
+                          }
+
                           {/* Preview de las primeras 3 cards */}
-                          {cards.slice(0, 3).map(card => (
+                          
+                          {/*
+                          cards.slice(0, 3).map(card => (
                             <ContentCard
                               key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress(unit, card)}
                               isCompleted={card.completed ?? completedCards.includes(card.id)}
                             />
-                          ))}
+                          ))
+                          */}
+
                           {/*
                           {
                             const isCompleted = card.completed ?? completedCards.includes(card.id);

@@ -21,8 +21,7 @@ export const ContentCard = (props) => {
 	const { 
 		card = {},
 		onClick = () => {},
-		isCompleted = false,
-		onCardCompleted = () => {}
+		isCompleted = false
 	} = props
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
 	return (
@@ -37,6 +36,12 @@ export const ContentCard = (props) => {
 				border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
 			}}
 		>
+			<Box
+				style={{ 
+					backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
+					border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
+				}}
+			/>
 			{isCompleted ? (
 				<CheckCircle style={{
 					color: '#4caf50',
