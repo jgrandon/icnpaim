@@ -46,9 +46,9 @@ function getLearningRoutes(cards) {
 	const iCards = cards.length
 	for (let i = 0; i < iCards; i++) {
 		console.log('getLearningRoutes => inside for', i)
-		const currentCard = cards[i]
+		const currentCard = cards[i] 
 		const routeId = getRouteId(currentCard)
-		const oldRoutes = routes[routeId]
+		const oldRoutes = routes[routeId] ?? []
 		const newRoutes = [...oldRoutes, currentCard]
 		routes[routeId] = sortCardsByWeight(newRoutes)
 	}
