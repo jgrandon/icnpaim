@@ -664,7 +664,7 @@ class DashboardView extends React.Component {
                   const completedCount = completedCards.length;
 
                   return (
-                    <Grid item xs={12} sm={6} md={4} key={unit.id}>
+                    <Grid key={uuidv4()} item xs={12} sm={6} md={4} >
                       <Card className={classes.unitProgressCard} elevation={3}>
                         <CardContent style={{ flexGrow: 1 }}>
                           <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
