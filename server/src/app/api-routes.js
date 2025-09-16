@@ -296,11 +296,13 @@ router.get('/units', requireLTISession, async (req, res) => {
           }
         })
       }))
+      console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
 
       const bUnits = studentUnits.map(u => ({
-        learningRoutes: getLearningRoutes(u)
+        ...u,
+        learningRoutes: getLearningRoutes(u.cards)
       }))
-      console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
+      console.log('>>>>>>>>>>>> /units > bUnits =>', bUnits)
       
 
       return res.json({
