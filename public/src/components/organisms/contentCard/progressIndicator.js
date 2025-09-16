@@ -26,7 +26,6 @@ export const ProgressIndicator = (props) => {
     return (
         <div
             style={{
-                border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`,
                 height: '-webkit-fill-available',
                 display: 'flex',
                 alignItems: 'center',
@@ -48,7 +47,7 @@ export const ProgressIndicator = (props) => {
                     borderRadius: '5px'
                 }}
             />
-            
+
             {/** Pipe */}
             <div 
                 key={uuidv4()}
