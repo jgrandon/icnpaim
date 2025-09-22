@@ -20,7 +20,7 @@ export const ProgressIndicator = (props) => {
                 paddingLeft: 5,
                 gridColumn: 2,
                 display: 'grid',
-                gridTemplateRows: '5fr 1fr 5fr',
+                gridTemplateRows: '3fr 1fr 3fr',
                 gridRowStart: 1,
                 justifyContent: 'center',
                 justifyItems: 'center',
