@@ -9,21 +9,10 @@ export const ProgressIndicator = (props) => {
         isLast = false,
         isPrevActive=false
     } = props
-    const pipeHeights = {
-        full: '-webkit-fill-available',
-        half: '50%', 
-    }
-    const pipeTops = {
-        regular: 0,
-        first: '50%',
-        last: '-50%', 
-    }
-    const pipe = {
-        height: isFirst || isLast ? pipeHeights.half : pipeHeights.full,
-        top: isFirst ? (pipeTops.first) 
-            : (isLast ? pipeTops.last : pipeTops.regular)
-        
-    }
+
+    const pipeColor = isActive ? '#4caf50' : '#aaaaaaff'
+    const prevPipeColor = isPrevActive ? '#4caf50' : '#aaaaaaff'
+
     return (
         <div
             style={{
@@ -40,16 +29,15 @@ export const ProgressIndicator = (props) => {
         >
 
             {/** Pipe */}
-            <div 
+            <div
                 key={uuidv4()}
                 style={{
-                    backgroundColor: isFirst
-                    ? 'white'
-                    : isPrevActive ? '#4caf50' : '#aaaaaaff',
+                    backgroundColor: isFirst ? 'white' : prevPipeColor,
                     width: 5,
-                    height: 50,
+                    height: 50
                 }}
             />
+            
             {/** 
              * border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`,
              * 
@@ -59,14 +47,25 @@ export const ProgressIndicator = (props) => {
             <div
                 key={uuidv4()}
                 style={{
-                    backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
-                    height: 10,
-                    width: 10,
-                    border: '2px solid white',
-                    borderRadius: '5px',
-                    zIndex: 2
+                    backgroundColor: 'white',
+                    height: 15,
+                    width: 15,
+                    border: `2px solid ${pipeColor}`,
+                    borderRadius: '10px',
+                    zIndex: 2,
+                    display: 'grid',
+                    alignContent: 'center',
+                    justifyContent: 'center'
                 }}
-            />
+            >
+                {/** inner circle */}
+                <div style={{
+                    backgroundColor: pipeColor,
+                    width: 9,
+                    height: 9,
+                    borderRadius: 5
+                }}/>
+            </div>
 
             {/** Pipe */}
             <div 
