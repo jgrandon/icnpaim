@@ -681,7 +681,7 @@ class DashboardView extends React.Component {
                                 learningRoute.map((card, index) => (
                                   <ContentCard
                                     isFirst={index==0}
-                                    isLast={index==learningRoute.length}
+                                    isLast={index==(learningRoute.length-1)}
                                     key={uuidv4()}
                                     card={card}
                                     prevCard={learningRoute[index-1]}
