@@ -7,11 +7,11 @@ export const ProgressIndicator = (props) => {
         isActive = {},
         isFirst = false,
         isLast = false,
-        isPrevActive=false
+        isNextActive=false
     } = props
 
     const pipeColor = isActive ? '#4caf50' : '#aaaaaaff'
-    const prevPipeColor = isPrevActive ? '#4caf50' : '#aaaaaaff'
+    const nextPipeColor = isNextActive ? '#4caf50' : '#aaaaaaff'
 
     return (
         <div
@@ -32,7 +32,7 @@ export const ProgressIndicator = (props) => {
             <div
                 key={uuidv4()}
                 style={{
-                    backgroundColor: isFirst ? 'white' : prevPipeColor,
+                    backgroundColor: isFirst ? 'white' : pipeColor,
                     width: 5,
                     height: 50
                 }}
@@ -76,6 +76,15 @@ export const ProgressIndicator = (props) => {
                     : isActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
                     height: 50,
+                }}
+            />
+
+            <div
+                key={uuidv4()}
+                style={{
+                    backgroundColor: isLast ? 'white' : nextPipeColor,
+                    width: 5,
+                    height: 50
                 }}
             />
 

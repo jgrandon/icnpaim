@@ -684,7 +684,7 @@ class DashboardView extends React.Component {
                                     isLast={index==(learningRoute.length-1)}
                                     key={uuidv4()}
                                     card={card}
-                                    prevCard={learningRoute[index-1]}
+                                    nextCard={learningRoute[index + 1]}
                                     index={index}
                                     onClick={() => this.notifyContentProgress(unit, card)}
                                     isCompleted={card.completed}
