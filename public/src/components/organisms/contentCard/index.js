@@ -47,7 +47,7 @@ export const ContentCard = (props) => {
 				to={{ pathname: card.url }}
 				onClick={onClick}
 				target="_blank"
-				styles={{
+				style={{
 					gridColumn: index%2==0 ? 1 : 3,
 					borderRadius: 8,
 					padding: 8,
