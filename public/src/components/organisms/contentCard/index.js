@@ -20,6 +20,7 @@ const getDefaultColor = (type) => {
 export const ContentCard = (props) => {
 	const { 
 		card = {},
+		prevCard = { completed: false },
 		onClick = () => {},
 		isCompleted = false,
         isFirst = false,
@@ -42,6 +43,8 @@ export const ContentCard = (props) => {
 				isActive={isCompleted}
 				isFirst={isFirst}
 				isLast={isLast}
+				index={index}
+				isPrevActive={prevCard?.completed}
 			/>
 			<Link
 				to={{ pathname: card.url }}

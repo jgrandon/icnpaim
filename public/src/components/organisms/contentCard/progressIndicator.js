@@ -7,6 +7,7 @@ export const ProgressIndicator = (props) => {
         isActive = {},
         isFirst = false,
         isLast = false,
+        isPrevActive=false
     } = props
     const pipeHeights = {
         full: '-webkit-fill-available',
@@ -44,7 +45,7 @@ export const ProgressIndicator = (props) => {
                 style={{
                     backgroundColor: isFirst
                     ? 'white'
-                    : isActive ? '#4caf50' : '#aaaaaaff',
+                    : isPrevActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
                     height: 50,
                 }}
