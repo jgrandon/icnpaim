@@ -264,7 +264,8 @@ class DashboardView extends React.Component {
     const units = rawUnits.map( u => {
       console.log('updateUnits => map units => ', u)
       const studentLearningRoutes = u.learningRoutes.filter((u, index) => 
-        index < learningEvaluation
+        // index < learningEvaluation
+        index == learningEvaluation - 1
       )
       console.log('updateUnits => studentLearningRoutes => ', studentLearningRoutes)
       return {
@@ -426,32 +427,10 @@ class DashboardView extends React.Component {
     return unitProgress ? (unitProgress.meta.percent || 0) : 0;
   };
 
-  getCompletedCards = (unitId) => {
-    const unitProgress = this.state.progress.find(p => p.meta && p.meta.unit_id == unitId);
-    if (!unitProgress || !unitProgress.meta.completed_card_ids) return [];
-    
-    try {
-      return typeof unitProgress.meta.completed_card_ids === 'string' 
-        ? JSON.parse(unitProgress.meta.completed_card_ids)
-        : unitProgress.meta.completed_card_ids;
-    } catch (e) {
-      return [];
-    }
-  };
 
   notifyContentProgress = (unit, content) => {
     this.handleCardComplete(unit.id, content.id)
   }
-
-  viewUnitProgress = (unit) => {
-    // Navegar a página de progreso de la unidad
-    const params = new URLSearchParams({
-      courseId: this.state.selectedCourse.id,
-      unitId: unit.id,
-      unitTitle: unit.title?.rendered || unit.title
-    });
-    window.location.href = `/unit-progress?${params.toString()}`;
-  };
 
 
   updateLearningEvaluation(newEvaluation) {
@@ -679,38 +658,10 @@ class DashboardView extends React.Component {
                 </Card>
 
                 {units.map(unit => {
-                  const cards = unit.cards || [];
-                  const completedCards = this.getCompletedCards(unit.id);
-                  const progress = this.getProgressForUnit(unit.id);
-                  const totalCards = cards.length;
-                  const completedCount = completedCards.length;
-
                   return (
                     <Grid key={uuidv4()} item xs={12} sm={6} md={4} >
                       <Card className={classes.unitProgressCard} elevation={3}>
                         <CardContent style={{ flexGrow: 1 }}>
-                          <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
-                            <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                            <Chip 
-                              label={`${progress}%`} 
-                              color={progress === 100 ? 'primary' : 'default'}
-                              className={classes.gradeChip}
-                            />
-                          </Box>
-                          
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={progress} 
-                            className={classes.progressBar}
-                            color="primary"
-                          />
-
-                          <Box style={{ marginTop: 16, marginBottom: 16 }}>
-                            <Typography variant="body2" color="textSecondary">
-                              {completedCount} de {totalCards} actividades completadas
-                            </Typography>
-                          </Box>
-
 
                           {
                             unit.studentLearningRoutes?.map(learningRoute => (
@@ -729,7 +680,7 @@ class DashboardView extends React.Component {
                                     key={uuidv4()}
                                     card={card}
                                     onClick={() => this.notifyContentProgress(unit, card)}
-                                    isCompleted={card.completed ?? completedCards.includes(card.id)}
+                                    isCompleted={card.completed}
                                   />
                                 ))
                               }
@@ -737,80 +688,11 @@ class DashboardView extends React.Component {
                             ))
                           }
 
-                          {/* Preview de las primeras 3 cards */}
-                          
-                          {/*
-                          cards.slice(0, 3).map(card => (
-                            <ContentCard
-                              key={uuidv4()}
-                              card={card}
-                              onClick={() => this.notifyContentProgress(unit, card)}
-                              isCompleted={card.completed ?? completedCards.includes(card.id)}
-                            />
-                          ))
-                          */}
-
-                          {/*
-                          {
-                            const isCompleted = card.completed ?? completedCards.includes(card.id);
-                            const key = Math.floor(Math.random()*100000)
-                            return (
-                              <Box 
-                                key={key}
-                                display="flex"
-                                alignItems="center" 
-                                style={{ 
-                                  padding: 8, 
-                                  marginBottom: 8, 
-                                  backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
-                                  borderRadius: 8,
-                                  border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
-                                }}
-                              >
-                                {isCompleted ? (
-                                  <CheckCircle style={{ color: '#4caf50', fontSize: 16, marginRight: 8 }} />
-                                ) : (
-                                  <PlayArrow style={{ color: this.getActivityTypeColor(card.tipoActividad), fontSize: 16, marginRight: 8 }} />
-                                )}
-                                <Link
-                                  to={card.url}
-                                  onClick={(event) => this.notifyContentProgress(unit,card)}
-                                  target="_blank"
-                                >
-                                  <Typography variant="body2" style={{ flexGrow: 1, fontSize: 12 }}>
-                                    {card.title}
-                                  </Typography>
-                                </Link>
-                                <Chip 
-                                  label={card.tipoActividad || 'actividad'} 
-                                  size="small"
-                                  style={{ 
-                                    backgroundColor: card.color || this.getActivityTypeColor(card.tipoActividad),
-                                    color: 'white',
-                                    fontSize: 9,
-                                    height: 20
-                                  }}
-                                />
-                              </Box>
-                            );
-                          }
-                          */}
-                          
-
                         </CardContent>
 
                         <CardActions>
-                          {/*
-                          <Button 
-                            size="small" 
-                            color="primary" 
-                            startIcon={<Visibility />}
-                            onClick={() => this.viewUnitProgress(unit)}
-                            fullWidth
-                          >
-                            Ver Progreso
-                          </Button>
-                          */}
+
+                          {/* some actions */}
                         </CardActions>
                       </Card>
                     </Grid>
@@ -938,21 +820,6 @@ class DashboardView extends React.Component {
       </div>
     );
   }
-
-  viewUnitProgress = (unit) => {
-    // Por ahora, mostrar alert con información de la unidad
-    // Más tarde se puede crear una página separada
-    const cards = unit.cards || [];
-    const completedCards = this.getCompletedCards(unit.id);
-    const progress = this.getProgressForUnit(unit.id);
-    
-    alert(`Unidad: ${unit.title?.rendered || unit.title}
-Progreso: ${progress}%
-Actividades: ${cards.length}
-Completadas: ${completedCards.length}
-
-Próximamente: página dedicada de progreso por unidad`);
-  };
 }
 
 export default withStyles(styles)(DashboardView);
