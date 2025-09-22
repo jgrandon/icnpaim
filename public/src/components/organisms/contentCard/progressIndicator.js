@@ -10,7 +10,7 @@ export const ProgressIndicator = (props) => {
     } = props
     const pipeHeights = {
         full: '-webkit-fill-available',
-        half: '-webkit-fill-available/2', 
+        half: '50%', 
     }
     const pipeTops = {
         regular: 0,
@@ -27,8 +27,7 @@ export const ProgressIndicator = (props) => {
         <div
             style={{
                 height: '-webkit-fill-available',
-                display: 'flex',
-                alignItems: 'center',
+                paddingLeft: 5
             }}
         >
             {/** 
@@ -44,7 +43,10 @@ export const ProgressIndicator = (props) => {
                     height: 10,
                     width: 10,
                     border: '2px solid white',
-                    borderRadius: '5px'
+                    borderRadius: '5px',
+                    position: 'relative',
+                    top: '50%',
+                    zIndex: 2
                 }}
             />
 
@@ -55,7 +57,10 @@ export const ProgressIndicator = (props) => {
                     backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
                     height: pipe.height,
-                    top: pipe.top
+                    top: pipe.top,
+                    position: 'sticky',
+                    top: '50%',
+                    paddingLeft: 5
                 }}
             />
 
