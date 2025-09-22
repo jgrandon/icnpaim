@@ -49,10 +49,12 @@ export const ContentCard = (props) => {
 				target="_blank"
 				style={{
 					gridColumn: index%2==0 ? 1 : 3,
-					borderRadius: 8,
-					padding: 8,
+					border: `2px solid ${cardColor}`,
+					borderRadius: 5,
+					padding: 5,
 					marginBottom: 8,
-					gridRowStart: 1
+					gridRowStart: 1,
+					display: 'grid'
 				}}
 				>
 				{isCompleted ? (
