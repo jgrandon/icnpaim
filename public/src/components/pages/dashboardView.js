@@ -338,7 +338,7 @@ class DashboardView extends React.Component {
               console.log('studentLearningRoutes map => u.cards ', u.cards)
 
               console.log('studentLearningRoutes map => card ' ,card)
-              const completed = u.cards.find(c => c.id == card.id)[0]?.completed ?? false
+              const completed = u.cards.find(c => c.id == card.id)?.completed ?? false
               return {
                 ...card,
                 completed
