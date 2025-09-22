@@ -422,12 +422,6 @@ class DashboardView extends React.Component {
     return colors[tipo] || '#718096';
   };
 
-  getProgressForUnit = (unitId) => {
-    const unitProgress = this.state.progress.find(p => p.meta && p.meta.unit_id == unitId);
-    return unitProgress ? (unitProgress.meta.percent || 0) : 0;
-  };
-
-
   notifyContentProgress = (unit, content) => {
     this.handleCardComplete(unit.id, content.id)
   }
@@ -660,6 +654,17 @@ class DashboardView extends React.Component {
                 {units.map(unit => {
                   return (
                     <Grid key={uuidv4()} item xs={12} sm={6} md={4} >
+                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
+                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                        {/*
+                          <Chip
+                            label={`${progress}%`}
+                            color={progress === 100 ? 'primary' : 'default'}
+                            className={classes.gradeChip}
+                          />
+                        */}
+                        </Box>
+                          
                       <Card className={classes.unitProgressCard} elevation={3}>
                         <CardContent style={{ flexGrow: 1 }}>
 
