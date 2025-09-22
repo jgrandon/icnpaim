@@ -669,7 +669,7 @@ class DashboardView extends React.Component {
                               key={uuidv4()}
                               style={{
                                 padding: 10,
-                                backgroundColor: this.getLearningRouteColor(learningRoute)
+                                //backgroundColor: this.getLearningRouteColor(learningRoute)
                               }}
                             >
                               {

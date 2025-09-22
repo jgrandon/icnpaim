@@ -24,17 +24,20 @@ export const ContentCard = (props) => {
 		isCompleted = false,
         isFirst = false,
         isLast = false,
+		index = 0
 	} = props
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
 	return (
 		<div
 			style={{
-				display: 'flex',
-			    alignItems: 'center',
-				backgroundColor: isCompleted ? '#e8f5e8' : '#f5f5f5',
-				border: `2px solid ${isCompleted ? '#4caf50' : 'transparent'}`
+				display: 'grid',
+				gridTemplateColumns: '6fr 1fr 6fr',
+				gridTemplateRows: '1fr'
 			}}
 		>
+			<div style={{
+				gridColumn: index%2==0 ? 3 : 1 
+			}}/>
 			<ProgressIndicator 
 				isActive={isCompleted}
 				isFirst={isFirst}
@@ -45,9 +48,11 @@ export const ContentCard = (props) => {
 				onClick={onClick}
 				target="_blank"
 				styles={{
+					gridColumn: index%2==0 ? 1 : 3,
 					borderRadius: 8,
 					padding: 8,
-					marginBottom: 8
+					marginBottom: 8,
+					gridRowStart: 1
 				}}
 				>
 				{isCompleted ? (

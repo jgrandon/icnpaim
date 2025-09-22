@@ -27,9 +27,23 @@ export const ProgressIndicator = (props) => {
         <div
             style={{
                 height: '-webkit-fill-available',
-                paddingLeft: 5
+                paddingLeft: 5,
+                gridColumn: 2,
+                display: 'grid',
+                gridTemplateRows: '5fr 1fr 5fr',
+                gridRowStart: 1
             }}
         >
+
+            {/** Pipe */}
+            <div 
+                key={uuidv4()}
+                style={{
+                    backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
+                    width: 5,
+                    height: 20,
+                }}
+            />
             {/** 
              * border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`,
              * 
@@ -44,8 +58,6 @@ export const ProgressIndicator = (props) => {
                     width: 10,
                     border: '2px solid white',
                     borderRadius: '5px',
-                    position: 'relative',
-                    top: '50%',
                     zIndex: 2
                 }}
             />
@@ -56,11 +68,7 @@ export const ProgressIndicator = (props) => {
                 style={{
                     backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
-                    height: pipe.height,
-                    top: pipe.top,
-                    position: 'sticky',
-                    top: '50%',
-                    paddingLeft: 5
+                    height: 20,
                 }}
             />
 
