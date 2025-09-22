@@ -9,3 +9,6 @@ const _DEFAULT_COLORS = {
 export const getDefaultColor = (type) => {
 	return _DEFAULT_COLORS[type] || '#718096'
 }
+
+export const _OK_GREEN = '#4caf50'
+export const _INACTIVE_GRAY = '#aaaaaaff'

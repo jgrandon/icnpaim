@@ -1,6 +1,6 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
+import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 
 export const ProgressIndicator = (props) => {
     const { 
@@ -10,8 +10,8 @@ export const ProgressIndicator = (props) => {
         isNextActive=false
     } = props
 
-    const pipeColor = isActive ? '#4caf50' : '#aaaaaaff'
-    const nextPipeColor = isNextActive ? '#4caf50' : '#aaaaaaff'
+    const pipeColor = isActive ? _OK_GREEN :_INACTIVE_GRAY
+    const nextPipeColor = isNextActive ? _OK_GREEN : _INACTIVE_GRAY
 
     return (
         <div
@@ -27,7 +27,6 @@ export const ProgressIndicator = (props) => {
                 alignItems: 'center'
             }}
         >
-
             {/** Pipe */}
             <div
                 key={uuidv4()}
@@ -37,11 +36,6 @@ export const ProgressIndicator = (props) => {
                     height: 50
                 }}
             />
-            
-            {/** 
-             * border: `2px solid ${isCompleted ? '#308a33ff' : '#5e5e5eff'}`,
-             * 
-             */}
 
             {/** Node */}
             <div
@@ -68,17 +62,6 @@ export const ProgressIndicator = (props) => {
             </div>
 
             {/** Pipe */}
-            <div 
-                key={uuidv4()}
-                style={{
-                    backgroundColor: isLast
-                    ? 'white'
-                    : isActive ? '#4caf50' : '#aaaaaaff',
-                    width: 5,
-                    height: 50,
-                }}
-            />
-
             <div
                 key={uuidv4()}
                 style={{

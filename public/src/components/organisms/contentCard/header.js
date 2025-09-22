@@ -4,21 +4,28 @@ import {
     RadioButtonUnchecked as Unchecked
 } from '@material-ui/icons'
 import { Icon } from './Icon'
+import { _OK_GREEN } from './colors'
 
 export function CardHeader(props) {
-    const { card } = props
+    const { card, color } = props
 	const circleStyles = {
 		width: 20,
 		height: 20,
 		borderRadius: 10,
-		border: '2px solid rgb(209 213 219 )'
+		border: `2px solid ${_OK_GREEN}`
 	}
 
     return <div>
-        <div>
-            <Icon search={card.tipoActividad}/>
+        <div style={{
+            backgroundColor: color
+        }}>
+            <Icon 
+                search={card.tipoActividad}
+                color={'white'}
+            />
             <Typography
                 variant="body2"
+                color={'white'}
                 style={{
                     flexGrow: 1,
                     fontSize: 12

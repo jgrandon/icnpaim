@@ -2,8 +2,9 @@ import React from 'react'
 import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 import { ProgressIndicator } from './progressIndicator'
-import { Content } from './content'
+import { CardContent } from './content'
 import { getDefaultColor } from './colors'
+import { CardHeader } from './header'
 
 export const ContentCard = (props) => {
 	const { 
@@ -26,7 +27,7 @@ export const ContentCard = (props) => {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: index%2==0 ? 3 : 1 
+				gridColumn: index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
@@ -51,9 +52,8 @@ export const ContentCard = (props) => {
 					display: 'grid'
 				}}
 			>
-				<Header card={card}/>
-				<Content />
-
+				<CardHeader card={card} color={cardColor} />
+				<CardContent card={card} color={cardColor} />
 				<Typography
 					variant="body2"
 					style={{
