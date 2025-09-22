@@ -31,7 +31,10 @@ export const ProgressIndicator = (props) => {
                 gridColumn: 2,
                 display: 'grid',
                 gridTemplateRows: '5fr 1fr 5fr',
-                gridRowStart: 1
+                gridRowStart: 1,
+                justifyContent: 'center',
+                justifyItems: 'center',
+                alignItems: 'center'
             }}
         >
 
@@ -39,9 +42,11 @@ export const ProgressIndicator = (props) => {
             <div 
                 key={uuidv4()}
                 style={{
-                    backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
+                    backgroundColor: isFirst
+                    ? 'white'
+                    : isActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
-                    height: 20,
+                    height: 50,
                 }}
             />
             {/** 
@@ -66,9 +71,11 @@ export const ProgressIndicator = (props) => {
             <div 
                 key={uuidv4()}
                 style={{
-                    backgroundColor: isActive ? '#4caf50' : '#aaaaaaff',
+                    backgroundColor: isLast
+                    ? 'white'
+                    : isActive ? '#4caf50' : '#aaaaaaff',
                     width: 5,
-                    height: 20,
+                    height: 50,
                 }}
             />
 
