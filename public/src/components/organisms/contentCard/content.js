@@ -9,20 +9,22 @@ export const CardContent = (props) => {
     
     return <>
         <Typography
-            variant="body2"
             style={{
                 flexGrow: 1,
-                fontSize: 12
+                fontSize: 12,
+                fontSize: '1rem',
+                lineHeight: '1.75rem',
             }}
         >
         {card.title}
         </Typography>
 
         <Typography
-            variant="body2"
             style={{
                 fontSize: 11,
-                color
+                color,
+                fontSize: '0.875rem',
+                lineHeight: '1.25rem',
             }}
         >
         {card.description}
