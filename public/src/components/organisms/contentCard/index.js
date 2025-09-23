@@ -5,6 +5,7 @@ import { ProgressIndicator } from './progressIndicator'
 import { CardContent } from './content'
 import { getDefaultColor } from './colors'
 import { CardHeader } from './header'
+import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 
 export const ContentCard = (props) => {
 	const { 
@@ -16,6 +17,7 @@ export const ContentCard = (props) => {
 		index = 0
 	} = props
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
+	const cardBorderColor = card.completed ? _OK_GREEN : _INACTIVE_GRAY
 
 	return (
 		<div
@@ -43,13 +45,18 @@ export const ContentCard = (props) => {
 				onClick={onClick}
 				target="_blank"
 				style={{
+					height: '12rem',
+					width: '18rem',
+					padding: '1.5rem',
 					gridColumn: index%2==0 ? 1 : 3,
-					border: `2px solid ${cardColor}`,
+					border: `2px solid ${cardBorderColor}`,
 					borderRadius: 5,
 					padding: 5,
 					marginBottom: 8,
 					gridRowStart: 1,
-					display: 'grid'
+					display: 'grid',
+					color: 'white',
+    				textDecoration: 'none'
 				}}
 			>
 				<CardHeader card={card} color={cardColor} />
@@ -57,12 +64,13 @@ export const ContentCard = (props) => {
 				<Typography
 					variant="body2"
 					style={{
-						fontSize: 12
+						fontSize: 12,
+						color: 'gray'
 					}}
 				>
-					{card.status =='bloqueado'
-					? 'Comenzar >'
-					: 'Bloqueado X'}
+					{card.status == 'bloqueado' 
+						? 'Bloqueado X'
+						: (card.completed ? 'Revisar >' : 'Comenzar >')}
 				</Typography>
 			</Link>
 		</div>
