@@ -6,6 +6,7 @@ import {
 } from '@material-ui/icons'
 import { Icon } from './Icon'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
+import { v4 as uuidv4 } from 'uuid';
 
 export function CardHeader(props) {
     const { card, color } = props
@@ -21,15 +22,18 @@ export function CardHeader(props) {
             gridTemplateColumns: '1fr 1fr'
         }}
     >
-        <div style={{
+        <div 
+        key={uuidv4()}
+        style={{
             backgroundColor: color,
-            display: 'grid',
-            padding: '5px',
+            display: 'flex',
+            paddingLeft: '0.75rem',
+            paddingRight: '0.75rem',
+            paddingBottom: '0.25rem',
+            paddingTop: '0.25rem',
             gridTemplateColumns: '1fr 2fr',
-            borderRadius: '10px',
-            alignItems: 'center',
-            justifyItems: 'center',
-            justifyContent: 'center',
+            borderRadius: '100px',
+            placeItems: 'center',
             height: '30px',
             width: 'fit-content'
         }}>
@@ -47,6 +51,16 @@ export function CardHeader(props) {
             >
                 {card.tipoActividad || 'actividad'}
             </Typography>
+        </div>
+
+        <div
+        key={uuidv4()}
+        styles={{
+            display: 'flex',
+            justifyContent: 'end'
+        }}    
+        >
+
         </div>
         {
             card.completed
