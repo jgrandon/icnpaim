@@ -17,7 +17,7 @@ export function CardHeader(props) {
 	}
 
     return <div style={{
-                display: grid,
+                display: 'grid',
                 gridTemplateColumns: '1fr 1fr'
             }}
         >
@@ -40,7 +40,7 @@ export function CardHeader(props) {
                 style={{
                     flexGrow: 1,
                     fontSize: 12,
-                    color: white
+                    color: 'white'
                 }}
             >
                 {card.tipoActividad || 'actividad'}
