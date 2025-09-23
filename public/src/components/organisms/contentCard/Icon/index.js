@@ -1,6 +1,6 @@
 import {
     PlayArrow,
-    HeadPhones,
+    Headset,
     MenuBook,
     Description,
     School
@@ -15,7 +15,7 @@ export function Icon (props) {
     const { search , color } = props
 
     if (search.includes('podcast'))
-        return <HeadPhones style={styles}/>
+        return <Headset style={styles}/>
     else if (search.includes('actividad'))
         return <MenuBook style={styles}/>
     else if (search.includes('examen'))
