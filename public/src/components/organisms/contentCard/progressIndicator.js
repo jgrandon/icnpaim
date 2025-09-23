@@ -45,7 +45,7 @@ export const ProgressIndicator = (props) => {
                     height: 24,
                     width: 24,
                     border: `4px solid white`,
-                    borderRadius: '10px',
+                    borderRadius: '50%',
                     zIndex: 2,
                     display: 'grid',
                     alignContent: 'center',
