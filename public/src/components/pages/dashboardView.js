@@ -653,8 +653,15 @@ class DashboardView extends React.Component {
 
                 {units.map(unit => {
                   return (
-                    <Grid key={uuidv4()} item xs={12} sm={10} md={10} >
-
+                    <div 
+                      key={uuidv4()}
+                      styles={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        maxWidth: '700px'
+                      }}
+                    >
+                    
                       <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
                         <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
                       </Box>
@@ -685,7 +692,7 @@ class DashboardView extends React.Component {
                           {/* some actions */}
                         </CardActions>
                       </Card>
-                    </Grid>
+                    </div>
                   );
                 })}
               </Grid>
