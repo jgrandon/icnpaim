@@ -25,7 +25,7 @@ export const CardContent = (props) => {
                 color
             }}
         >
-        {card.content}
+        {card.description}
         </Typography>
     </>
 }
