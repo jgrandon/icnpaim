@@ -10,6 +10,7 @@ import {
 export function Icon (props) {
     const styles = {
         color,
+        fill: color,
         fontSize: 16,
         marginRight: 8
     }
