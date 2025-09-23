@@ -17,10 +17,10 @@ export function CardHeader(props) {
 	}
 
     return <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr'
-            }}
-        >
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr'
+        }}
+    >
         <div style={{
             backgroundColor: color,
             display: 'grid',
@@ -29,7 +29,9 @@ export function CardHeader(props) {
             borderRadius: '10px',
             alignItems: 'center',
             justifyItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            height: '30px',
+            width: 'fit-content'
         }}>
             <Icon 
                 search={card.tipoActividad}
