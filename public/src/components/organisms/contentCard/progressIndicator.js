@@ -41,25 +41,18 @@ export const ProgressIndicator = (props) => {
             <div
                 key={uuidv4()}
                 style={{
-                    backgroundColor: 'white',
+                    backgroundColor:pipeColor,
                     height: 15,
                     width: 15,
-                    border: `2px solid ${pipeColor}`,
+                    border: `4px solid white`,
                     borderRadius: '10px',
                     zIndex: 2,
                     display: 'grid',
                     alignContent: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
                 }}
-            >
-                {/** inner circle */}
-                <div style={{
-                    backgroundColor: pipeColor,
-                    width: 9,
-                    height: 9,
-                    borderRadius: 5
-                }}/>
-            </div>
+            />
 
             {/** Pipe */}
             <div
