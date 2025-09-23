@@ -33,7 +33,7 @@ export const ProgressIndicator = (props) => {
                 style={{
                     backgroundColor: isFirst ? 'white' : pipeColor,
                     width: 5,
-                    height: 50
+                    height: '6rem'
                 }}
             />
 
@@ -42,8 +42,8 @@ export const ProgressIndicator = (props) => {
                 key={uuidv4()}
                 style={{
                     backgroundColor:pipeColor,
-                    height: 15,
-                    width: 15,
+                    height: 24,
+                    width: 24,
                     border: `4px solid white`,
                     borderRadius: '10px',
                     zIndex: 2,
@@ -60,7 +60,7 @@ export const ProgressIndicator = (props) => {
                 style={{
                     backgroundColor: isLast ? 'white' : nextPipeColor,
                     width: 5,
-                    height: 50
+                    height: '6rem'
                 }}
             />
 
