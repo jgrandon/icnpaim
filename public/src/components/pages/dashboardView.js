@@ -615,7 +615,7 @@ class DashboardView extends React.Component {
                 </CardContent>
               </Card>
             ) : (
-              <Grid container spacing={3}>
+              <Grid container spacing={1}>
                 <Card className={classes.unitProgressCard} elevation={3}>
                   <Button
                     key={uuidv4()}
@@ -653,51 +653,35 @@ class DashboardView extends React.Component {
 
                 {units.map(unit => {
                   return (
-                    <Grid key={uuidv4()} item xs={12} sm={8} md={8} >
+                    <Grid key={uuidv4()} item xs={12} sm={10} md={10} >
+
                       <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
                         <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                        {/*
-                          <Chip
-                            label={`${progress}%`}
-                            color={progress === 100 ? 'primary' : 'default'}
-                            className={classes.gradeChip}
-                          />
-                        */}
-                        </Box>
-                          
-                      <Card className={classes.unitProgressCard} elevation={3}>
-                        <CardContent style={{ flexGrow: 1 }}>
+                      </Box>
 
-                          {
-                            unit.studentLearningRoutes?.map(learningRoute => (
+                      <Card className={classes.unitProgressCard} elevation={3} styles={{boxShadow:'unset'}}>
+                        <CardContent style={{ flexGrow: 1 }}>
+                          {unit.studentLearningRoutes?.map(learningRoute => (
                             <Box 
                               key={uuidv4()}
-                              style={{
-                                padding: 10,
-                                //backgroundColor: this.getLearningRouteColor(learningRoute)
-                              }}
+                              style={{ padding: 10 }}
                             >
-                              {
-                                learningRoute.map((card, index) => (
-                                  <ContentCard
-                                    isFirst={index==0}
-                                    isLast={index==(learningRoute.length-1)}
-                                    key={uuidv4()}
-                                    card={card}
-                                    nextCard={learningRoute[index + 1]}
-                                    index={index}
-                                    onClick={() => this.notifyContentProgress(unit, card)}
-                                  />
-                                ))
-                              }
+                              {learningRoute.map((card, index) => (
+                                <ContentCard
+                                  isFirst={index==0}
+                                  isLast={index==(learningRoute.length-1)}
+                                  key={uuidv4()}
+                                  card={card}
+                                  nextCard={learningRoute[index + 1]}
+                                  index={index}
+                                  onClick={() => this.notifyContentProgress(unit, card)}
+                                />
+                              ))}
                             </Box>
-                            ))
-                          }
-
+                          ))}
                         </CardContent>
 
                         <CardActions>
-
                           {/* some actions */}
                         </CardActions>
                       </Card>
