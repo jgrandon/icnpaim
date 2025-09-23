@@ -653,7 +653,7 @@ class DashboardView extends React.Component {
 
                 {units.map(unit => {
                   return (
-                    <Grid key={uuidv4()} item xs={12} sm={6} md={4} >
+                    <Grid key={uuidv4()} item xs={12} sm={8} md={8} >
                       <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
                         <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
                         {/*
