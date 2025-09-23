@@ -55,7 +55,7 @@ export const ContentCard = (props) => {
 					marginBottom: 8,
 					gridRowStart: 1,
 					display: 'grid',
-					color: 'white',
+					color: 'black',
     				textDecoration: 'none'
 				}}
 			>
@@ -65,7 +65,10 @@ export const ContentCard = (props) => {
 					variant="body2"
 					style={{
 						fontSize: 12,
-						color: 'gray'
+						color: 'gray',
+						display: 'flex',
+						justifyContent: 'flex-end',
+						alignItems: 'flex-end'
 					}}
 				>
 					{card.status == 'bloqueado' 
