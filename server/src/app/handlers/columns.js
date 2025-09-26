@@ -3,7 +3,7 @@ import { getColumnId, insertNewContent } from '../db/blackboard'
 
 export async function getColumnByContent (courseId, contentId) {
     console.log('getColumnsByContent => start')
-    const cachedColumnId = getColumnId(contentId)
+    const cachedColumnId = await getColumnId(contentId)
     console.log('getColumnsByContent => cachedColumnId' , cachedColumnId)
 
     if ( !!cachedColumnId ) return cachedColumnId

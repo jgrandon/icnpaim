@@ -9,7 +9,8 @@ const tokenDB = new JsonDB(new Config(`${config.database_directory}/blackboard_t
 export async function getColumnId(contentId) {
     console.log('getColumnId')
     try {
-        const contents = await db.getData('/content') ?? {}
+        const cachedContents = await db.getData('/content')
+        const contents = cachedContents ?? {}
         console.log('getColumnId => contents => ', contents)
         const searchedContent = contents[contentId]
         console.log('getColumnId => contents => ', contents)
@@ -26,9 +27,13 @@ export async function insertNewContent(contentId, body) {
 }
 
 export async function getToken() {
-    return await tokenDB.getData('/token')
+    try {
+        return await tokenDB.getData('/token')
+    } catch (error) {
+        return null
+    }
 }
 
 export function saveToken (token) {
-    return tokenDB.push('/token', token)
+    return tokenDB.push('/token', token, true)
 }
