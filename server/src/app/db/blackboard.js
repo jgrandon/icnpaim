@@ -6,8 +6,13 @@ const db = new JsonDB(new Config(`${config.database_directory}/blackboard`, true
 
 
 export function getColumnId(contentId) {
+    console.log('getColumnId')
     const contents = db.getData('content') ?? {}
+    console.log('getColumnId => contents => ', contents)
+
     const searchedContent = contents[contentId]
+    console.log('getColumnId => contents => ', contents)
+
     return searchedContent?.columnId
 }
 
