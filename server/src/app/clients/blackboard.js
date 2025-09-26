@@ -39,8 +39,8 @@ class BlackBoardApiClient {
       
       // Interceptor para logging
       this.client.interceptors.request.use(
-        (config) => {
-          const token = this.getToken()
+        async (config) => {
+          const token = await this.getToken()
           console.log('interceptors.request.use => token => ', token)
           config.headers.Authorization = `Bearer ${token}`
           console.log('BLACKBOARD API Request:', {
@@ -53,7 +53,7 @@ class BlackBoardApiClient {
         },
         (error) => {
           console.error('BLACKBOARD API Request Error:', error)
-          return Promise.reject(error)
+          return Promise.reject(error); // Propagate the error if not retried
         }
       )
       
@@ -66,19 +66,33 @@ class BlackBoardApiClient {
           })
           return response
         },
-        (error) => {
-					if (401 == error.response?.status) {
-            
-						this.notifyResponseError(error, 'error 401 => should retry authenticate: ')
-
-					}
-					this.notifyResponseError(error, 'BLACKBOARD API Response Error: ')
-					return Promise.reject(error)
-        }
+        async (error) => this.handleResponseError(error)
       )
       BlackBoardApiClient.instance = this
     }
   }
+
+async handleResponseError (error) {
+  const originalRequest = error.config;
+  originalRequest._retryCount = originalRequest._retryCount || 0;
+
+  if (error.response.status == 401) {
+    this.notifyResponseError(error, 'request error 401 => getting new token')
+
+    if (originalRequest._retryCount < 3) {
+      originalRequest._retryCount += 1;
+      console.log('handleResponseError => Retrying request', originalRequest._retryCount)
+      const token = await this.getNewToken()
+      originalRequest.headers.Authorization = `Bearer ${token}`
+      console.log('handleResponseError => Retrying request => new token', `Bearer ${token}`)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return axios(originalRequest); // Re-send the request
+    }
+  }
+
+  this.notifyResponseError(error, 'BLACKBOARD API Unknown Response Error: ')
+  return Promise.reject(error); // Propagate the error if not retried
+}
 
   notifyResponseError (error, message = '') {
     console.error(message, {
@@ -90,12 +104,12 @@ class BlackBoardApiClient {
   }
 
   /* get token from cache or blackboard */
-  getToken() {
+  async getToken() {
 		// obtener token de cache
-	  const oldToken = cache.getToken();
+	  const oldToken = await cache.getToken();
     console.log('getToken => oldToken => ', oldToken)
     if (!!oldToken) return oldToken
-    const newToken = this.getNewToken()
+    const newToken = await this.getNewToken()
 		console.log('getToken => newToken => ', newToken)
     return newToken
   }
@@ -116,17 +130,17 @@ class BlackBoardApiClient {
     // retorno el error
 
   /* Asks blackboard for new token  */
-  getNewToken () {
+  async getNewToken () {
     try {
       console.log('getNewToken => try => ')
 			const auth = Buffer.from(`${BB_API_CLIENT_ID}:${BB_API_SECRET}`).toString('base64')
       console.log('getNewToken => try => auth => ', auth)
 
-			const request = this.client.get('',{
-					headers: {
-							Authorization: `Basic ${auth}`
-					}
-			})
+			const request = await this.client.post(
+        '/v1/oauth2/token?grant_type=client_credentials',
+        {	headers: { Authorization: `Basic ${auth}` }}
+      )
+
 			const token = request.data
 			console.log('getNewToken => token', token)
       cache.saveToken(newToken)

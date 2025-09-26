@@ -6,27 +6,29 @@ const db = new JsonDB(new Config(`${config.database_directory}/blackboard`, true
 const tokenDB = new JsonDB(new Config(`${config.database_directory}/blackboard_token`, true, false, '/'));
 
 
-export function getColumnId(contentId) {
+export async function getColumnId(contentId) {
     console.log('getColumnId')
-    const contents = db.getData('/content') ?? {}
-    console.log('getColumnId => contents => ', contents)
-
-    const searchedContent = contents[contentId]
-    console.log('getColumnId => contents => ', contents)
-
-    return searchedContent?.columnId
+    try {
+        const contents = await db.getData('/content') ?? {}
+        console.log('getColumnId => contents => ', contents)
+        const searchedContent = contents[contentId]
+        console.log('getColumnId => contents => ', contents)
+        return searchedContent?.columnId
+    } catch (error) {
+        return null
+    }
 }
 
 export async function insertNewContent(contentId, body) {
-    apps.push('/content', {
+    await apps.push('/content', {
         [contentId] : body
     })
 }
 
 export async function getToken() {
-    return tokenDB.getData('/token')
+    return await tokenDB.getData('/token')
 }
 
-export async function saveToken (token) {
+export function saveToken (token) {
     return tokenDB.push('/token', token)
 }
