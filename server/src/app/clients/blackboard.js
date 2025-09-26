@@ -40,7 +40,12 @@ class BlackBoardApiClient {
       // Interceptor para logging
       this.client.interceptors.request.use(
         async (config) => {
-          if (!config.headers.Authorization) {
+          console.log(
+            'interceptors.request.use => Authorization',
+            config?.headers?.Authorization
+          )
+
+          if (!config.headers?.Authorization?.includes('Basic')) {
             const token = await this.getToken()
             console.log('interceptors.request.use => token => ', token)
             config.headers.Authorization = `Bearer ${token}`
@@ -75,27 +80,27 @@ class BlackBoardApiClient {
     }
   }
 
-async handleResponseError (error) {
-  const originalRequest = error.config;
-  originalRequest._retryCount = originalRequest._retryCount || 0;
+  async handleResponseError (error) {
+    const originalRequest = error.config;
+    originalRequest._retryCount = originalRequest._retryCount || 0;
 
-  if (error.response.status == 401) {
-    this.notifyResponseError(error, 'request error 401 => getting new token')
+    if (error.response.status == 401) {
+      this.notifyResponseError(error, 'request error 401 => getting new token')
 
-    if (originalRequest._retryCount < 3) {
-      originalRequest._retryCount += 1;
-      console.log('handleResponseError => Retrying request', originalRequest._retryCount)
-      const token = await this.getNewToken()
-      originalRequest.headers.Authorization = `Bearer ${token}`
-      console.log('handleResponseError => Retrying request => new token', `Bearer ${token}`)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return axios(originalRequest); // Re-send the request
+      if (originalRequest._retryCount < 3) {
+        originalRequest._retryCount += 1;
+        console.log('handleResponseError => Retrying request', originalRequest._retryCount)
+        const token = await this.getNewToken()
+        originalRequest.headers.Authorization = `Bearer ${token}`
+        console.log('handleResponseError => Retrying request => new token', `Bearer ${token}`)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return axios(originalRequest); // Re-send the request
+      }
     }
-  }
 
-  this.notifyResponseError(error, 'BLACKBOARD API Unknown Response Error: ')
-  return Promise.reject(error); // Propagate the error if not retried
-}
+    this.notifyResponseError(error, 'BLACKBOARD API Unknown Response Error: ')
+    return Promise.reject(error); // Propagate the error if not retried
+  }
 
   notifyResponseError (error, message = '') {
     console.error(message, {
@@ -150,6 +155,7 @@ async handleResponseError (error) {
 			return token
     } catch (e) {
 			console.log('Error getNewToken', e)
+      return null
     }
   }
 
