@@ -329,7 +329,8 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     console.log('>>>>>>>>>>>> /evaluationGrade >  req.ltiSession =>', req.ltiSession)
     const jwt = req.ltiSession.jwt;
 
-    const { courseId, contentId } = req.query
+    const courseId = parseInt(req.query.courseId)
+    const contentId = parseInt(req.query.contentId)
     
     const column = await getColumnByContent(courseId, contentId)
     console.log('evaluationGrade => columns => ', column)

@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import * as cache from '../db/blackboard'
 const baseURL = process.env.BLACKBOARD_API_URL
 const BB_API_CLIENT_ID = process.env.BLACKBOARD_API_CLIENT_ID
 const BB_API_SECRET = process.env.BLACKBOARD_API_SECRET
@@ -40,6 +40,9 @@ class BlackBoardApiClient {
       // Interceptor para logging
       this.client.interceptors.request.use(
         (config) => {
+          const token = this.getToken()
+          console.log('interceptors.request.use => token => ', token)
+          config.headers.Authorization = `Bearer ${token}`
           console.log('BLACKBOARD API Request:', {
             url: config.url,
             method: config.method,
@@ -65,7 +68,9 @@ class BlackBoardApiClient {
         },
         (error) => {
 					if (401 == error.response?.status) {
+            
 						this.notifyResponseError(error, 'error 401 => should retry authenticate: ')
+
 					}
 					this.notifyResponseError(error, 'BLACKBOARD API Response Error: ')
 					return Promise.reject(error)
@@ -84,35 +89,47 @@ class BlackBoardApiClient {
     })
   }
 
+  /* get token from cache or blackboard */
   getToken() {
 		// obtener token de cache
-		//const oldToken = this.cache.getToken(); //??
-		
-		// validate if token exists
-    //if (!!oldToken) return oldToken
-
-    // obtener token desde BlackBoard
+	  const oldToken = cache.getToken();
+    console.log('getToken => oldToken => ', oldToken)
+    if (!!oldToken) return oldToken
     const newToken = this.getNewToken()
 		console.log('getToken => newToken => ', newToken)
-    // guarda token en caché
-    
-    // how do i cache a token?
-
-    // necesito atrapar el error de invalid token o expired token
-    // obtener un nuevo token
     return newToken
   }
 
+
+  // Al interceptar cada request:
+  // obtengo token desde cache
+  // si no hay token en cache
+    // obtengo nuevo token
+    // guardo el token
+  // procedo con la request
+  
+  // Al interceptar Error:
+  // si el error es por expired token
+    // obtengo nuevo token
+    // guardo el token
+  // si no
+    // retorno el error
+
+  /* Asks blackboard for new token  */
   getNewToken () {
     try {
+      console.log('getNewToken => try => ')
 			const auth = Buffer.from(`${BB_API_CLIENT_ID}:${BB_API_SECRET}`).toString('base64')
+      console.log('getNewToken => try => auth => ', auth)
+
 			const request = this.client.get('',{
 					headers: {
 							Authorization: `Basic ${auth}`
 					}
 			})
 			const token = request.data
-			console.log('token', token)
+			console.log('getNewToken => token', token)
+      cache.saveToken(newToken)
 			return token
     } catch (e) {
 			console.log('Error getNewToken', e)
