@@ -5,13 +5,13 @@ const db = new JsonDB(new Config(`${config.database_directory}/blackboard`, true
 
 
 export function getColumnId(contentId) {
-    const contents = db.getData('content') ?? []
-    const searchedContent = contents.map((c, cId) => cId == contentId)[0]
+    const contents = db.getData('content') ?? {}
+    const searchedContent = contents[contentId]
     return searchedContent?.columnId
 }
 
 export async function insertNewContent(contentId, body) {
-    apps.push('columns', {
+    apps.push('content', {
         [contentId] : body
     })
 }
