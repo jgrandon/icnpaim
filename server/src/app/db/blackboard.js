@@ -1,7 +1,7 @@
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig';
-import config from '../config/config';
+import config from '../../config/config';
 
-const db = new JsonDB(new Config(`${config.database_directory}/applications-data`, true, true, '/'));
+const db = new JsonDB(new Config(`${config.database_directory}/blackboard`, true, true, '/'));
 
 
 export function getColumnId(contentId) {
