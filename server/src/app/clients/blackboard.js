@@ -40,7 +40,7 @@ class BlackBoardApiClient {
       // Interceptor para logging
       this.client.interceptors.request.use(
         async (config) => {
-          if (!config._auth_request) {
+          if (!config.headers.Authorization) {
             const token = await this.getToken()
             console.log('interceptors.request.use => token => ', token)
             config.headers.Authorization = `Bearer ${token}`
@@ -141,10 +141,7 @@ async handleResponseError (error) {
 
 			const request = await this.client.post(
         '/v1/oauth2/token?grant_type=client_credentials',
-        {	
-          headers: { Authorization: `Basic ${auth}`,
-          _auth_request: true
-       }}
+        {	headers: { Authorization: `Basic ${auth}` }}
       )
 
 			const token = request.data
