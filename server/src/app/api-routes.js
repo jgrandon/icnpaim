@@ -322,24 +322,32 @@ router.get('/units', requireLTISession, async (req, res) => {
 
   
 router.get('/evaluationGrade', requireLTISession, async (req, res) => {
-  console.log('-------------------\nunits');
+  console.log('-------------------/evaluationGrade');
   try {
     const studentId = req.ltiSession.wpStudentId;
-    console.log('>>>>>>>>>>>> /units > studentId =>',studentId)
+    console.log('>>>>>>>>>>>> /evaluationGrade > studentId =>',studentId)
+    console.log('>>>>>>>>>>>> /evaluationGrade >  req.ltiSession =>', req.ltiSession)
     const jwt = req.ltiSession.jwt;
 
     const { courseId, contentId } = req.query
     
     const column = await getColumnByContent(courseId, contentId)
+    console.log('evaluationGrade => columns => ', column)
+    
+    return res.json({
+      success: true,
+      column
+    });
+
     const columnId = column.contentHandler?.gradeColumnId
 
     const grade = await getUserEvaluationGrade(courseId, columnId, studentId)
-      return res.json({
-        success: true,
-        grade
-      });
+    return res.json({
+      success: true,
+      grade
+    });
     } catch (error) {
-      console.error('get Units failed:', error.response?.data);
+      console.error('get evaluationGrade failed:', error.response?.data);
       return res.status(500).json({
         error: error.message,
         details: error.response?.data,
