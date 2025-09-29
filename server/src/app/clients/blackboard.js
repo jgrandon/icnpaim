@@ -171,7 +171,7 @@ class BlackBoardApiClient {
         }}
       )
       //console.log('getNewToken => request', request)
-			const token = request.data
+			const {access_token: token} = request.data
       console.log('getNewToken => request.status', request.status)
       console.log('getNewToken => request', request)
 
