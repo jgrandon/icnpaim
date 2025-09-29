@@ -170,7 +170,7 @@ class BlackBoardApiClient {
           'Content-Type': 'application/x-www-form-urlencoded'
         }}
       )
-      console.log('getNewToken => request', request)
+      //console.log('getNewToken => request', request)
 			const token = request.data
       console.log('getNewToken => request.status', request.status)
       console.log('getNewToken => request', request)
