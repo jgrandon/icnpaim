@@ -50,7 +50,7 @@ export async function getColumnMaxScore(columnId) {
     }
 }
 
-export function updateColumnMaxScore(columnId, maxGrade) {
+export function updateColumnMaxScore(columnId, maxScore) {
     db.push('/column', {
         [columnId] : {maxScore}
     })
