@@ -82,12 +82,20 @@ class BlackBoardApiClient {
   }
 
   async handleResponseError (error) {
+    handleResponseError
     const originalRequest = error.config;
     originalRequest._retryCount = originalRequest._retryCount || 0;
 
-    if (error.response.status == 401) {
-      this.notifyResponseError(error, 'request error 401 => getting new token')
+    const isAuthReq = originalRequest
+      .headers?.Authorization?.includes('Basic')
 
+    if (error.response.status == 401) {
+      if (isAuthReq) {
+        this.notifyResponseError(error, 'BLACKBOARD API - FAILED AUTHENTICATION: ')
+        return Promise.reject(error);
+      }
+
+      this.notifyResponseError(error,'request error 401 => getting new token')
       if (originalRequest._retryCount < 3) {
         originalRequest._retryCount += 1;
         console.log('handleResponseError => Retrying request', originalRequest._retryCount)
@@ -149,7 +157,7 @@ class BlackBoardApiClient {
         '/v1/oauth2/token?grant_type=client_credentials',
         {	headers: { Authorization: `Basic ${auth}` }}
       )
-
+      console.log('getNewToken => request.status', request.status)
 			const token = request.data
       console.log('getNewToken => request.status', request.status)
       console.log('getNewToken => request', request)
