@@ -1,9 +1,9 @@
 import BlackBoardApiClient from '../clients/blackboard'
-import { getColumnId, insertNewContent } from '../db/blackboard'
+import * as cache from '../db/blackboard'
 
 export async function getColumnIdByContent (courseId, contentId) {
     console.log('getColumnsByContent => start')
-    const cachedColumnId = await getColumnId(contentId)
+    const cachedColumnId = await cache.getColumnId(contentId)
     console.log('getColumnsByContent => cachedColumnId' , cachedColumnId)
 
     if ( !!cachedColumnId ) return cachedColumnId
@@ -18,7 +18,7 @@ export async function getColumnIdByContent (courseId, contentId) {
     console.log('getColumnsByContent => request', request.data)
     const column = request.data
     const { gradeColumnId: columnId } = column.contentHandler
-    insertNewContent(contentId, { columnId })
+    await cache.insertNewContent(contentId, { columnId })
 
     return columnId
 }

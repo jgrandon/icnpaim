@@ -18,7 +18,7 @@ export async function getMaxScore (
     courseId,
     columnId
 ) {
-    const cachedMaxScore = cache.getColumnMaxScore(columnId)
+    const cachedMaxScore = await cache.getColumnMaxScore(columnId)
     if (!!cachedMaxScore) return cachedMaxScore
     
     const apiClient = BlackBoardApiClient.getClient()
@@ -26,6 +26,6 @@ export async function getMaxScore (
         `/v1/courses/${courseId}/gradebook/columns/${columnId}`
     )
     const {possible: maxScore} = request.data.score
-    cache.updateColumnMaxScore(maxScore)
+    await cache.updateColumnMaxScore(maxScore)
     return maxScore
 }

@@ -34,8 +34,8 @@ export async function getToken() {
     }
 }
 
-export function saveToken (token) {
-    return tokenDB.push('/token', token, true)
+export async function saveToken (token) {
+    return await tokenDB.push('/token', token, true)
 }
 
 export async function getColumnMaxScore(columnId) {
@@ -55,3 +55,24 @@ export async function updateColumnMaxScore(columnId, maxGrade) {
         [columnId] : {maxScore}
     })
 }
+
+export async function getStudentId(externalStudentId,) {
+    console.log('cache => getStudentId', externalStudentId)
+    try {
+        const cachedStudents = await db.getData('/student')
+        const students = cachedStudents ?? {}
+        const searchedStudent = students[externalStudentId]
+        return searchedStudent.id
+    } catch (error) {
+        return null
+    }
+}
+
+export async function updateStudentId(externalStudentId, studentId) {
+    console.log('cache => updateStudentId', externalStudentId)
+
+    return await apps.push('/student', {
+        [externalStudentId] : {studentId}
+    })
+}
+
