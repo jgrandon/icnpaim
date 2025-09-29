@@ -44,8 +44,9 @@ class BlackBoardApiClient {
             'interceptors.request.use => Authorization',
             config?.headers?.Authorization
           )
+          const isAuthReq = config.headers?.Authorization?.includes('Basic')
 
-          if (!config.headers?.Authorization?.includes('Basic')) {
+          if (!isAuthReq) {
             const token = await this.getToken()
             console.log('interceptors.request.use => token => ', token)
             config.headers.Authorization = `Bearer ${token}`
@@ -150,6 +151,9 @@ class BlackBoardApiClient {
       )
 
 			const token = request.data
+      console.log('getNewToken => request.status', request.status)
+      console.log('getNewToken => request', request)
+
 			console.log('getNewToken => token', token)
       cache.saveToken(newToken)
 			return token
