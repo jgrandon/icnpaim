@@ -1,8 +1,31 @@
 import BlackBoardApiClient from '../clients/blackboard'
+import * as cache from '../db/blackboard'
 
-export default async function getUserEvaluationGrade (courseId, columnId, studentId) {
+export async function getGrade (
+    courseId,
+    columnId,
+    studentId
+) {
     const apiClient = BlackBoardApiClient.getClient()
-    const request = await apiClient.get(`/v1/courses/${courseId}/gradebook/columns/${columnId}/users/${studentId}`)
+    const request = await apiClient.get(
+        `/v1/courses/${courseId}/gradebook/columns/${columnId}/users/${studentId}`
+    )
     const grade = request.data.score
     return grade
+}
+
+export async function getMaxScore (
+    courseId,
+    columnId
+) {
+    const cachedMaxScore = cache.getColumnMaxScore(columnId)
+    if (!!cachedMaxScore) return cachedMaxScore
+    
+    const apiClient = BlackBoardApiClient.getClient()
+    const request = await apiClient.get(
+        `/v1/courses/${courseId}/gradebook/columns/${columnId}`
+    )
+    const {possible: maxScore} = request.data.score
+    cache.updateColumnMaxScore(maxScore)
+    return maxScore
 }

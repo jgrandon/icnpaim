@@ -37,3 +37,21 @@ export async function getToken() {
 export function saveToken (token) {
     return tokenDB.push('/token', token, true)
 }
+
+export async function getColumnMaxScore(columnId) {
+    console.log('cache => getColumnMaxScore', columnId)
+    try {
+        const cachedColumns = await db.getData('/column')
+        const columns = cachedColumns ?? {}
+        const searchedColumn = columns[columnId]
+        return searchedColumn.maxScore
+    } catch (error) {
+        return null
+    }
+}
+
+export async function updateColumnMaxScore(columnId, maxGrade) {
+    await apps.push('/column', {
+        [columnId] : {maxScore}
+    })
+}

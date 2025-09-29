@@ -6,8 +6,8 @@ import request from 'request';
 import { getUnit } from './handlers/units'
 import { getCourseUnits, getLearningRoutes } from './handlers/units'
 import { getProgressByUnits } from './handlers/progress'
-import { getColumnByContent } from './handlers/columns'
-import { getUserEvaluationGrade } from './handlers/grades'
+import { getColumnIdByContent } from './handlers/columns'
+import * as grades from './handlers/grades'
 
 const router = express.Router();
 
@@ -327,24 +327,22 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     const studentId = req.ltiSession.wpStudentId;
     console.log('>>>>>>>>>>>> /evaluationGrade > studentId =>',studentId)
     console.log('>>>>>>>>>>>> /evaluationGrade >  req.ltiSession =>', req.ltiSession)
-    const jwt = req.ltiSession.jwt;
+    //const jwt = req.ltiSession.jwt;
 
     const { courseId, contentId } = req.query
 
-    const column = await getColumnByContent(courseId, contentId)
-    console.log('evaluationGrade => columns => ', column)
-    
+    const columnId = await getColumnIdByContent(courseId, contentId)
+    console.log('evaluationGrade => columnId => ', columnId)
+    const maxScore = await grades.getMaxScore(courseId, columnId)
+    console.log('evaluationGrade => maxScore => ', maxScore)
+
+    const grade = await grades.getGrade(courseId, columnId, studentId)
+    console.log('evaluationGrade => grade => ', grade)
+
     return res.json({
       success: true,
-      column
-    });
-
-    const columnId = column.contentHandler?.gradeColumnId
-
-    const grade = await getUserEvaluationGrade(courseId, columnId, studentId)
-    return res.json({
-      success: true,
-      grade
+      grade,
+      maxGrade
     });
     } catch (error) {
       console.error('get evaluationGrade failed:', error.response?.data);
