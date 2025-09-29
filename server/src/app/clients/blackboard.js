@@ -100,10 +100,13 @@ class BlackBoardApiClient {
         originalRequest._retryCount += 1;
         console.log('handleResponseError => Retrying request', originalRequest._retryCount)
         const token = await this.getNewToken()
-        originalRequest.headers.Authorization = `Bearer ${token}`
+        originalRequest.headers.Authorization =
+        this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        originalRequest.headers['Authorization'] = `Bearer ${token}`
         console.log('handleResponseError => Retrying request => new token', `Bearer ${token}`)
         await new Promise(resolve => setTimeout(resolve, 1000));
-        return axios(originalRequest); // Re-send the request
+        return this.client(originalRequest)
+        //return axios(originalRequest); // Re-send the request
       }
     }
 
