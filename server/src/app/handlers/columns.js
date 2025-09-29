@@ -10,7 +10,7 @@ export async function getColumnByContent (courseId, contentId) {
     console.log('getColumnsByContent => not cached')
 
     const apiClient = BlackBoardApiClient.getClient()
-    console.log('getColumnsByContent => apiClient', apiClient)
+    //console.log('getColumnsByContent => apiClient', apiClient)
 
     const request = await apiClient.get(
         `/v1/courses/${courseId}/contents/${contentId}`
