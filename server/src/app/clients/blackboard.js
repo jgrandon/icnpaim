@@ -164,7 +164,7 @@ class BlackBoardApiClient {
       console.log('getNewToken => try => auth => ', auth)
 
 			const request = await this.client.post(
-        '/v1/oauth2/token?grant_type=client_credentials',
+        '/v1/oauth2/token?grant_type=client_credentials',{},
         {	headers: { Authorization: `Basic ${auth}` }}
       )
       console.log('getNewToken => request', request)
