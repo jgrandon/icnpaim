@@ -344,7 +344,7 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     return res.json({
       success: true,
       grade,
-      maxGrade
+      maxScore
     });
     } catch (error) {
       console.error('get evaluationGrade failed:', error.response?.data);
