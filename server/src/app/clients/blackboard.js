@@ -44,6 +44,10 @@ class BlackBoardApiClient {
             'interceptors.request.use => Authorization',
             config?.headers?.Authorization
           )
+          console.log(
+            'interceptors.request.use => config',
+            config,
+          )
           const isAuthReq = config.headers?.Authorization?.includes('Basic')
 
           if (!isAuthReq) {
