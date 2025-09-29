@@ -75,7 +75,10 @@ class BlackBoardApiClient {
           })
           return response
         },
-        async (error) => this.handleResponseError(error)
+        async (error) => {
+          console.log('before handleResponseError', error)
+          return await this.handleResponseError(error)
+        }
       )
       BlackBoardApiClient.instance = this
     }
@@ -160,7 +163,7 @@ class BlackBoardApiClient {
         '/v1/oauth2/token?grant_type=client_credentials',
         {	headers: { Authorization: `Basic ${auth}` }}
       )
-      console.log('getNewToken => request.status', request.status)
+      console.log('getNewToken => request', request)
 			const token = request.data
       console.log('getNewToken => request.status', request.status)
       console.log('getNewToken => request', request)
