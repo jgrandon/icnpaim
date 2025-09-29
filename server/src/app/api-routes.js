@@ -28,7 +28,8 @@ const requireLTISession = async (req, res, next) => {
       jwt: auth.jwt,
       sessionId: sessionId,
       wpStudentId: auth.wpStudentId,
-      wpCourseId: auth.wpCourseId
+      wpCourseId: auth.wpCourseId,
+      bbStudentExternalId: auth.bbStudentExternalId
     };
     next();
   } catch (error) {
@@ -324,7 +325,7 @@ router.get('/units', requireLTISession, async (req, res) => {
 router.get('/evaluationGrade', requireLTISession, async (req, res) => {
   console.log('-------------------/evaluationGrade');
   try {
-    const studentId = req.ltiSession.wpStudentId;
+    const studentId = req.ltiSession.bbStudentExternalId;
     console.log('>>>>>>>>>>>> /evaluationGrade > studentId =>',studentId)
     console.log('>>>>>>>>>>>> /evaluationGrade >  req.ltiSession =>', req.ltiSession)
     //const jwt = req.ltiSession.jwt;
