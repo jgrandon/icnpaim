@@ -82,7 +82,7 @@ class BlackBoardApiClient {
   }
 
   async handleResponseError (error) {
-    handleResponseError
+    console.log('handleResponseError')
     const originalRequest = error.config;
     originalRequest._retryCount = originalRequest._retryCount || 0;
 
