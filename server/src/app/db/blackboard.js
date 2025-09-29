@@ -20,8 +20,8 @@ export async function getColumnId(contentId) {
     }
 }
 
-export async function insertNewContent(contentId, body) {
-    await apps.push('/content', {
+export function insertNewContent(contentId, body) {
+    db.push('/content', {
         [contentId] : body
     })
 }
@@ -34,8 +34,8 @@ export async function getToken() {
     }
 }
 
-export async function saveToken (token) {
-    return await tokenDB.push('/token', token, true)
+export function saveToken (token) {
+    tokenDB.push('/token', token, true)
 }
 
 export async function getColumnMaxScore(columnId) {
@@ -50,8 +50,8 @@ export async function getColumnMaxScore(columnId) {
     }
 }
 
-export async function updateColumnMaxScore(columnId, maxGrade) {
-    await apps.push('/column', {
+export function updateColumnMaxScore(columnId, maxGrade) {
+    db.push('/column', {
         [columnId] : {maxScore}
     })
 }
@@ -68,10 +68,10 @@ export async function getStudentId(externalStudentId,) {
     }
 }
 
-export async function updateStudentId(externalStudentId, studentId) {
+export function updateStudentId(externalStudentId, studentId) {
     console.log('cache => updateStudentId', externalStudentId)
 
-    return await apps.push('/student', {
+    db.push('/student', {
         [externalStudentId] : {studentId}
     })
 }

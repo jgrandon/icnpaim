@@ -176,7 +176,7 @@ class BlackBoardApiClient {
       console.log('getNewToken => request', request)
 
 			console.log('getNewToken => token', token)
-      await cache.saveToken(token)
+      cache.saveToken(token)
 			return token
     } catch (e) {
 			console.log('Error getNewToken', e)

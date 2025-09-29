@@ -14,6 +14,6 @@ export async function getStudentId (
         `/v1/users?externalId=${studentExternalId}`
     )
     const studentId = request.data.results[0]?.id
-    await cache.updateStudentId(studentExternalId, studentId)
+    cache.updateStudentId(studentExternalId, studentId)
     return studentId
 }

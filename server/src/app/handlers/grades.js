@@ -26,6 +26,6 @@ export async function getMaxScore (
         `/v1/courses/${courseId}/gradebook/columns/${columnId}`
     )
     const {possible: maxScore} = request.data.score
-    await cache.updateColumnMaxScore(maxScore)
+    cache.updateColumnMaxScore(maxScore)
     return maxScore
 }

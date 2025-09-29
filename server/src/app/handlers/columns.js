@@ -18,7 +18,7 @@ export async function getColumnIdByContent (courseId, contentId) {
     console.log('getColumnsByContent => request', request.data)
     const column = request.data
     const { gradeColumnId: columnId } = column.contentHandler
-    await cache.insertNewContent(contentId, { columnId })
+    cache.insertNewContent(contentId, { columnId })
 
     return columnId
 }
