@@ -136,6 +136,7 @@ class DashboardView extends React.Component {
       user: null,
       courses: [],
       selectedCourse: null,
+      selectedUnit: null,
       learningEvaluation: 3,
       units: [],
       grades: [],
@@ -227,19 +228,9 @@ class DashboardView extends React.Component {
         const { units } = responseBody
         console.log('responseBody success => ',responseBody )
         this.updateUnits(units)
+        this.loadUnitGrades(course.id, units[0])
       }
 
-/*
-      // Cargar notas
-      const contentId = units.contentId
-      // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
-      const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${course.id}&contenId=${contentId}`);
-      console.log('grade =>' , gradesResponse)
-      const grade = await gradesResponse.json();
-      console.log('grade =>' , grade)
-*/
-
-      //this.setState({ grades });
       //this.calculateOverallProgress(grades);
 /*
       // Cargar progreso
@@ -254,6 +245,36 @@ class DashboardView extends React.Component {
     }
   };
 
+  async loadUnitGrades (courseId, unit) {
+    // Cargar notas
+    const { contentId } = unit
+    // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
+    const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${courseId}&contenId=${contentId}`);
+    console.log('grade response =>' , gradesResponse)
+    const { grade } = await gradesResponse.json();
+    console.log('grade =>' , grade)
+    if (!grade) {
+      return
+    }
+    const {possible: maxScore, score} = grade.displayGrade
+
+    const evaluation = score * 100 / maxScore
+    console.log('evaluation =>' , evaluation)
+    const learningRouteIndex = evaluation >= 0.5
+      ? (evaluation >= 0.8 ? 1 : 2 ) : 3
+    console.log('learningRouteIndex =>' , learningRouteIndex)
+    this.updateLearningEvaluation(learningRouteIndex)
+
+    this.setState({ grades: {
+      ...this.state.grades,
+      [unit.id] : {
+        ...grade,
+        evaluation,
+        learningRouteIndex
+      } 
+    } });
+  }
+ 
 
   updateUnits(rawUnits) {
     console.log('updateUnits => rawUnits => ', rawUnits)
@@ -274,7 +295,10 @@ class DashboardView extends React.Component {
       studentLearningRoutes
     }})
     console.log('updateUnits => units => ', units)
-    this.setState({ units });
+    this.setState({
+      units,
+      selectedUnit: units[0]?.id
+    });
   }
   
 

@@ -335,16 +335,13 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     const studentId = await students.getStudentId(bbStudentExternalId)
     const columnId = await getColumnIdByContent(courseId, contentId)
     console.log('evaluationGrade => columnId => ', columnId)
-    const maxScore = await grades.getMaxScore(courseId, columnId)
-    console.log('evaluationGrade => maxScore => ', maxScore)
 
     const grade = await grades.getGrade(courseId, columnId, studentId)
     console.log('evaluationGrade => grade => ', grade)
 
     return res.json({
       success: true,
-      grade,
-      maxScore
+      grade
     });
     } catch (error) {
       console.error('get evaluationGrade failed:', error.response?.data);
