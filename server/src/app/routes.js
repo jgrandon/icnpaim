@@ -311,7 +311,10 @@ module.exports = function (app) {
     // Now finally redirect to the UI
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     const {person_sourcedid : bbStudentExternalId} = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/lis']
-    
+    const bbCourseId = jwtPayload.return_url
+      .split('?')[1]
+      .split('&')[0]
+      .replace('course_id=','')
     if (messageType === 'LtiDeepLinkingRequest') {
       res.redirect(`/deep_link_options?nonce=${state}`);
     } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {
@@ -323,6 +326,7 @@ module.exports = function (app) {
       await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
+      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
       // Redirigir al dashboard
       res.redirect('/dashboard');
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
@@ -348,6 +352,7 @@ module.exports = function (app) {
       await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
+      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
       res.redirect(`/dashboard?nonce=${state}`);
     }
   });
