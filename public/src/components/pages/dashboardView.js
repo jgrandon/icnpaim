@@ -256,9 +256,8 @@ class DashboardView extends React.Component {
     console.log('grade response =>' , gradesResponse)
     const { grade } = await gradesResponse.json();
     console.log('grade =>' , grade)
-    if (!grade) {
+    if (grade.status == "NeedsGrading") {
       console.log('no grade')
-
       this.updateLearningEvaluation(1)
       return
     }
