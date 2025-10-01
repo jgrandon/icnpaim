@@ -257,6 +257,9 @@ class DashboardView extends React.Component {
     const { grade } = await gradesResponse.json();
     console.log('grade =>' , grade)
     if (!grade) {
+      console.log('no grade')
+
+      this.updateLearningEvaluation(1)
       return
     }
     const {possible: maxScore, score} = grade.displayGrade
@@ -465,7 +468,6 @@ class DashboardView extends React.Component {
     this.loadUnitGrades(course.id, unit)
   }
 
-  learningEvaluation
   render() {
     const { classes } = this.props;
     const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, overallProgress } = this.state;
@@ -706,8 +708,12 @@ class DashboardView extends React.Component {
                           <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          {this.state.grades[unit.id]
-                            ? unit.studentLearningRoutes?.map(learningRoute => (
+                          {!this.state.grades[unit.id]
+                            ? <Typography variant="h6" style={{ color: 'black' }}>
+                                Aun no tienes nota de evaluación para esta unidad
+                              </Typography>
+                            : null}
+                          {unit.studentLearningRoutes?.map(learningRoute => (
                             <Box 
                               key={uuidv4()}
                               style={{ padding: 10 }}
@@ -724,7 +730,7 @@ class DashboardView extends React.Component {
                                 />
                               ))}
                             </Box>
-                            )) :  <div>Aun no tienes nota de evaluación para esta unidad</div>
+                            ))
                           }
                         </AccordionDetails>
                       </Accordion>
