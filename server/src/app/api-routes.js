@@ -30,7 +30,8 @@ const requireLTISession = async (req, res, next) => {
       sessionId: sessionId,
       wpStudentId: auth.wpStudentId,
       wpCourseId: auth.wpCourseId,
-      bbStudentExternalId: auth.bbStudentExternalId
+      bbStudentExternalId: auth.bbStudentExternalId,
+      bbCourseId: auth.bbCourseId
     };
     next();
   } catch (error) {
