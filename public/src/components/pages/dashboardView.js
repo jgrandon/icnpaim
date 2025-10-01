@@ -697,7 +697,7 @@ class DashboardView extends React.Component {
                         key={uuidv4()}
                         square
                         expanded={this.selectedUnit === unit.id}
-                        onChange={this.handleAccordionChange(selectedCourse, unit)}
+                        onChange={() => this.handleAccordionChange(selectedCourse, unit)}
                       >
                         <AccordionSummary 
                           aria-controls="panel1d-content"
