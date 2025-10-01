@@ -6,26 +6,18 @@ export async function getGrade (
     columnId,
     studentId
 ) {
-    const apiClient = BlackBoardApiClient.getClient()
-    const request = await apiClient.get(
-        `/v1/courses/${courseId}/gradebook/columns/${columnId}/users/${studentId}`
-    )
-    const grade = request.data.score
+    let grades = []
+    const cachedGrades = cache.getGrades(courseId, columnId)
+    if (cachedGrades.length>0) {
+        grades = cachedGrades
+    } else {
+        const apiClient = BlackBoardApiClient.getClient()
+        const request = await apiClient.get(
+            `/v2/courses/${courseId}/gradebook/columns/${columnId}/users/${studentId}`
+        )
+        grades = request.data.results
+        cache.saveGrades(courseId, columnId, grades)
+    }
+    const grade = grades.find(g => g.userId == studentId)
     return grade
-}
-
-export async function getMaxScore (
-    courseId,
-    columnId
-) {
-    const cachedMaxScore = await cache.getColumnMaxScore(columnId)
-    if (!!cachedMaxScore) return cachedMaxScore
-    
-    const apiClient = BlackBoardApiClient.getClient()
-    const request = await apiClient.get(
-        `/v1/courses/${courseId}/gradebook/columns/${columnId}`
-    )
-    const {possible: maxScore} = request.data.score
-    cache.updateColumnMaxScore(maxScore)
-    return maxScore
 }

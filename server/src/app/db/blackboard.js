@@ -38,24 +38,6 @@ export function saveToken (token) {
     tokenDB.push('/token', token, true)
 }
 
-export async function getColumnMaxScore(columnId) {
-    console.log('cache => getColumnMaxScore', columnId)
-    try {
-        const cachedColumns = await db.getData('/column')
-        const columns = cachedColumns ?? {}
-        const searchedColumn = columns[columnId]
-        return searchedColumn.maxScore
-    } catch (error) {
-        return null
-    }
-}
-
-export function updateColumnMaxScore(columnId, maxScore) {
-    db.push('/column', {
-        [columnId] : {maxScore}
-    })
-}
-
 export async function getStudentId(externalStudentId,) {
     console.log('cache => getStudentId', externalStudentId)
     try {
@@ -69,10 +51,22 @@ export async function getStudentId(externalStudentId,) {
 }
 
 export function updateStudentId(externalStudentId, studentId) {
-    console.log('cache => updateStudentId', externalStudentId)
+    console.log('cache => updateStudentId', externalStudentId, studentId)
 
     db.push('/student', {
         [externalStudentId] : {studentId}
     })
 }
 
+export async function getGrades(courseId, columnId) {
+    try {
+        const grades = await db.getData(`/grades/${courseId}/${columnId}`)
+        return grades ?? []
+    } catch (error) {
+        return null
+    }
+}
+
+export function saveGrades(courseId, columnId, grades) {
+    db.push(`/grades/${courseId}/${columnId}`, grades)
+}
