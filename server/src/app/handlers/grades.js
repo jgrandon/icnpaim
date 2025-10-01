@@ -13,7 +13,7 @@ export async function getGrade (
     } else {
         const apiClient = BlackBoardApiClient.getClient()
         const request = await apiClient.get(
-            `/v2/courses/${courseId}/gradebook/columns/${columnId}/users/${studentId}`
+            `/v2/courses/${courseId}/gradebook/columns/${columnId}/users`
         )
         grades = request.data.results
         cache.saveGrades(courseId, columnId, grades)
