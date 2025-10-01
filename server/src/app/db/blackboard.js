@@ -51,7 +51,8 @@ export async function getStudentId(externalStudentId,) {
 }
 
 export function updateStudentId(externalStudentId, studentId) {
-    console.log('cache => updateStudentId', externalStudentId, studentId)
+    console.log('cache => updateStudentId => externalStudentId', externalStudentId)
+    console.log('cache => updateStudentId => studentId', studentId)
 
     db.push('/student', {
         [externalStudentId] : {studentId}
