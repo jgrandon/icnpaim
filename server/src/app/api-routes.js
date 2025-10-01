@@ -333,7 +333,7 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
 
     const { /*courseId,*/ contentId } = req.query
     const studentId = await students.getStudentId(bbStudentExternalId)
-    const columnId = await getColumnIdByContent(courseId, contentId)
+    const columnId = await getColumnIdByContent(bbCourseId, contentId)
     console.log('evaluationGrade => columnId => ', columnId)
 
     const grade = await grades.getGrade(bbCourseId, columnId, studentId)
