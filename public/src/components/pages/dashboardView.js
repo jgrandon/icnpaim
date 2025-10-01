@@ -142,7 +142,7 @@ class DashboardView extends React.Component {
       selectedUnit: null,
       learningEvaluation: 3,
       units: [],
-      grades: [],
+      grades: {},
       progress: [],
       loading: true,
       refreshingGrades: false,
@@ -219,7 +219,7 @@ class DashboardView extends React.Component {
   }
 
   selectCourse = async (course) => {
-    this.setState({ selectedCourse: course, units: [], grades: [], progress: [] });
+    this.setState({ selectedCourse: course, units: [], grades: {}, progress: [] });
     
     try {
       // Cargar unidades
@@ -233,8 +233,6 @@ class DashboardView extends React.Component {
         this.updateUnits(units)
         this.loadUnitGrades(course.id, units[0])
       }
-
-      //this.calculateOverallProgress(grades);
 /*
       // Cargar progreso
       const progressResponse = await fetch(`/api/progress?courseId=${course.id}`);
@@ -305,23 +303,6 @@ class DashboardView extends React.Component {
       selectedUnit: units[0]?.id
     });
   }
-  
-
-  calculateOverallProgress = (grades) => {
-    if (grades.length === 0) {
-      this.setState({ overallProgress: 0 });
-      return;
-    }
-
-    const totalScore = grades.reduce((sum, grade) => {
-      const scoreGiven = grade.meta?.score_given || 0;
-      const scoreMaximum = grade.meta?.score_maximum || 100;
-      return sum + (scoreMaximum > 0 ? (scoreGiven / scoreMaximum) * 100 : 0);
-    }, 0);
-
-    const averageProgress = Math.round(totalScore / grades.length);
-    this.setState({ overallProgress: averageProgress });
-  };
 
   getLearningRouteColor (learningRoute) {
     const colors = {
@@ -412,7 +393,7 @@ class DashboardView extends React.Component {
       openSnackbar({ message: 'Error actualizando progreso' });
     }
   };
-
+/*
   refreshGrades = async () => {
     this.setState({ refreshingGrades: true });
     try {
@@ -426,7 +407,6 @@ class DashboardView extends React.Component {
         if (gradesResponse.ok) {
           const grades = await gradesResponse.json();
           this.setState({ grades });
-          this.calculateOverallProgress(grades);
         }
         openSnackbar({ message: 'Notas actualizadas desde el LMS' });
       } else {
@@ -439,6 +419,7 @@ class DashboardView extends React.Component {
       this.setState({ refreshingGrades: false });
     }
   };
+  */
 
   getActivityTypeColor = (tipo) => {
     const colors = {
@@ -545,6 +526,7 @@ class DashboardView extends React.Component {
                 </CardContent>
               </Card>
             </Grid>
+            {/*
             <Grid item xs={12} sm={4}>
               <Card className={classes.progressCard} elevation={4}>
                 <CardContent>
@@ -579,6 +561,7 @@ class DashboardView extends React.Component {
                 </CardContent>
               </Card>
             </Grid>
+            */}
           </Grid>
         )}
 
@@ -778,7 +761,9 @@ class DashboardView extends React.Component {
         )}
 
         {/* Notas */}
-        {selectedCourse && (
+        {
+        /*
+        selectedCourse && (
           <>
             <Box display="flex" justifyContent="space-between" alignItems="center" className={classes.sectionTitle}>
               <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
@@ -849,7 +834,8 @@ class DashboardView extends React.Component {
               </TableContainer>
             </Card>
           </>
-        )}
+        )
+        */}
 
         {/* Estado sin curso seleccionado */}
         {!selectedCourse && courses.length > 0 && (
