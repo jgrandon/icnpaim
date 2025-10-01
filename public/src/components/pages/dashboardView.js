@@ -252,7 +252,7 @@ class DashboardView extends React.Component {
     // Cargar notas
     const { contentId } = unit
     // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
-    const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${courseId}&contenId=${contentId}`);
+    const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${courseId}&contentId=${contentId}`);
     console.log('grade response =>' , gradesResponse)
     const { grade } = await gradesResponse.json();
     console.log('grade =>' , grade)
