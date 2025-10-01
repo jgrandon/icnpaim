@@ -33,6 +33,9 @@ import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
 import { ContentCard } from '../organisms/contentCard/';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import { v4 as uuidv4 } from 'uuid';
 
 const params = parameters.getInstance();
@@ -457,6 +460,11 @@ class DashboardView extends React.Component {
     this.updateUnits(this.state.units)
   }
 
+  handleAccordionChange(course, unit) {
+    this.setState({ selectedUnit : unit })
+    this.loadUnitGrades(course.id, unit)
+  }
+
   learningEvaluation
   render() {
     const { classes } = this.props;
@@ -638,7 +646,7 @@ class DashboardView extends React.Component {
                   </Typography>
                 </CardContent>
               </Card>
-            ) : (
+            ) : (              
               <Grid container spacing={1}>
                 <Card className={classes.unitProgressCard} elevation={3}>
                   <Button
@@ -685,14 +693,21 @@ class DashboardView extends React.Component {
                         maxWidth: '700px'
                       }}
                     >
-                    
-                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
-                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                      </Box>
-
-                      <Card className={classes.unitProgressCard} elevation={3} styles={{boxShadow:'unset'}}>
-                        <CardContent style={{ flexGrow: 1 }}>
-                          {unit.studentLearningRoutes?.map(learningRoute => (
+                      <Accordion 
+                        key={uuidv4()}
+                        square
+                        expanded={this.selectedUnit === unit.id}
+                        onChange={handleAccordionChange(course, unit)}
+                      >
+                        <AccordionSummary 
+                          aria-controls="panel1d-content"
+                          id="panel1d-header"
+                        >
+                          <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          {this.state.grades[unit.id]
+                            ? unit.studentLearningRoutes?.map(learningRoute => (
                             <Box 
                               key={uuidv4()}
                               style={{ padding: 10 }}
@@ -709,13 +724,45 @@ class DashboardView extends React.Component {
                                 />
                               ))}
                             </Box>
-                          ))}
+                            )) :  <div>Aun no tienes nota de evaluación para esta unidad</div>
+                          }
+                        </AccordionDetails>
+                      </Accordion>
+
+                    {/*
+                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
+                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                      </Box>
+
+                      <Card className={classes.unitProgressCard} elevation={3} styles={{boxShadow:'unset'}}>
+                        <CardContent style={{ flexGrow: 1 }}>
+                          {this.state.grades[unit.id]
+                            ? unit.studentLearningRoutes?.map(learningRoute => (
+                            <Box 
+                              key={uuidv4()}
+                              style={{ padding: 10 }}
+                            >
+                              {learningRoute.map((card, index) => (
+                                <ContentCard
+                                  isFirst={index==0}
+                                  isLast={index==(learningRoute.length-1)}
+                                  key={uuidv4()}
+                                  card={card}
+                                  nextCard={learningRoute[index + 1]}
+                                  index={index}
+                                  onClick={() => this.notifyContentProgress(unit, card)}
+                                />
+                              ))}
+                            </Box>
+                            )) :  <div>Aun no tienes nota de evaluación para esta unidad</div>
+                          }
                         </CardContent>
 
                         <CardActions>
-                          {/* some actions */}
+                          some actions
                         </CardActions>
                       </Card>
+                    */}
                     </div>
                   );
                 })}
