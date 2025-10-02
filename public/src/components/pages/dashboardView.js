@@ -299,7 +299,7 @@ class DashboardView extends React.Component {
     return {
       ...rawUnit,
       studentLearningRoute,
-      studentGrade
+      studentGrade: grade
     }
   }
 
@@ -651,7 +651,22 @@ class DashboardView extends React.Component {
                         aria-controls="panel1d-content"
                         id="panel1d-header"
                       >
-                        <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
+                        <div>
+                          <School style={{
+                            fontSize: '1.25rem'
+                          }}/>
+                        </div>
+                        <div>
+                          <Typography variant="h4"
+                          style={{fontSize: '1.25rem'}}
+                          >{unit.title?.rendered || unit.title}</Typography>
+                          <Typography variant="h6"
+                          style={{fontSize: '0.85rem'}}
+                          >{unit.content?.rendered || unit.content}</Typography>
+                        </div>
+                        <div>
+                          {unit.studentLearningRoute?.length} actividades
+                        </div>
                       </AccordionSummary>
                       <AccordionDetails>
                         {!unit.studentGrade
