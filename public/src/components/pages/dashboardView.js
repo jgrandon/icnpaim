@@ -646,7 +646,11 @@ class DashboardView extends React.Component {
                 </CardContent>
               </Card>
             ) : (              
-              <Grid container spacing={1}>
+              <div style={{
+                width: 700,
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
                 {/*
                 <Card className={classes.unitProgressCard} elevation={3}>
                   <Button
@@ -686,90 +690,46 @@ class DashboardView extends React.Component {
                 {units.map(unit => {
                   const learningRoute = unit.studentLearningRoute
                   return (
-                    <div 
+                    <Accordion 
                       key={uuidv4()}
-                      styles={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        maxWidth: '700px'
-                      }}
+                      square
+                      expanded={this.state.selectedUnitId === unit.id}
+                      onChange={() => this.handleAccordionChange(selectedCourse, unit)}
                     >
-                      <Accordion 
-                        key={uuidv4()}
-                        square
-                        expanded={this.state.selectedUnitId === unit.id}
-                        onChange={() => this.handleAccordionChange(selectedCourse, unit)}
+                      <AccordionSummary 
+                        aria-controls="panel1d-content"
+                        id="panel1d-header"
                       >
-                        <AccordionSummary 
-                          aria-controls="panel1d-content"
-                          id="panel1d-header"
-                        >
-                          <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          {!this.state.grades[unit.id]
-                            ? <Typography variant="h6" style={{ color: 'black' }}>
-                                Aun no tienes nota de evaluación para esta unidad
-                              </Typography>
-                            : null}
-                          <Box 
-                            key={uuidv4()}
-                            style={{ padding: 10 }}
-                          >
-                            {
-                            learningRoute?.map((card, index) => (
-                              <ContentCard
-                                isFirst={index==0}
-                                isLast={index==(learningRoute.length-1)}
-                                key={uuidv4()}
-                                card={card}
-                                nextCard={learningRoute[index + 1]}
-                                index={index}
-                                onClick={() => this.notifyContentProgress(unit, card)}
-                              />
-                            ))}
-                          </Box>
-                        </AccordionDetails>
-                      </Accordion>
-
-                    {/*
-                      <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: 16 }}>
                         <Typography variant="h6">{unit.title?.rendered || unit.title}</Typography>
-                      </Box>
-
-                      <Card className={classes.unitProgressCard} elevation={3} styles={{boxShadow:'unset'}}>
-                        <CardContent style={{ flexGrow: 1 }}>
-                          {this.state.grades[unit.id]
-                            ? unit.studentLearningRoute?.map(learningRoute => (
-                            <Box 
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {!this.state.grades[unit.id]
+                          ? <Typography variant="h6" style={{ color: 'black' }}>
+                              Aun no tienes nota de evaluación para esta unidad
+                            </Typography>
+                          : null}
+                        <Box 
+                          key={uuidv4()}
+                          style={{ padding: 10 }}
+                        >
+                          {
+                          learningRoute?.map((card, index) => (
+                            <ContentCard
+                              isFirst={index==0}
+                              isLast={index==(learningRoute.length-1)}
                               key={uuidv4()}
-                              style={{ padding: 10 }}
-                            >
-                              {learningRoute.map((card, index) => (
-                                <ContentCard
-                                  isFirst={index==0}
-                                  isLast={index==(learningRoute.length-1)}
-                                  key={uuidv4()}
-                                  card={card}
-                                  nextCard={learningRoute[index + 1]}
-                                  index={index}
-                                  onClick={() => this.notifyContentProgress(unit, card)}
-                                />
-                              ))}
-                            </Box>
-                            )) :  <div>Aun no tienes nota de evaluación para esta unidad</div>
-                          }
-                        </CardContent>
-
-                        <CardActions>
-                          some actions
-                        </CardActions>
-                      </Card>
-                    */}
-                    </div>
+                              card={card}
+                              nextCard={learningRoute[index + 1]}
+                              index={index}
+                              onClick={() => this.notifyContentProgress(unit, card)}
+                            />
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
                   );
                 })}
-              </Grid>
+              </div>
             )}
             
           </>
