@@ -696,7 +696,7 @@ class DashboardView extends React.Component {
                       <Accordion 
                         key={uuidv4()}
                         square
-                        expanded={this.selectedUnit === unit.id}
+                        expanded={this.state.selectedUnit === unit.id}
                         onChange={() => this.handleAccordionChange(selectedCourse, unit)}
                       >
                         <AccordionSummary 
