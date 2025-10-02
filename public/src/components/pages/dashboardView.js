@@ -647,6 +647,7 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <Grid container spacing={1}>
+                {/*
                 <Card className={classes.unitProgressCard} elevation={3}>
                   <Button
                     key={uuidv4()}
@@ -681,7 +682,7 @@ class DashboardView extends React.Component {
                     Ruta 3
                   </Button>
                 </Card>
-
+                */}
                 {units.map(unit => {
                   const learningRoute = unit.studentLearningRoute
                   return (
