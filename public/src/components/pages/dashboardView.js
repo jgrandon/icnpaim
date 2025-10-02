@@ -139,7 +139,7 @@ class DashboardView extends React.Component {
       user: null,
       courses: [],
       selectedCourse: null,
-      selectedUnit: null,
+      selectedUnitId: null,
       //learningEvaluation: 3,
       units: [],
       grades: {},
@@ -234,7 +234,7 @@ class DashboardView extends React.Component {
         const updatedUnits = this.getUpdatedUnits(units, grade.learningRouteIndex)
         this.setState({
           units: updatedUnits,
-          selectedUnit: updatedUnits[0]?.id
+          selectedUnitId: updatedUnits[0]?.id
         });
       }
 /*
@@ -444,7 +444,7 @@ class DashboardView extends React.Component {
     this.setState({
       //learningEvaluation: newEvaluation,
       units: updatedUnits,
-      selectedUnit: updatedUnits[0]?.id
+      selectedUnitId: updatedUnits[0]?.id
     });
   }
 
@@ -455,7 +455,7 @@ class DashboardView extends React.Component {
     else unitGrade = await this.getUnitGrade(course.id, unit)
 
     this.setState({
-      selectedUnit : unit,
+      selectedUnitId : unit.id,
       grades: {
         ...oldGrades,
         [unit.id]: unitGrade
@@ -697,7 +697,7 @@ class DashboardView extends React.Component {
                       <Accordion 
                         key={uuidv4()}
                         square
-                        expanded={this.state.selectedUnit === unit.id}
+                        expanded={this.state.selectedUnitId === unit.id}
                         onChange={() => this.handleAccordionChange(selectedCourse, unit)}
                       >
                         <AccordionSummary 
