@@ -228,16 +228,17 @@ class DashboardView extends React.Component {
       const responseBody = await unitsResponse.json();
       console.log('responseBody => ', responseBody )
       if (responseBody.success) {
-        const { units } = responseBody
+        const { units: allUnits } = responseBody
         console.log('responseBody success => ',responseBody )
-        const grade = await this.getUnitGrade(course.id, units[0])
-        const evaluatedUnit = this.getEvaluatedUnit(units[0], grade)
+        const selectedUnit = allUnits[0]
+        const grade = await this.getUnitGrade(course.id, selectedUnit)
+        const evaluatedUnit = this.getEvaluatedUnit(selectedUnit, grade)
+        const units = allUnits.map( u =>
+          u.id == evaluatedUnit.id ? evaluatedUnit : u
+        )
         this.setState({
-          units: [
-            ...units,
-            evaluatedUnit
-          ],
-          selectedUnitId: evaluatedUnit?.id
+          units,
+          selectedUnitId: selectedUnit?.id
         });
       }
 /*
@@ -653,7 +654,7 @@ class DashboardView extends React.Component {
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
-                          //justyfyContent: 'center'
+                          justifyContent: 'space-evenly'
                         }}
                       >
                         <div>
