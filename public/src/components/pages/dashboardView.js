@@ -292,9 +292,7 @@ class DashboardView extends React.Component {
     // const { learningEvaluation } = this.state
     console.log('updateUnits => learningEvaluation => ', grade)
 
-    console.log('updateUnits => map units => ', u)
     const studentLearningRoute = rawUnit.learningRoutes.find((lr, index) => 
-      // index < learningEvaluation
       index == grade.learningRouteIndex - 1
     )
     console.log('updateUnits => studentLearningRoute => ', studentLearningRoute)
