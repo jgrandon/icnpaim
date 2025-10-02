@@ -140,7 +140,7 @@ class DashboardView extends React.Component {
       courses: [],
       selectedCourse: null,
       selectedUnit: null,
-      learningEvaluation: 3,
+      //learningEvaluation: 3,
       units: [],
       grades: {},
       progress: [],
@@ -230,8 +230,12 @@ class DashboardView extends React.Component {
       if (responseBody.success) {
         const { units } = responseBody
         console.log('responseBody success => ',responseBody )
-        this.updateUnits(units)
-        this.loadUnitGrades(course.id, units[0])
+        const grade = this.getUnitGrade(course.id, units[0])
+        const updatedUnits = this.getUpdatedUnits(units, grade.learningRouteIndex)
+        this.setState({
+          units: updatedUnits,
+          selectedUnit: updatedUnits[0]?.id
+        });
       }
 /*
       // Cargar progreso
@@ -246,7 +250,8 @@ class DashboardView extends React.Component {
     }
   };
 
-  async loadUnitGrades (courseId, unit) {
+  async getUnitGrade (courseId, unit) {
+    let learningRouteIndex
     // Cargar notas
     const { contentId } = unit
     // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
@@ -256,52 +261,47 @@ class DashboardView extends React.Component {
     console.log('grade =>' , grade)
     if (grade.status == "NeedsGrading") {
       console.log('no grade')
-      this.updateLearningEvaluation(1)
+      learningRouteIndex = 1
       return
+    } else {
+      const {possible: maxScore, score} = grade.displayGrade
+      const evaluation = score / maxScore
+      console.log('evaluation =>' , evaluation)
+      learningRouteIndex = evaluation >= 0.5
+        ? (evaluation >= 0.8 ? 1 : 2 ) : 3
     }
-    const {possible: maxScore, score} = grade.displayGrade
-
-    const evaluation = score * 100 / maxScore
-    console.log('evaluation =>' , evaluation)
-    const learningRouteIndex = evaluation >= 0.5
-      ? (evaluation >= 0.8 ? 1 : 2 ) : 3
     console.log('learningRouteIndex =>' , learningRouteIndex)
-    this.updateLearningEvaluation(learningRouteIndex)
+    //this.updateLearningEvaluation(learningRouteIndex)
 
-    this.setState({ grades: {
-      ...this.state.grades,
-      [unit.id] : {
+    return {
         ...grade,
         evaluation,
         learningRouteIndex
-      } 
-    } });
+    };
   }
  
 
-  updateUnits(rawUnits) {
+  getUpdatedUnits(rawUnits, learningEvaluation) {
     console.log('updateUnits => rawUnits => ', rawUnits)
     
-    const { learningEvaluation } = this.state
+    // const { learningEvaluation } = this.state
     console.log('updateUnits => learningEvaluation => ', learningEvaluation)
 
     const units = rawUnits.map( u => {
       console.log('updateUnits => map units => ', u)
-      const studentLearningRoutes = u.learningRoutes.filter((u, index) => 
+      const studentLearningRoute = u.learningRoutes.find((u, index) => 
         // index < learningEvaluation
         index == learningEvaluation - 1
       )
-      console.log('updateUnits => studentLearningRoutes => ', studentLearningRoutes)
+      console.log('updateUnits => studentLearningRoute => ', studentLearningRoute)
       return {
-      ...u,
-      studentLearningEvaluation: learningEvaluation,
-      studentLearningRoutes
-    }})
+        ...u,
+        studentLearningEvaluation: learningEvaluation,
+        studentLearningRoute
+      }
+    })
     console.log('updateUnits => units => ', units)
-    this.setState({
-      units,
-      selectedUnit: units[0]?.id
-    });
+    return units
   }
 
   getLearningRouteColor (learningRoute) {
@@ -344,23 +344,22 @@ class DashboardView extends React.Component {
             }
           })
 
-          const studentLearningRoutes = u.studentLearningRoutes.map(
-            route => route.map(card => {
-              console.log('studentLearningRoutes map => newCards ', newCards)
+          const studentLearningRoute = u.studentLearningRoute.map(card => {
+            console.log('studentLearningRoute map => newCards ', newCards)
 
-              console.log('studentLearningRoutes map => card ' ,card)
-              const completed = newCards.find(c => c.id == card.id)?.completed ?? false
-              return {
-                ...card,
-                completed
-              }
-            })
-          )
+            console.log('studentLearningRoute map => card ', card)
+            const completed = newCards.find(c => c.id == card.id)?.completed ?? false
+            return {
+              ...card,
+              completed
+            }
+          })
+          
 
           return {
             ...u,
             cards: newCards,
-            studentLearningRoutes
+            studentLearningRoute
           }
         })
         console.log('handleCardComplete => newUnits => ', newUnits)
@@ -439,13 +438,27 @@ class DashboardView extends React.Component {
 
   updateLearningEvaluation(newEvaluation) {
     console.log('updateLearningEvaluation', newEvaluation)
-    this.setState({ learningEvaluation: newEvaluation })
-    this.updateUnits(this.state.units)
+    const updatedUnits = this.getUpdatedUnits(this.state.units, newEvaluation)
+    this.setState({
+      //learningEvaluation: newEvaluation,
+      units: updatedUnits,
+      selectedUnit: updatedUnits[0]?.id
+    });
   }
 
-  handleAccordionChange(course, unit) {
-    this.setState({ selectedUnit : unit })
-    this.loadUnitGrades(course.id, unit)
+  async  handleAccordionChange(course, unit) {
+    let unitGrade
+    const { grades: oldGrades } = this.state
+    if (!oldGrades[unit.id]) unitGrade = oldGrades[unit.id]
+    else unitGrade = await this.getUnitGrade(course.id, unit)
+
+    this.setState({
+      selectedUnit : unit,
+      grades: {
+        ...oldGrades,
+        [unit.id]: unitGrade
+      }
+    })
   }
 
   render() {
@@ -668,6 +681,7 @@ class DashboardView extends React.Component {
                 </Card>
 
                 {units.map(unit => {
+                  const learningRoute = unit.studentLearningRoute
                   return (
                     <div 
                       key={uuidv4()}
@@ -695,25 +709,23 @@ class DashboardView extends React.Component {
                                 Aun no tienes nota de evaluación para esta unidad
                               </Typography>
                             : null}
-                          {unit.studentLearningRoutes?.map(learningRoute => (
-                            <Box 
-                              key={uuidv4()}
-                              style={{ padding: 10 }}
-                            >
-                              {learningRoute.map((card, index) => (
-                                <ContentCard
-                                  isFirst={index==0}
-                                  isLast={index==(learningRoute.length-1)}
-                                  key={uuidv4()}
-                                  card={card}
-                                  nextCard={learningRoute[index + 1]}
-                                  index={index}
-                                  onClick={() => this.notifyContentProgress(unit, card)}
-                                />
-                              ))}
-                            </Box>
-                            ))
-                          }
+                          <Box 
+                            key={uuidv4()}
+                            style={{ padding: 10 }}
+                          >
+                            {
+                            learningRoute?.map((card, index) => (
+                              <ContentCard
+                                isFirst={index==0}
+                                isLast={index==(learningRoute.length-1)}
+                                key={uuidv4()}
+                                card={card}
+                                nextCard={learningRoute[index + 1]}
+                                index={index}
+                                onClick={() => this.notifyContentProgress(unit, card)}
+                              />
+                            ))}
+                          </Box>
                         </AccordionDetails>
                       </Accordion>
 
@@ -725,7 +737,7 @@ class DashboardView extends React.Component {
                       <Card className={classes.unitProgressCard} elevation={3} styles={{boxShadow:'unset'}}>
                         <CardContent style={{ flexGrow: 1 }}>
                           {this.state.grades[unit.id]
-                            ? unit.studentLearningRoutes?.map(learningRoute => (
+                            ? unit.studentLearningRoute?.map(learningRoute => (
                             <Box 
                               key={uuidv4()}
                               style={{ padding: 10 }}
