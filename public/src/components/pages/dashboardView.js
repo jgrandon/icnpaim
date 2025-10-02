@@ -653,25 +653,27 @@ class DashboardView extends React.Component {
                         id="panel1d-header"
                         style={{
                           display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-evenly'
-                        }}
-                      >
-                        <div>
-                          <School style={{
-                            fontSize: '1.25rem'
-                          }}/>
-                        </div>
-                        <div>
-                          <Typography variant="h4"
-                          style={{fontSize: '1.25rem'}}
-                          >{unit.title?.rendered || unit.title}</Typography>
-                          <Typography variant="h6"
-                          style={{fontSize: '0.85rem'}}
-                          >{unit.content?.rendered || unit.content}</Typography>
-                        </div>
-                        <div>
-                          {unit.studentLearningRoute?.length} actividades
+                          justifyContent: 'space-between',
+                          border: '1px solid',
+                          padding: 30,
+                          borderRadius: 50,
+                        }}>
+                          <div>
+                            <School style={{
+                              fontSize: '1.25rem'
+                            }}/>
+                          </div>
+                          <div>
+                            <Typography variant="h4"
+                            style={{fontSize: '1.25rem'}}
+                            >{unit.title?.rendered || unit.title}</Typography>
+                            <Typography variant="h6"
+                            style={{fontSize: '0.85rem'}}
+                            >{unit.content?.rendered || unit.content}</Typography>
+                          </div>
+                          <div>
+                            {unit.studentLearningRoute?.length} actividades
+                          </div>
                         </div>
                       </AccordionSummary>
                       <AccordionDetails>
