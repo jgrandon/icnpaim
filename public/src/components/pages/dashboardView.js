@@ -237,7 +237,7 @@ class DashboardView extends React.Component {
             ...units,
             evaluatedUnit
           ],
-          selectedUnitId: updatedUnits[0]?.id
+          selectedUnitId: evaluatedUnit?.id
         });
       }
 /*
@@ -650,6 +650,11 @@ class DashboardView extends React.Component {
                       <AccordionSummary 
                         aria-controls="panel1d-content"
                         id="panel1d-header"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          //justyfyContent: 'center'
+                        }}
                       >
                         <div>
                           <School style={{
