@@ -651,7 +651,9 @@ class DashboardView extends React.Component {
                       <AccordionSummary 
                         aria-controls="panel1d-content"
                         id="panel1d-header"
-                        style={{
+                      >
+                        <div style={{
+                          width: 500,
                           display: 'flex',
                           justifyContent: 'space-between',
                           border: '1px solid',
