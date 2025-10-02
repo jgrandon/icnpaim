@@ -252,6 +252,7 @@ class DashboardView extends React.Component {
 
   async getUnitGrade (courseId, unit) {
     let learningRouteIndex
+    let evaluation
     // Cargar notas
     const { contentId } = unit
     // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
@@ -262,10 +263,11 @@ class DashboardView extends React.Component {
     if (grade.status == "NeedsGrading") {
       console.log('no grade')
       learningRouteIndex = 1
+      evaluation = 0
       return
     } else {
       const {possible: maxScore, score} = grade.displayGrade
-      const evaluation = score / maxScore
+      evaluation = score / maxScore
       console.log('evaluation =>' , evaluation)
       learningRouteIndex = evaluation >= 0.5
         ? (evaluation >= 0.8 ? 1 : 2 ) : 3
