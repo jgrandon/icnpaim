@@ -230,7 +230,7 @@ class DashboardView extends React.Component {
       if (responseBody.success) {
         const { units } = responseBody
         console.log('responseBody success => ',responseBody )
-        const grade = this.getUnitGrade(course.id, units[0])
+        const grade = await this.getUnitGrade(course.id, units[0])
         const updatedUnits = this.getUpdatedUnits(units, grade.learningRouteIndex)
         this.setState({
           units: updatedUnits,
