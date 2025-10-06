@@ -255,6 +255,13 @@ function lti_register_meta_fields()
         'description' => 'ID del Contenido (evaluacion) en BlackBoard que determina la ruta de aprendizaje'
     ));
 
+    register_post_meta('unit', 'cards_blocked', array(
+        'type' => 'string',
+        'single' => true,
+        'show_in_rest' => true,
+        'description' => 'Indicador de bloqueo de cards'
+    ));
+
     // Meta fields para Progress
     register_post_meta('progress', 'student_id', array(
         'type' => 'integer',
@@ -412,6 +419,14 @@ function lti_add_unit_metaboxes()
         'side',
         'default'
     );
+    add_meta_box(
+        'unit_cards_blocked_metabox',
+        'Bloqueo de Avance',
+        'lti_unit_cards_blocked_metabox_callback',
+        'unit',
+        'side',
+        'default'
+    );
 }
 add_action('add_meta_boxes', 'lti_add_unit_metaboxes');
 
@@ -485,6 +500,32 @@ function lti_unit_content_metabox_callback($post)
     echo '</div>';
 }
 
+function lti_unit_cards_blocked_metabox_callback($post)
+{
+    wp_nonce_field('unit_cards_blocked_nonce', 'unit_cards_blocked_nonce');
+
+    $cards_blocked = get_post_meta($post->ID, 'cards_blocked', true);
+
+    // Obtener todos los cursos
+    $courses = get_posts(array(
+        'post_type' => 'course',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+    if ($cards_blocked == 'true') {
+        $yesOption = 'selected';
+        $noOption = '';
+    } else {
+        $yesOption = '';
+        $noOption = 'selected';
+    }
+    echo '<p><label for="cards_blocked"><strong>Bloquear Cards:</strong></label></p>';
+    echo '<select name="cards_blocked" id="cards_blocked" style="width:100%">';
+    echo '<option value="true" ' . $yesOption .  '>Bloquear segun avance</option>';
+    echo '<option value="false" ' . $noOption .  '>Permitir libre acceso</option>';
+    echo '</select>';
+}
+
 function lti_save_unit_metaboxes($post_id)
 {
     // Verificar nonces
@@ -505,6 +546,11 @@ function lti_save_unit_metaboxes($post_id)
     if (isset($_POST['unit_content_nonce']) && wp_verify_nonce($_POST['unit_content_nonce'], 'unit_content_nonce')) {
         if (isset($_POST['content_id'])) {
             update_post_meta($post_id, 'content_id', $_POST['content_id']);
+        }
+    }
+    if (isset($_POST['unit_cards_blocked_nonce']) && wp_verify_nonce($_POST['unit_cards_blocked_nonce'], 'unit_cards_blocked_nonce')) {
+        if (isset($_POST['cards_blocked'])) {
+            update_post_meta($post_id, 'cards_blocked', $_POST['cards_blocked']);
         }
     }
 }
