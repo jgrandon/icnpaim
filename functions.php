@@ -266,7 +266,7 @@ function lti_register_meta_fields()
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
-        'description' => 'Color based de la unidad'
+        'description' => 'Color base de la unidad'
     ));
 
     // Meta fields para Progress
@@ -519,6 +519,7 @@ function lti_unit_color_metabox_callback($post)
     $color = get_post_meta($post->ID, 'color', true);
     echo '<div id="unit-color-editor">';
     echo '<p><strong>Color base de la unidad</strong></p>';
+    echo '<p>rgb, hexadecimal o nombre en ingles</p>';
     echo '<textarea name="color" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($color) . '</textarea>';
     echo '</div>';
 }
