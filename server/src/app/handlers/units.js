@@ -74,7 +74,8 @@ function getRouteId (card) {
 }
 
 function sortCardsByWeight (cards) {
-	return cards.sort((a,b) => a.peso - b.peso)
+	const sortedCards = cards.sort((a,b) => a.peso - b.peso)
+	return sortedCards.map((c, index) => ({...c, index}))
 }
 
 export async function getCourseUnits (searchedCourse) {
