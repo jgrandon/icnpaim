@@ -255,11 +255,11 @@ function lti_register_meta_fields()
         'description' => 'ID del Contenido (evaluacion) en BlackBoard que determina la ruta de aprendizaje'
     ));
 
-    register_post_meta('unit', 'cards_blocked', array(
+    register_post_meta('unit', 'free_progress', array(
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
-        'description' => 'Indicador de bloqueo de cards'
+        'description' => 'Indica se el progreso libre esta habilitado'
     ));
 
     register_post_meta('unit', 'color', array(
@@ -427,9 +427,9 @@ function lti_add_unit_metaboxes()
         'default'
     );
     add_meta_box(
-        'unit_cards_blocked_metabox',
+        'unit_free_progress_metabox',
         'Bloqueo de Avance',
-        'lti_unit_cards_blocked_metabox_callback',
+        'lti_unit_free_progress_metabox_callback',
         'unit',
         'side',
         'default'
@@ -524,11 +524,11 @@ function lti_unit_color_metabox_callback($post)
     echo '</div>';
 }
 
-function lti_unit_cards_blocked_metabox_callback($post)
+function lti_unit_free_progress_metabox_callback($post)
 {
-    wp_nonce_field('unit_cards_blocked_nonce', 'unit_cards_blocked_nonce');
+    wp_nonce_field('unit_free_progress_nonce', 'unit_free_progress_nonce');
 
-    $cards_blocked = get_post_meta($post->ID, 'cards_blocked', true);
+    $free_progress = get_post_meta($post->ID, 'free_progress', true);
 
     // Obtener todos los cursos
     $courses = get_posts(array(
@@ -536,17 +536,19 @@ function lti_unit_cards_blocked_metabox_callback($post)
         'posts_per_page' => -1,
         'post_status' => 'publish'
     ));
-    if ($cards_blocked == 'true') {
+    if ($free_progress == 'true') {
         $yesOption = 'selected';
         $noOption = '';
     } else {
         $yesOption = '';
         $noOption = 'selected';
     }
-    echo '<p><label for="cards_blocked"><strong>Bloquear Cards:</strong></label></p>';
-    echo '<select name="cards_blocked" id="cards_blocked" style="width:100%">';
-    echo '<option value="true" ' . $yesOption .  '>Bloquear segun avance</option>';
-    echo '<option value="false" ' . $noOption .  '>Permitir libre acceso</option>';
+    echo '<p><label for="free_progress"><strong>Tipo de Progreso</strong></label></p>';
+    echo '<p><label for="free_progress">Progreso Libre: el estudiante puede ver los contenidos en cualquier orden</label></p>';
+    echo '<p><label for="free_progress">Progreso Secuencial: el estudiante debe completar un contenido para ver el siguiente</label></p>';
+    echo '<select name="free_progress" id="free_progress" style="width:100%">';
+    echo '<option value="true" ' . $yesOption .  '>Progreso libre</option>';
+    echo '<option value="false" ' . $noOption .  '>Progreso secuencial</option>';
     echo '</select>';
 }
 
@@ -572,9 +574,9 @@ function lti_save_unit_metaboxes($post_id)
             update_post_meta($post_id, 'content_id', $_POST['content_id']);
         }
     }
-    if (isset($_POST['unit_cards_blocked_nonce']) && wp_verify_nonce($_POST['unit_cards_blocked_nonce'], 'unit_cards_blocked_nonce')) {
-        if (isset($_POST['cards_blocked'])) {
-            update_post_meta($post_id, 'cards_blocked', $_POST['cards_blocked']);
+    if (isset($_POST['unit_free_progress_nonce']) && wp_verify_nonce($_POST['unit_free_progress_nonce'], 'unit_free_progress_nonce')) {
+        if (isset($_POST['free_progress'])) {
+            update_post_meta($post_id, 'free_progress', $_POST['free_progress']);
         }
     }
     if (isset($_POST['unit_color_nonce']) && wp_verify_nonce($_POST['unit_color_nonce'], 'unit_color_nonce')) {
