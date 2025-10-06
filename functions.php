@@ -259,7 +259,7 @@ function lti_register_meta_fields()
         'type' => 'string',
         'single' => true,
         'show_in_rest' => true,
-        'description' => 'Indica se el progreso libre esta habilitado'
+        'description' => 'Indica tipo de progreso: libre (true) o secuencial (false)'
     ));
 
     register_post_meta('unit', 'color', array(
@@ -428,7 +428,7 @@ function lti_add_unit_metaboxes()
     );
     add_meta_box(
         'unit_free_progress_metabox',
-        'Bloqueo de Avance',
+        'Tipo de progreso',
         'lti_unit_free_progress_metabox_callback',
         'unit',
         'side',
@@ -543,9 +543,8 @@ function lti_unit_free_progress_metabox_callback($post)
         $yesOption = '';
         $noOption = 'selected';
     }
-    echo '<p><label for="free_progress"><strong>Tipo de Progreso</strong></label></p>';
-    echo '<p><label for="free_progress">Progreso Libre: el estudiante puede ver los contenidos en cualquier orden</label></p>';
-    echo '<p><label for="free_progress">Progreso Secuencial: el estudiante debe completar un contenido para ver el siguiente</label></p>';
+    echo '<p style="color:green;"><label for="free_progress">Progreso Libre: el estudiante puede ver los contenidos en cualquier orden</label></p>';
+    echo '<p style="color:orange"><label for="free_progress">Progreso Secuencial: el estudiante debe completar un contenido para ver el siguiente</label></p>';
     echo '<select name="free_progress" id="free_progress" style="width:100%">';
     echo '<option value="true" ' . $yesOption .  '>Progreso libre</option>';
     echo '<option value="false" ' . $noOption .  '>Progreso secuencial</option>';
