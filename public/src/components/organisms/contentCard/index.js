@@ -25,7 +25,8 @@ export const ContentCard = (props) => {
 			style={{
 				display: 'grid',
 				gridTemplateColumns: '6fr 1fr 6fr',
-				gridTemplateRows: '1fr'
+				gridTemplateRows: '1fr',
+				alignItems: 'center'
 			}}
 		>
 			{/* ghost div only for correct display */}
