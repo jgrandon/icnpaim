@@ -50,7 +50,7 @@ export const ContentCard = (props) => {
 					padding: '1.5rem',
 					gridColumn: index%2==0 ? 1 : 3,
 					border: `2px solid ${cardBorderColor}`,
-					borderRadius: 5,
+					borderRadius: '1rem',
 					gridRowStart: 1,
 					display: 'grid',
 					color: 'black',
