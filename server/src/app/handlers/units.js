@@ -35,7 +35,7 @@ function getUnitData (unit) {
 			title,
 			content: clearContent(unit.content.rendered),
 			color: unit.meta.color,
-			cardsLocked: unit.meta.cards_locked,
+			freeProgress: unit.meta.free_progress,
 			courseId: unit.meta.course_id,
 			cards: allCards,
 			learningRoutes: getLearningRoutes(allCards),
