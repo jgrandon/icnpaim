@@ -14,7 +14,8 @@ export const ContentCard = (props) => {
 		onClick = () => {},
         isFirst = false,
         isLast = false,
-		index = 0
+		index = 0,
+		color = null
 	} = props
 	const cardColor = card.color || getDefaultColor(card.tipoActividad)
 	const cardBorderColor = card.completed ? _OK_GREEN : _INACTIVE_GRAY
@@ -38,6 +39,7 @@ export const ContentCard = (props) => {
 				isLast={isLast}
 				index={index}
 				isNextActive={nextCard?.completed}
+				color={color}
 			/>
 
 			<Link
