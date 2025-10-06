@@ -709,7 +709,7 @@ class DashboardView extends React.Component {
                               nextCard={learningRoute[index + 1]}
                               index={index}
                               onClick={() => this.notifyContentProgress(unit, card)}
-                              color={unit?.color}
+                              unit={unit}
                             />
                           ))}
                         </Box>

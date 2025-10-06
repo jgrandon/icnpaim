@@ -7,18 +7,35 @@ import { getDefaultColor } from './colors'
 import { CardHeader } from './header'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 
+const getCurrentCard = (unit) => {
+	const iCards = unit.learningRoute.length
+	let currentFounded = false
+	let currentIndex = 0
+	for (let i = 0; i < iCards; i++) {
+		if (unit.learningRoute[i].completed && !currentFounded) {
+			currentIndex = i
+		} else {
+			currentFounded = true
+		}
+	}
+	return unit.learningRoute[currentIndex]
+}
+
 export const ContentCard = (props) => {
 	const { 
 		card = {},
-		nextCard = { completed: false },
 		onClick = () => {},
-        isFirst = false,
-        isLast = false,
-		index = 0,
-		color = null
+		unit
 	} = props
-	const cardColor = card.color || getDefaultColor(card.tipoActividad)
-	const cardBorderColor = card.completed ? _OK_GREEN : _INACTIVE_GRAY
+	const nextCard = unit.learningRoute[index + 1]
+	const prevCard = unit.learningRoute[index - 1]
+	const isCurrentCard = getCurrentCard(unit).id == card.id
+	const { cardsBlocked: isFreeProgressEnabled } = unit
+	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
+	const color = unit.color || getDefaultColor(card.tipoActividad)
+	const cardColor = card.completed
+		? _OK_GREEN 
+		: ( isFreeProgressEnabled || isCurrentCard ? color : _INACTIVE_GRAY )
 
 	return (
 		<div
@@ -31,15 +48,14 @@ export const ContentCard = (props) => {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: index%2==0 ? 3 : 1
+				gridColumn: card.index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
 				isActive={card.completed}
-				isFirst={isFirst}
-				isLast={isLast}
-				index={index}
-				isNextActive={nextCard?.completed}
+				index={card.index}
+				next={nextCard}
+				prev={prevCard}
 				color={color}
 			/>
 
@@ -51,8 +67,8 @@ export const ContentCard = (props) => {
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: index%2==0 ? 1 : 3,
-					border: `2px solid ${cardBorderColor}`,
+					gridColumn: card.index%2==0 ? 1 : 3,
+					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,
 					display: 'grid',
@@ -72,7 +88,7 @@ export const ContentCard = (props) => {
 						alignItems: 'flex-end'
 					}}
 				>
-					{card.status == 'bloqueado' 
+					{isLocked
 						? 'Bloqueado X'
 						: (card.completed ? 'Revisar >' : 'Comenzar >')}
 				</Typography>
