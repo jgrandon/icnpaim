@@ -8,17 +8,17 @@ import { CardHeader } from './header'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 
 const getCurrentCard = (unit) => {
-	const iCards = unit.learningRoute.length
+	const iCards = unit.studentLearningRoute.length
 	let currentFounded = false
 	let currentIndex = 0
 	for (let i = 0; i < iCards; i++) {
-		if (unit.learningRoute[i].completed && !currentFounded) {
+		if (unit.studentLearningRoute[i].completed && !currentFounded) {
 			currentIndex = i
 		} else {
 			currentFounded = true
 		}
 	}
-	return unit.learningRoute[currentIndex]
+	return unit.studentLearningRoute[currentIndex]
 }
 
 export const ContentCard = (props) => {
@@ -28,8 +28,8 @@ export const ContentCard = (props) => {
 		unit
 	} = props
 	const { index, completed } = card
-	const nextCard = unit.learningRoute[index + 1]
-	const prevCard = unit.learningRoute[index - 1]
+	const nextCard = unit.studentLearningRoute[index + 1]
+	const prevCard = unit.studentLearningRoute[index - 1]
 	const isCurrentCard = getCurrentCard(unit).id == card.id
 	const { cardsBlocked: isFreeProgressEnabled } = unit
 	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
