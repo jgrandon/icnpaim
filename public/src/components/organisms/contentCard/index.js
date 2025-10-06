@@ -16,6 +16,7 @@ const getCurrentCard = (unit) => {
 			currentIndex = i
 		} else {
 			currentFounded = true
+			currentIndex++
 		}
 	}
 	return unit.studentLearningRoute[currentIndex]
@@ -31,7 +32,7 @@ export const ContentCard = (props) => {
 	const nextCard = unit.studentLearningRoute[index + 1]
 	const prevCard = unit.studentLearningRoute[index - 1]
 	const isCurrentCard = getCurrentCard(unit).id == card.id
-	const { cardsBlocked: isFreeProgressEnabled } = unit
+	const { freeProgress: isFreeProgressEnabled } = unit
 	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
 	const color = unit.color || getDefaultColor(card.tipoActividad)
 	const cardColor = completed
