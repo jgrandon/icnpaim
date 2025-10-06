@@ -343,7 +343,7 @@ class DashboardView extends React.Component {
               completed: true
             }
           })
-
+          console.log('handleCardComplete => unit before map', u)
           const studentLearningRoute = u.studentLearningRoute.map(card => {
             console.log('studentLearningRoute map => newCards ', newCards)
 
@@ -656,13 +656,24 @@ class DashboardView extends React.Component {
                           width: 500,
                           display: 'flex',
                           justifyContent: 'space-between',
-                          border: '1px solid',
-                          padding: 30,
-                          borderRadius: 50,
+                          border: '2px rgb(229 231 235f)',
+                          padding: '0.75rem 1.5rem',
+                          borderRadius: '9999px',
+                          alignItems: 'center',
+                          boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
                         }}>
-                          <div>
+                          <div style={{
+                            width: '3rem',
+                            height: '3rem',
+                            border: `1px solid ${unit.color ?? 'gray'}`,
+                            borderRadius: '999px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
                             <School style={{
-                              fontSize: '1.25rem'
+                              width: 'calc(3rem * 0.7)',
+                              height: 'calc(3rem * 0.7)'
                             }}/>
                           </div>
                           <div>
