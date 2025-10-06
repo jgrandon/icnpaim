@@ -27,13 +27,14 @@ export const ContentCard = (props) => {
 		onClick = () => {},
 		unit
 	} = props
+	const { index, completed } = card
 	const nextCard = unit.learningRoute[index + 1]
 	const prevCard = unit.learningRoute[index - 1]
 	const isCurrentCard = getCurrentCard(unit).id == card.id
 	const { cardsBlocked: isFreeProgressEnabled } = unit
 	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
 	const color = unit.color || getDefaultColor(card.tipoActividad)
-	const cardColor = card.completed
+	const cardColor = completed
 		? _OK_GREEN 
 		: ( isFreeProgressEnabled || isCurrentCard ? color : _INACTIVE_GRAY )
 
@@ -48,12 +49,12 @@ export const ContentCard = (props) => {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: card.index%2==0 ? 3 : 1
+				gridColumn: index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
-				isActive={card.completed}
-				index={card.index}
+				isActive={completed}
+				index={index}
 				next={nextCard}
 				prev={prevCard}
 				color={color}
@@ -67,7 +68,7 @@ export const ContentCard = (props) => {
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: card.index%2==0 ? 1 : 3,
+					gridColumn: index%2==0 ? 1 : 3,
 					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,
@@ -94,7 +95,7 @@ export const ContentCard = (props) => {
 				>
 					{isLocked
 						? 'Bloqueado X'
-						: (card.completed ? 'Revisar >' : 'Comenzar >')}
+						: (completed ? 'Revisar >' : 'Comenzar >')}
 				</Typography>
 			</Link>
 		</div>
