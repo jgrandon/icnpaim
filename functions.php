@@ -262,6 +262,13 @@ function lti_register_meta_fields()
         'description' => 'Indicador de bloqueo de cards'
     ));
 
+    register_post_meta('unit', 'color', array(
+        'type' => 'string',
+        'single' => true,
+        'show_in_rest' => true,
+        'description' => 'Color based de la unidad'
+    ));
+
     // Meta fields para Progress
     register_post_meta('progress', 'student_id', array(
         'type' => 'integer',
@@ -427,6 +434,14 @@ function lti_add_unit_metaboxes()
         'side',
         'default'
     );
+    add_meta_box(
+        'unit_color_metabox',
+        'Color de unidad',
+        'lti_unit_color_metabox_callback',
+        'unit',
+        'side',
+        'default'
+    );
 }
 add_action('add_meta_boxes', 'lti_add_unit_metaboxes');
 
@@ -492,11 +507,19 @@ function lti_unit_content_metabox_callback($post)
     wp_nonce_field('unit_content_nonce', 'unit_content_nonce');
 
     $content_id = get_post_meta($post->ID, 'content_id', true);
-
-
     echo '<div id="unit-content-id-editor">';
     echo '<p><strong>content_id de evaluacion:</strong></p>';
     echo '<textarea name="content_id" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($content_id) . '</textarea>';
+    echo '</div>';
+}
+
+function lti_unit_color_metabox_callback($post)
+{
+    wp_nonce_field('unit_color_nonce', 'unit_color_nonce');
+    $color = get_post_meta($post->ID, 'color', true);
+    echo '<div id="unit-color-editor">';
+    echo '<p><strong>Color base de la unidad</strong></p>';
+    echo '<textarea name="color" rows="1" style="width:100%; font-family:monospace">' . esc_textarea($color) . '</textarea>';
     echo '</div>';
 }
 
@@ -551,6 +574,11 @@ function lti_save_unit_metaboxes($post_id)
     if (isset($_POST['unit_cards_blocked_nonce']) && wp_verify_nonce($_POST['unit_cards_blocked_nonce'], 'unit_cards_blocked_nonce')) {
         if (isset($_POST['cards_blocked'])) {
             update_post_meta($post_id, 'cards_blocked', $_POST['cards_blocked']);
+        }
+    }
+    if (isset($_POST['unit_color_nonce']) && wp_verify_nonce($_POST['unit_color_nonce'], 'unit_color_nonce')) {
+        if (isset($_POST['color'])) {
+            update_post_meta($post_id, 'color', $_POST['color']);
         }
     }
 }
