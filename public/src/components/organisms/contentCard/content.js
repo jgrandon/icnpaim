@@ -14,6 +14,7 @@ export const CardContent = (props) => {
                 fontSize: 12,
                 fontSize: '1rem',
                 lineHeight: '1.75rem',
+                fontWeight: 700
             }}
         >
         {card.title}
@@ -25,6 +26,7 @@ export const CardContent = (props) => {
                 color,
                 fontSize: '0.875rem',
                 lineHeight: '1.25rem',
+                fontWeight: 500
             }}
         >
         {card.description}
