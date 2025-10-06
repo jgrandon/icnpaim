@@ -15,7 +15,6 @@ export function Icon (props) {
         fontSize: 16,
         marginRight: 8
     }
-    const { search , color } = props
 
     if (search.includes('podcast'))
         return <Headset style={styles}/>
