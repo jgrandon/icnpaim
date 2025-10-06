@@ -5,13 +5,16 @@ import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 export const ProgressIndicator = (props) => {
     const { 
         isActive = {},
-        isFirst = false,
-        isLast = false,
-        isNextActive=false
+        prev = undefined,
+        next = undefined,
+        color = null
     } = props
-
-    const pipeColor = isActive ? _OK_GREEN :_INACTIVE_GRAY
-    const nextPipeColor = isNextActive ? _OK_GREEN : _INACTIVE_GRAY
+    const isFirst = prev == undefined
+    const isLast = next == undefined
+    const inactiveColor = color ?? _INACTIVE_GRAY
+    const pipeColor = isActive ? _OK_GREEN : inactiveColor
+    const nextPipeColor = next?.completed ? _OK_GREEN : inactiveColor
+    const prevPipeColor = prev?.completed ? _OK_GREEN : inactiveColor
 
     return (
         <div
