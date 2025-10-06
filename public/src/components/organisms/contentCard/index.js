@@ -73,11 +73,15 @@ export const ContentCard = (props) => {
 					gridRowStart: 1,
 					display: 'grid',
 					color: 'black',
-    				textDecoration: 'none'
+					textDecoration: 'none',
+					boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+					'&:hover': {
+						trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
+					}
 				}}
 			>
 				<CardHeader card={card} color={cardColor} />
-				<CardContent card={card} color={cardColor} />
+				<CardContent card={card} color={color} />
 				<Typography
 					variant="body2"
 					style={{
