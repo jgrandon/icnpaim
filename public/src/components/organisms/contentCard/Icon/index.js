@@ -8,6 +8,7 @@ import {
 } from '@material-ui/icons';
 
 export function Icon (props) {
+    const { search , color } = props
     const styles = {
         color,
         fill: color,
