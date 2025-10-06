@@ -33,12 +33,20 @@ function getUnitData (unit) {
 			id,
 			status,
 			title,
-			content: unit.content.rendered,
+			content: clearContent(unit.content.rendered),
+			color: unit.meta.color,
+			cardsLocked: unit.meta.cards_locked,
 			courseId: unit.meta.course_id,
 			cards: allCards,
 			learningRoutes: getLearningRoutes(allCards),
 			contentId: unit.meta?.content_id ?? 0,
 		}
+}
+
+function clearContent(content) {
+	return content
+		.replaceAll('<p>','')
+		.replaceAll('</p>', '')
 }
 
 export function getLearningRoutes(cards) {
