@@ -315,7 +315,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       console.log('>>>>>>/units => contents', contents)
 
       const grades = await contents.map( async c => {
-        const columnId = c.contentHandler?.columnId
+        const columnId = c.contentHandler?.gradeColumnId
         let grade = null
         if (!!columnId) {
           grade = await grades.getGrade(bbCourseId, columnId, bbStudentExternalId)
