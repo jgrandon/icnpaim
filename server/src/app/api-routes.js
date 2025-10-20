@@ -314,7 +314,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       //  make only one request for al contents and filter for seached ids
       console.log('>>>>>>/units => contents', contents)
 
-      const grades = await contents.map( async c => {
+      const unitsGrades = await contents.map( async c => {
         const columnId = c.contentHandler?.gradeColumnId
         let grade = null
         if (!!columnId) {
@@ -326,11 +326,11 @@ router.get('/units', requireLTISession, async (req, res) => {
           grade
         }
       })
-      console.log('>>>>>>/units => grades', grades)
+      console.log('>>>>>>/units => grades', unitsGrades)
 
       const cUnits = bUnits.map(u => ({
         ...u,
-        grade: grades.find(g => g.contentId == u.contentId)?.grade
+        grade: unitsGrades.find(g => g.contentId == u.contentId)?.grade
       }))
       // map content to get their column_ids
 
