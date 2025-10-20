@@ -613,6 +613,19 @@ class DashboardView extends React.Component {
         )}
           */}
 
+        <div style={{
+          fontWeight: 900,
+          fontSize: '2.25rem',
+          lineHeight: '2.5rem'
+        }}>
+          Ruta de Aprendizaje
+        </div>
+        <div style={{
+          fontSize: '1.25rem'
+        }}>
+          Sigue el camino secuencial para completar todas las actividades del curso
+        </div>
+
         {/* Unidades como Cards */}
         {selectedCourse && (
           <>
