@@ -9,6 +9,7 @@ import { getProgressByUnits } from './handlers/progress'
 import { getColumnIdByContent } from './handlers/columns'
 import * as grades from './handlers/grades'
 import * as students from './handlers/students'
+import { getContentsByCourseId } from './handlers/content';
 
 const router = express.Router();
 
@@ -268,6 +269,9 @@ router.get('/units', requireLTISession, async (req, res) => {
     const studentId = req.ltiSession.wpStudentId;
     console.log('>>>>>>>>>>>> /units > studentId =>',studentId)
 
+    const { bbStudentExternalId, bbCourseId } = req.ltiSession;
+
+      
     const { courseId } = req.query
     // const courseId = /*req.query?.courseId ??*/ 50;
     // const course = (await getCourse(courseName))[0]
@@ -281,17 +285,16 @@ router.get('/units', requireLTISession, async (req, res) => {
       // const { id : courseId } = course
       console.log('>>>>>>>>>>>> /units > courseId =>',courseId)
 
-      const units = await getCourseUnits(courseId)
-      console.log('>>>>>>>>>>>> /units > units =>', units)
+      const rawUnits = await getCourseUnits(courseId)
+      console.log('>>>>>>>>>>>> /units > units =>', rawUnits)
 
       const progress = await getProgressByUnits(studentId, courseId)
       console.log('>>>>>>>>>>>> /units > progress =>', progress)
 
-      const studentUnits = units.map(u => ({
+      const studentUnits = rawUnits.map(u => ({
         ...u,
         cards: u.cards.map(c => {
-          console.log('>>>>>>>>>>>> /units > card =>', c)
-
+          // read card progress
           return {
             ...c,
             completed:
@@ -299,18 +302,45 @@ router.get('/units', requireLTISession, async (req, res) => {
           }
         })
       }))
-      console.log('>>>>>>>>>>>> /units > studentUnits =>', studentUnits)
 
       const bUnits = studentUnits.map(u => ({
         ...u,
         learningRoutes: getLearningRoutes(u.cards)
       }))
-      console.log('>>>>>>>>>>>> /units > bUnits =>', bUnits)
+
+      const contentIds = bUnits.map(u => u.contentId)
+      const contents = (await getContentsByCourseId(bbCourseId))
+        .filter(c => contentIds.includes(c.id))
+      //  make only one request for al contents and filter for seached ids
+
+      const grades = contents.map( async c => {
+        const columnId = c.contentHandler?.columnId
+        let grade = null
+        if (!!columnId) {
+          grade = await grades.getGrade(bbCourseId, columnId, bbStudentExternalId)
+        }
+        return {
+          contentId: c.id,
+          columnId,
+          grade
+        }
+      })
+
+      const cUnits = bUnits.map(u => ({
+        ...u,
+        grade: grades.find(g => g.contentId == u.contentId)?.grade
+      }))
+      // map content to get their column_ids
+
+      //getAllGrades:
+      //  check if there is a enpoint to get all grades 
+      //  and filter by column_ids instead of doing x 
+      //  number on requests
       
 
       return res.json({
         success: true,
-        units: bUnits
+        units: cUnits
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);

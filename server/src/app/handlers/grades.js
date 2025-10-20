@@ -7,17 +7,18 @@ export async function getGrade (
     studentId
 ) {
     let grades = []
-    const cachedGrades = cache.getGrades(courseId, columnId)
-    if (cachedGrades.length>0) {
-        grades = cachedGrades
-    } else {
+    let searchedGrade = null
+
+    const cachedGrades = await cache.getGrades(courseId, columnId)
+    searchedGrade = cachedGrades.find(cg => cg.userId == studentId)
+    if (!searchedGrade) {
         const apiClient = BlackBoardApiClient.getClient()
         const request = await apiClient.get(
             `/v2/courses/${courseId}/gradebook/columns/${columnId}/users`
         )
         grades = request.data.results
         cache.saveGrades(courseId, columnId, grades)
+        searchedGrade = grades.find(g => g.userId == studentId)
     }
-    const grade = grades.find(g => g.userId == studentId)
-    return grade
+    return searchedGrade
 }

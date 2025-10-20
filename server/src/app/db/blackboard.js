@@ -20,6 +20,22 @@ export async function getColumnId(contentId) {
     }
 }
 
+export async function getContents(courseId) {
+    console.log('getColumnId')
+    try {
+        const cachedContents = await db.getData(`/course/${courseId}/content`)
+        const contents = cachedContents ?? {}
+        return contents
+    } catch (error) {
+        console.error('BLACKBOARD DB: getContents error: ', error)
+        return {}
+    }
+}
+
+export function updateContents(courseId, contents) {
+    db.push(`/course/${courseId}/content`, contents)
+}
+
 export function insertNewContent(contentId, body) {
     db.push('/content', {
         [contentId] : body
