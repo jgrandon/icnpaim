@@ -1,10 +1,9 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import styles from './progress.module.css'
 
-/*
-const styles = theme => ({
-  progressDashboard : {
+const styles = {
+    progressDashboard : {
+        display: 'grid',
     },
     titleContainer: {
         display: 'flex',
@@ -31,11 +30,9 @@ const styles = theme => ({
         color: 'rgb(36, 97, 233)',
         border: '1px solid rgb(191 219 254)'
     }
-})
-    */
+}
 
 export default function ProgressDashboard(props) {
-    //const { classes } = props
     return <div className={styles.progressDashboard}>
         <div className={styles.titleContainer}>
             <div className={styles.title}> Tu Progreso en la Ruta </div>
