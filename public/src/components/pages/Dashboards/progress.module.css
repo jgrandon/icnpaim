@@ -1,0 +1,29 @@
+
+.progressDashboard {
+    display: grid;
+}
+.titleContainer {
+    display: flex;
+    flex-direction: column;
+}
+.title {
+    font-weight: 700;
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+.tasksProgress {
+    display: flex;
+}
+.tasksProgressDetail {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+.generalProgress {
+    display: grid;
+}
+.nextTask {
+    display: grid;
+    color: rgb(36, 97, 233);
+    border: 1px solid rgb(191 219 254);
+}

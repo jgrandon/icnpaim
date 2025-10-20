@@ -1,5 +1,7 @@
 import { withStyles } from '@material-ui/core/styles';
+import styles from './progress.module.css'
 
+/*
 const styles = theme => ({
   progressDashboard : {
     },
@@ -29,16 +31,17 @@ const styles = theme => ({
         border: '1px solid rgb(191 219 254)'
     }
 })
+    */
 
- function ProgressDashboard(props) {
-    const { classes } = props
-    return <div className={classes.progressDashboard}>
-        <div className={classes.titleContainer}>
-            <div className={classes.title}> Tu Progreso en la Ruta </div>
+export default function ProgressDashboard(props) {
+    //const { classes } = props
+    return <div className={styles.progressDashboard}>
+        <div className={styles.titleContainer}>
+            <div className={styles.title}> Tu Progreso en la Ruta </div>
             <div>  Sigue el camino para completar todas las actividade </div>
         </div>
-        <div className={classes.tasksProgress}>
-            <div className={classes.tasksProgressDetail}>
+        <div className={styles.tasksProgress}>
+            <div className={styles.tasksProgressDetail}>
                 <div>icon</div>
                 <div>0</div>
                 <div>Completadas</div>
@@ -54,7 +57,7 @@ const styles = theme => ({
                 <div>Total</div>
             </div>
         </div>
-        <div className={classes.generalProgress}>
+        <div className={styles.generalProgress}>
             <div>Progreso General</div>
             <div>
                 0%
@@ -63,7 +66,7 @@ const styles = theme => ({
                Barra
             </div>
         </div>
-        <div className={classes.nextTask}>
+        <div className={styles.nextTask}>
             <div>Icon</div>
             <div> SiguienteActividad: </div>
             <div> Ver Clase 1 </div>
@@ -75,4 +78,4 @@ const styles = theme => ({
     </div>
 }
 
-export default withStyles(styles)(ProgressDashboard);
+//export default withStyles(styles)(ProgressDashboard);
