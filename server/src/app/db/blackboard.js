@@ -80,7 +80,7 @@ export async function getGrades(courseId, columnId) {
         const grades = await db.getData(`/grades/${courseId}/${columnId}`)
         return grades ?? []
     } catch (error) {
-        return null
+        return []
     }
 }
 
