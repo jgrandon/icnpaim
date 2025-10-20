@@ -47,7 +47,7 @@ const styles = theme => ({
     backgroundColor: '#f8fafc'
   },
   welcomeCard: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: '#ec622b', //UDLA background
     color: 'white',
     marginBottom: theme.spacing(3)
   },
@@ -510,6 +510,7 @@ class DashboardView extends React.Component {
         </Card>
 
         {/* Estadísticas del Curso */}
+        {/*
         {selectedCourse && (
           <Grid container spacing={3} style={{ marginBottom: 24 }}>
             <Grid item xs={12} sm={4}>
@@ -529,6 +530,7 @@ class DashboardView extends React.Component {
                 </CardContent>
               </Card>
             </Grid>
+            */}
             {/*
             <Grid item xs={12} sm={4}>
               <Card className={classes.progressCard} elevation={4}>
@@ -565,10 +567,13 @@ class DashboardView extends React.Component {
               </Card>
             </Grid>
             */}
+          {/* 
           </Grid>
+          /*}
         )}
 
         {/* Cursos */}
+        {/*
         {courses.length > 0 && (
           <>
             <Typography variant="h5" className={classes.sectionTitle}>
@@ -606,21 +611,18 @@ class DashboardView extends React.Component {
             </Grid>
           </>
         )}
+          */}
 
         {/* Unidades como Cards */}
         {selectedCourse && (
           <>
+          {/*
             <Typography variant="h5" className={classes.sectionTitle}>
               <TrendingUp className={classes.cardIcon} />
               Unidades - {selectedCourse.title}
             </Typography>
+          */}
 
-            {/*
-            <UnitsDashboard
-              units={units}
-              classes={classes}
-            />
-            */}
           
             {units.length === 0 ? (
               <Card>
