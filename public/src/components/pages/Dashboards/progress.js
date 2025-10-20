@@ -5,6 +5,9 @@ const styles = {
     progressDashboard : {
         display: 'grid',
         maxWidth: 850,
+        boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+        borderRadius: '1rem',
+        padding: 32
     },
     titleContainer: {
         display: 'flex',
@@ -74,7 +77,7 @@ export default function ProgressDashboard(props) {
                 <div>icon</div>
                 <div style={{
                     ...styles.detailNumber,
-                    fontColor: 'rgb(22 163 74)',
+                    color: 'rgb(22 163 74)',
                 }}>0</div>
                 <div>Completadas</div>
             </div>
@@ -82,7 +85,7 @@ export default function ProgressDashboard(props) {
                 <div>icon</div>
                 <div style={{
                     ...styles.detailNumber,
-                    fontColor: 'rgb(37 99 235)',
+                    color: 'rgb(37 99 235)',
                 }}>21</div>
                 <div>Pendientes</div>
             </div>
