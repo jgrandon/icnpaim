@@ -309,8 +309,10 @@ router.get('/units', requireLTISession, async (req, res) => {
       }))
 
       const contentIds = bUnits.map(u => u.contentId)
+      console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByCourseId(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
+      console.log('>>>>>>/units => contents', contents)
 
       const grades = contents.map( async c => {
         const columnId = c.contentHandler?.columnId
@@ -324,6 +326,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           grade
         }
       })
+      console.log('>>>>>>/units => grades', grades)
 
       const cUnits = bUnits.map(u => ({
         ...u,
