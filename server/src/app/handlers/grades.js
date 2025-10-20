@@ -10,7 +10,7 @@ export async function getGrade (
     let searchedGrade = null
 
     const cachedGrades = await cache.getGrades(courseId, columnId)
-    console.log('getGrade => cachedGrades', cachedGrades)
+    console.log('getGrade => cachedGrades', cachedGrades.length)
     searchedGrade = cachedGrades.find(cg => cg.userId == studentId)
     console.log('getGrade => searchedGrade', searchedGrade)
 
@@ -21,7 +21,7 @@ export async function getGrade (
             `/v2/courses/${courseId}/gradebook/columns/${columnId}/users`
         )
         grades = request.data.results
-        console.log('getGrade => grades', grades)
+        console.log('getGrade => grades', grades.length)
 
         cache.saveGrades(courseId, columnId, grades)
         searchedGrade = grades.find(g => g.userId == studentId)
