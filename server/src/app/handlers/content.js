@@ -7,7 +7,7 @@ export async function getContentsByCourseId (courseId, ids) {
     let contents = []
     contents = await cache.getContents(courseId)
     const cachedIds = contents.map(c => id)
-    const notCached = ids.filter(id => !cachedIds.include(id))
+    const notCached = ids.filter(id => !cachedIds.includes(id))
 
     //console.log('getContentsById => cachedColumnId' , cachedColumnId)
 
