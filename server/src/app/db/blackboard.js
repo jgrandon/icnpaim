@@ -24,11 +24,11 @@ export async function getContents(courseId) {
     console.log('getColumnId')
     try {
         const cachedContents = await db.getData(`/course/${courseId}/content`)
-        const contents = cachedContents ?? {}
+        const contents = cachedContents ?? []
         return contents
     } catch (error) {
         console.error('BLACKBOARD DB: getContents error: ', error)
-        return {}
+        return []
     }
 }
 
