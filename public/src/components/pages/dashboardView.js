@@ -37,6 +37,7 @@ import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import { v4 as uuidv4 } from 'uuid';
+import ProgressDashboard from './Dashboards/progress'
 
 const params = parameters.getInstance();
  
@@ -508,6 +509,8 @@ class DashboardView extends React.Component {
             </Box>
           </CardContent>
         </Card>
+
+        <ProgressDashboard />
 
         {/* Estadísticas del Curso */}
         {/*
