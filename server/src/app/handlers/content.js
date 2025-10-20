@@ -2,7 +2,7 @@ import { xor } from 'lodash'
 import BlackBoardApiClient from '../clients/blackboard'
 import * as cache from '../db/blackboard'
 
-export async function getContentsByCourseId (courseId) {
+export async function getContentsByCourseId (courseId, ids) {
     console.log('getContentsById => start')
     let contents = []
     contents = await cache.getContents(courseId)
@@ -28,5 +28,5 @@ export async function getContentsByCourseId (courseId) {
         cache.updateContents(courseId, newContents)
         contents = newContents
     }
-    return contents
+    return contents.filter(c => ids.includes(c.id))
 }

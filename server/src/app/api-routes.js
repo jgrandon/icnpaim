@@ -309,8 +309,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       }))
 
       const contentIds = bUnits.map(u => u.contentId)
-      const contents = (await getContentsByCourseId(bbCourseId))
-        .filter(c => contentIds.includes(c.id))
+      const contents = await getContentsByCourseId(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
 
       const grades = contents.map( async c => {
