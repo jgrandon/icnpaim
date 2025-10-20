@@ -1,33 +1,64 @@
 import React from 'react'
-
+import {uuidv4} from 'uuid'
 const styles = {
     progressDashboard : {
         display: 'grid',
+        maxWidth: 850,
     },
     titleContainer: {
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        alignItems: 'center',
     },
     title: {
         fontWeight: '700',
         fontSize: '1.875rem',
         lineHeight: '2.25rem',
     },
+    detail: {
+        fontSize: '1.125rem',
+        lineHeight: '1.75rem'
+    },
     tasksProgress: {
-        display: 'flex'
+        display: 'flex',
+        justifyContent: 'space-around',
+        marginBottom: 32
     },
     tasksProgressDetail: {
         display: 'flex',
         flexDirection: 'column',
-        alignContent: 'center'
+        alignContent: 'space-arround',
+        padding: '30px',
+        alignItems: 'center',
+        fontWeight: 500,
+    },
+    detailNumber: {
+        fontWeight: 700,
+        fontSize: '1.875rem',
+        lineHeight: '2.25rem'
     },
     generalProgress: {
         display: 'grid',
+        gridTemplateColumns: '10fr 1fr',
+    },
+    generalProgressBar: {
+        margin: '10px 0px',
+        gridArea: '2 / 1 / 2 / 11',
     },
     nextTask: {
-        display: 'grid',
+        display: 'flex',
+        justifyContent: 'space-between',
         color: 'rgb(36, 97, 233)',
         border: '1px solid rgb(191 219 254)'
+    },
+    button: {
+        width: 145,
+        padding: '0.75rem 1.5rem',
+    },
+    bold: {
+        fontWeight: 700,
+        fontSize: '1.125rem',
+        lineHeight: '1.75rem'
     }
 }
 
@@ -35,41 +66,59 @@ export default function ProgressDashboard(props) {
     return <div style={styles.progressDashboard}>
         <div style={styles.titleContainer}>
             <div style={styles.title}> Tu Progreso en la Ruta </div>
-            <div>  Sigue el camino para completar todas las actividade </div>
+            <div style={styles.detail}>  Sigue el camino para completar todas las actividades </div>
         </div>
         <div style={styles.tasksProgress}>
-            <div style={styles.tasksProgressDetail}>
+            <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div>icon</div>
-                <div>0</div>
+                <div style={{
+                    ...styles.detailNumber,
+                    fontColor: 'rgb(22 163 74)',
+                }}>0</div>
                 <div>Completadas</div>
             </div>
-            <div>
+            <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div>icon</div>
-                <div>21</div>
+                <div style={{
+                    ...styles.detailNumber,
+                    fontColor: 'rgb(37 99 235)',
+                }}>21</div>
                 <div>Pendientes</div>
             </div>
-            <div>
+            <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div>icon</div>
-                <div>21</div>
+                <div style={styles.detailNumber}>21</div>
                 <div>Total</div>
             </div>
         </div>
-        <div style={styles.generalProgress}>
-            <div>Progreso General</div>
+        <div style={{
+            ...styles.generalProgress,
+            ...styles.bold
+        }}>
+            <div >Progreso General</div>
             <div>
                 0%
             </div>
-            <div>
-               Barra
+            <div styles={styles.generalProgressBar}>
+                Barra
             </div>
         </div>
         <div style={styles.nextTask}>
-            <div>Icon</div>
-            <div> SiguienteActividad: </div>
-            <div> Ver Clase 1 </div>
-            <button>
-                Comenzar
-                <div> {'>'} </div>
+            <div style={{
+                display: 'grid', 
+                gridTemplateColumns: '1fr 5fr'
+            }}>
+                <div>Icon</div>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                    <div style={styles.bold}> Siguiente Actividad: </div>
+                    <div style={{ fontWeight: 500 }}> Ver Clase 1 </div>
+                </div>
+            </div>
+            <button >
+                Comenzar {'>'}
             </button> 
         </div>
     </div>
