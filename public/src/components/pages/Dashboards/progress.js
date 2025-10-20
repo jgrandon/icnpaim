@@ -1,5 +1,4 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
     progressDashboard : {
@@ -33,13 +32,13 @@ const styles = {
 }
 
 export default function ProgressDashboard(props) {
-    return <div className={styles.progressDashboard}>
-        <div className={styles.titleContainer}>
-            <div className={styles.title}> Tu Progreso en la Ruta </div>
+    return <div style={styles.progressDashboard}>
+        <div style={styles.titleContainer}>
+            <div style={styles.title}> Tu Progreso en la Ruta </div>
             <div>  Sigue el camino para completar todas las actividade </div>
         </div>
-        <div className={styles.tasksProgress}>
-            <div className={styles.tasksProgressDetail}>
+        <div style={styles.tasksProgress}>
+            <div style={styles.tasksProgressDetail}>
                 <div>icon</div>
                 <div>0</div>
                 <div>Completadas</div>
@@ -55,7 +54,7 @@ export default function ProgressDashboard(props) {
                 <div>Total</div>
             </div>
         </div>
-        <div className={styles.generalProgress}>
+        <div style={styles.generalProgress}>
             <div>Progreso General</div>
             <div>
                 0%
@@ -64,7 +63,7 @@ export default function ProgressDashboard(props) {
                Barra
             </div>
         </div>
-        <div className={styles.nextTask}>
+        <div style={styles.nextTask}>
             <div>Icon</div>
             <div> SiguienteActividad: </div>
             <div> Ver Clase 1 </div>
