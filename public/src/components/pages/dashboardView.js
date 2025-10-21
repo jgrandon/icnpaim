@@ -515,7 +515,7 @@ class DashboardView extends React.Component {
           </CardContent>
         </Card>
 
-        <ProgressDashboard />
+        <ProgressDashboard units={units} />
 
         {/* Estadísticas del Curso */}
         {/*

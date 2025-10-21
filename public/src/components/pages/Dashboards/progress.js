@@ -1,5 +1,10 @@
 import React from 'react'
 import { v4 as uuidv4 } from 'uuid';
+import {
+    PanoramaFishEye as AllTasksIcon,
+    CheckCircleOutline as CompletedTasksIcon,
+    TrackChanges as PendingTasksIcon
+ } from '@material-ui/icons';
 
 const styles = {
     progressDashboard : {
@@ -67,6 +72,10 @@ const styles = {
 }
 
 export default function ProgressDashboard(props) {
+    const { units } = props
+    const allTasks = units.map(u => u.studentLearningRoute).reduce((acc = [], current) => ({...acc, ...current})) 
+    const completedTasks = allTasks.filter(c => c.completed)
+    const pendingTasks = allTasks.filter(c => !c.completed)
     return <div style={styles.progressDashboard}>
         <div style={styles.titleContainer}>
             <div style={styles.title}> Tu Progreso en la Ruta </div>
@@ -74,24 +83,30 @@ export default function ProgressDashboard(props) {
         </div>
         <div style={styles.tasksProgress}>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div>icon</div>
+                <div><CompletedTasksIcon /></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(22 163 74)',
-                }}>0</div>
+                }}>
+                    {completedTasks.length}
+                </div>
                 <div>Completadas</div>
             </div>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div>icon</div>
+                <div><PendingTasksIcon /></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(37 99 235)',
-                }}>21</div>
+                }}>
+                    {pendingTasks.length}
+                </div>
                 <div>Pendientes</div>
             </div>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div>icon</div>
-                <div style={styles.detailNumber}>21</div>
+                <div><AllTasksIcon /></div>
+                <div style={styles.detailNumber}>
+                    {allTasks.length}
+                </div>
                 <div>Total</div>
             </div>
         </div>
