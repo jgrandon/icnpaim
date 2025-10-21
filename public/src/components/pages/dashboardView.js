@@ -229,7 +229,7 @@ class DashboardView extends React.Component {
       const responseBody = await unitsResponse.json();
       console.log('responseBody => ', responseBody )
       if (responseBody.success) {
-        const { units: allUnits } = responseBody
+        const { units /*: allUnits*/ } = responseBody
         console.log('responseBody success => ',responseBody )
         const selectedUnit = allUnits[0]
         /*

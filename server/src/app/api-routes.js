@@ -352,10 +352,34 @@ router.get('/units', requireLTISession, async (req, res) => {
         */
       console.log('>>>>>>/units => grades', unitsGrades)
 
-      const cUnits = bUnits.map(u => ({
-        ...u,
-        grade: unitsGrades.find(g => g.contentId == u.contentId)?.grade
-      }))
+      const cUnits = bUnits.map(u => {
+        let learningRouteIndex = null
+        let evaluation = null
+        let grade = unitsGrades.find(g => g.contentId == u.contentId)?.grade
+        
+        if (!grade || grade?.status == "NeedsGrading" ) {
+          learningRouteIndex = 1
+          evaluation = 0
+          grade = {}
+        } else {
+          const {possible: maxScore, score} = grade.displayGrade
+          evaluation = score / maxScore
+          console.log('evaluation =>' , evaluation)
+          learningRouteIndex = evaluation >= 0.5
+            ? (evaluation >= 0.8 ? 1 : 2 ) : 3
+        }
+
+        return {
+          ...u,
+          studentLearningRoute: u.learningRoutes[learningRouteIndex],
+          studentLearningIndex: learningRouteIndex,
+          studentGrade: {
+            ...grade,
+            evaluation,
+            learningRouteIndex
+          }
+        }
+      })
       // map content to get their column_ids
 
       //getAllGrades:
@@ -380,7 +404,7 @@ router.get('/units', requireLTISession, async (req, res) => {
   })
 
   
-router.get('/evaluationGradee', requireLTISession, async (req, res) => {
+router.get('/evaluationGrade', requireLTISession, async (req, res) => {
   console.log('-------------------/evaluationGrade');
   try {
     const { bbStudentExternalId, bbCourseId } = req.ltiSession;
