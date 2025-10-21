@@ -232,11 +232,13 @@ class DashboardView extends React.Component {
         const { units: allUnits } = responseBody
         console.log('responseBody success => ',responseBody )
         const selectedUnit = allUnits[0]
+        /*
         const grade = await this.getUnitGrade(course.id, selectedUnit)
         const evaluatedUnit = this.getEvaluatedUnit(selectedUnit, grade)
         const units = allUnits.map( u =>
           u.id == evaluatedUnit.id ? evaluatedUnit : u
         )
+          */
         this.setState({
           units,
           selectedUnitId: selectedUnit?.id
