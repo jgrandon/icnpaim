@@ -11,7 +11,7 @@ export async function getGrade (
 
     const cachedGrades = await cache.getGrades(courseId, columnId)
     console.log('getGrade => cachedGrades', cachedGrades.length)
-    searchedGrade = cachedGrades.find(cg => cg.userId == studentId)
+    searchedGrade = cachedGrades.find(cg => cg.userId == studentId && cg.columnId==columnId)
     console.log('getGrade => searchedGrade', searchedGrade)
 
     if (!searchedGrade) {
@@ -24,7 +24,7 @@ export async function getGrade (
         console.log('getGrade => grades', grades.length)
 
         cache.saveGrades(courseId, columnId, grades)
-        searchedGrade = grades.find(g => g.userId == studentId)
+        searchedGrade = grades.find(g => g.userId == studentId  && g.columnId==columnId)
     }
     return searchedGrade
 }
