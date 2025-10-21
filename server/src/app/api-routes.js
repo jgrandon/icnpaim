@@ -302,26 +302,40 @@ router.get('/units', requireLTISession, async (req, res) => {
           }
         })
       }))
-
+/*
       const bUnits = studentUnits.map(u => ({
         ...u,
         learningRoutes: getLearningRoutes(u.cards)
       }))
+        */
 
       const bbStudentId = await students.getStudentId(bbStudentExternalId)
 
+      const contentKey = 'ContentId%7C'
+      
+      // search for cards related to blackBoard activities
+      // to read their grades later
+      const cardsContentIds = studentUnits.map(
+        u => u.cards.filter(
+          c => !c.completed && c.url.includes(contentKey)
+        ).map(c => {
+            return c.url.split(contentKey)[1].split('%')[0]
+        })
+      ).reduce((acc = [], a) => [...acc, ...a])
 
-      const contentIds = bUnits.map(u => u.contentId)
+
+      const contentIds = {
+        ...studentUnits.map(u => u.contentId), // units contents
+        ...cardsContentIds // cards contents
+      }
+      
       console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByCourseId(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
       console.log('>>>>>>/units => contents', contents)
 
 
-      // i cannot await for a map 
-      // change this to a for loop
-
-      let unitsGrades = []
+      let allGrades = []
       const iContents = contents.length
       for (let i = 0; i<iContents; i++) {
         const currentContent = contents[i]
@@ -330,14 +344,14 @@ router.get('/units', requireLTISession, async (req, res) => {
         if (!!columnId) {
           grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
         }
-        unitsGrades.push({
+        allGrades.push({
           contentId: currentContent.id,
           columnId,
           grade
         })
       }
 /*
-      const unitsGrades = await contents.map( async c => {
+      const allGrades = await contents.map( async c => {
         const columnId = c.contentHandler?.gradeColumnId
         let grade = null
         if (!!columnId) {
@@ -350,12 +364,12 @@ router.get('/units', requireLTISession, async (req, res) => {
         }
       })
         */
-      console.log('>>>>>>/units => grades', unitsGrades)
+      console.log('>>>>>>/units => grades', allGrades)
 
-      const cUnits = bUnits.map(u => {
+      const finalUnits = studentUnits.map(u => {
         let learningRouteIndex = null
         let evaluation = null
-        let grade = unitsGrades.find(g => g.contentId == u.contentId)?.grade
+        let grade = allGrades.find(g => g.contentId == u.contentId)?.grade
         
         if (!grade || grade?.status == "NeedsGrading" ) {
           learningRouteIndex = 1
@@ -369,9 +383,33 @@ router.get('/units', requireLTISession, async (req, res) => {
             ? (evaluation >= 0.8 ? 1 : 2 ) : 3
         }
 
+        const cards = u.cards.map(c => {
+          if (c.completed || !c.url.includes(contentKey)) return c
+          //only blackboard activity cards
+          const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
+          const grade = allGrades.find(g => g.contentId == cardContentId)
+          if (!!grade) {
+            //update 
+            wpClient.upsertProgress({
+              studentId,
+              courseId: parseInt(courseId),
+              unitId: parseInt(u.id),
+              completedCardId: c.id
+            });
+          } 
+          return {
+            ...c,
+            completed: !!grade
+          }
+        })
+
+        const learningRoutes = getLearningRoutes(cards)
+
         return {
           ...u,
-          studentLearningRoute: u.learningRoutes[learningRouteIndex-1],
+          cards,
+          learningRoutes,
+          studentLearningRoute: learningRoutes[learningRouteIndex-1],
           studentLearningIndex: learningRouteIndex,
           studentGrade: {
             ...grade,
@@ -390,7 +428,7 @@ router.get('/units', requireLTISession, async (req, res) => {
 
       return res.json({
         success: true,
-        units: cUnits
+        units: finalUnits
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);
