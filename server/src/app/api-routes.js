@@ -317,6 +317,26 @@ router.get('/units', requireLTISession, async (req, res) => {
       //  make only one request for al contents and filter for seached ids
       console.log('>>>>>>/units => contents', contents)
 
+
+      // i cannot await for a map 
+      // change this to a for loop
+
+      let unitsGrades = []
+      const iContents = contents.length
+      for (let i = 0; i<iContents; i++) {
+        const currentContent = contents[i]
+        const columnId = currentContent.contentHandler?.gradeColumnId
+        let grade = null
+        if (!!columnId) {
+          grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
+        }
+        unitsGrades.push({
+          contentId: currentContent.id,
+          columnId,
+          grade
+        })
+      }
+/*
       const unitsGrades = await contents.map( async c => {
         const columnId = c.contentHandler?.gradeColumnId
         let grade = null
@@ -329,6 +349,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           grade
         }
       })
+        */
       console.log('>>>>>>/units => grades', unitsGrades)
 
       const cUnits = bUnits.map(u => ({
