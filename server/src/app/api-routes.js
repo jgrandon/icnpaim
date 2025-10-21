@@ -324,10 +324,10 @@ router.get('/units', requireLTISession, async (req, res) => {
       ).reduce((acc = [], a) => [...acc, ...a])
 
 
-      const contentIds = {
+      const contentIds = [
         ...studentUnits.map(u => u.contentId), // units contents
         ...cardsContentIds // cards contents
-      }
+      ]
       
       console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByCourseId(bbCourseId, contentIds)
