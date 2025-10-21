@@ -371,7 +371,7 @@ router.get('/units', requireLTISession, async (req, res) => {
 
         return {
           ...u,
-          studentLearningRoute: u.learningRoutes[learningRouteIndex],
+          studentLearningRoute: u.learningRoutes[learningRouteIndex-1],
           studentLearningIndex: learningRouteIndex,
           studentGrade: {
             ...grade,
