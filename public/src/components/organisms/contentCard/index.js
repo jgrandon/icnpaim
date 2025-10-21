@@ -6,6 +6,7 @@ import { CardContent } from './content'
 import { getDefaultColor } from './colors'
 import { CardHeader } from './header'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
+import { forwardRef } from 'react';
 
 const getCurrentCard = (unit) => {
 	const iCards = unit.studentLearningRoute.length
@@ -21,7 +22,7 @@ const getCurrentCard = (unit) => {
 	return unit.studentLearningRoute[currentIndex+1]
 }
 
-export const ContentCard = (props) => {
+const ContentCard = forwardRef(function ContentCard(props, ref) {
 	const { 
 		card = {},
 		onClick = () => {},
@@ -40,6 +41,7 @@ export const ContentCard = (props) => {
 
 	return (
 		<div
+			ref={ref}
 			style={{
 				display: 'grid',
 				gridTemplateColumns: '6fr 1fr 6fr',
@@ -100,4 +102,6 @@ export const ContentCard = (props) => {
 			</Link>
 		</div>
 	)
-}
+})
+
+export default ContentCard
