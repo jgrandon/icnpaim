@@ -151,6 +151,7 @@ class DashboardView extends React.Component {
       overallProgress: 0,
       bbCourseId: null
     };
+    this.cardsRef = React.createRef([])
   }
 
   async componentDidMount() {
@@ -457,6 +458,12 @@ class DashboardView extends React.Component {
     })
   }
 
+  focusOnNextTask (nextTask) {
+    console.log('nextTask', nextTask)
+    const searchedCard = this.cardsRef.current.filter(r => r.card.id==nextTask.id)
+    searchedCard.ref.scrollIntoView()
+  }
+
   render() {
     const { classes } = this.props;
     const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, overallProgress } = this.state;
@@ -515,7 +522,7 @@ class DashboardView extends React.Component {
           </CardContent>
         </Card>
 
-        <ProgressDashboard units={units} onNextTask={(nextTask) => console.log('nextTask', nextTask)}/>
+        <ProgressDashboard units={units} onNextTask={this.focusOnNextTask}/>
 
         {/* Estadísticas del Curso */}
         {/*
@@ -725,9 +732,9 @@ class DashboardView extends React.Component {
                           {
                           learningRoute?.map(card => (
                             <ContentCard
+                              ref={el => this.cardsRef.current[i] = {ref : el, card}}
                               key={uuidv4()}
                               card={card}
-
                               onClick={() => this.notifyContentProgress(unit, card)}
                               unit={unit}
                             />
