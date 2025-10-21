@@ -72,10 +72,17 @@ const styles = {
 }
 
 export default function ProgressDashboard(props) {
-    const { units } = props
-    const allTasks = units.map(u => u.studentLearningRoute).reduce((acc = [], current) => ({...acc, ...current})) 
+    const { 
+        units,
+        onNextTask = (task) => {}
+     } = props
+    const allTasks = units.map(u => u.studentLearningRoute).reduce((acc = [], current) => ([...acc, ...current])) 
     const completedTasks = allTasks.filter(c => c.completed)
     const pendingTasks = allTasks.filter(c => !c.completed)
+    const nextTask = pendingTasks[0]
+    const onClick = () => {
+        onNextTask(nextTask)
+    }
     return <div style={styles.progressDashboard}>
         <div style={styles.titleContainer}>
             <div style={styles.title}> Tu Progreso en la Ruta </div>
@@ -127,16 +134,16 @@ export default function ProgressDashboard(props) {
                 display: 'grid', 
                 gridTemplateColumns: '1fr 5fr'
             }}>
-                <div>Icon</div>
+                <div><PendingTasksIcon /></div>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
                     <div style={styles.bold}> Siguiente Actividad: </div>
-                    <div style={{ fontWeight: 500 }}> Ver Clase 1 </div>
+                    <div style={{ fontWeight: 500 }}>{nextTask.title}</div>
                 </div>
             </div>
-            <button >
+            <button onClick={onClick}>
                 Comenzar {'>'}
             </button> 
         </div>
