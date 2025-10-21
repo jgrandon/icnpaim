@@ -308,6 +308,9 @@ router.get('/units', requireLTISession, async (req, res) => {
         learningRoutes: getLearningRoutes(u.cards)
       }))
 
+      const bbStudentId = await students.getStudentId(bbStudentExternalId)
+
+
       const contentIds = bUnits.map(u => u.contentId)
       console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByCourseId(bbCourseId, contentIds)
@@ -318,7 +321,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         const columnId = c.contentHandler?.gradeColumnId
         let grade = null
         if (!!columnId) {
-          grade = await grades.getGrade(bbCourseId, columnId, bbStudentExternalId)
+          grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
         }
         return {
           contentId: c.id,
