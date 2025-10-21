@@ -435,7 +435,10 @@ class DashboardView extends React.Component {
   };
 
   notifyContentProgress = (unit, content) => {
-    this.handleCardComplete(unit.id, content.id)
+    const isBlackboarActivity = !!content.url.split('ContentId%7C')[1]?.split('%')[0]
+    if (!isBlackboarActivity) {
+      this.handleCardComplete(unit.id, content.id)
+    }
   }
 
 
