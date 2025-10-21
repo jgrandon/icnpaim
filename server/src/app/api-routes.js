@@ -359,7 +359,7 @@ router.get('/units', requireLTISession, async (req, res) => {
   })
 
   
-router.get('/evaluationGrade', requireLTISession, async (req, res) => {
+router.get('/evaluationGradee', requireLTISession, async (req, res) => {
   console.log('-------------------/evaluationGrade');
   try {
     const { bbStudentExternalId, bbCourseId } = req.ltiSession;
