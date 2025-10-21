@@ -159,6 +159,15 @@ class DashboardView extends React.Component {
       await this.loadUserData();
       await this.loadCourses();
       await this.loadBBCourseId();
+
+      const { units } = this.state
+      const cards = units.map(u => u.studentLearningRoute).reduce((acc= [], current)=> [...acc, ...current])
+      const cardsLength = cards
+      if (this.cardsRef.current.length !== cardsLength) {
+        this.cardsRef.current = Array(cardsLength)
+          .fill()
+          .map((_, i) => this.cardsRef.current[i] || {ref: createRef(), card: cards[i]});
+      }
     } catch (error) {
       console.error('Error loading dashboard:', error);
       this.setState({ 
