@@ -245,6 +245,18 @@ class DashboardView extends React.Component {
           units,
           selectedUnitId: selectedUnit?.id
         });
+
+        
+        //const { units } = this.state
+        const cards = (units.length > 0
+          ? units.map(u => u.studentLearningRoute)
+          : [[]]).reduce((acc= [], current)=> [...acc, ...current])
+        const cardsLength = cards
+        if (this.cardsRef.current.length !== cardsLength) {
+          this.cardsRef.current = Array(cardsLength)
+            .fill()
+            .map((_, i) => this.cardsRef.current[i] || {ref: createRef(), card: cards[i]});
+        }
       }
 /*
       // Cargar progreso
@@ -255,16 +267,6 @@ class DashboardView extends React.Component {
       }
     */
 
-      //const { units } = this.state
-      const cards = (units.length > 0
-        ? units.map(u => u.studentLearningRoute)
-        : [[]]).reduce((acc= [], current)=> [...acc, ...current])
-      const cardsLength = cards
-      if (this.cardsRef.current.length !== cardsLength) {
-        this.cardsRef.current = Array(cardsLength)
-          .fill()
-          .map((_, i) => this.cardsRef.current[i] || {ref: createRef(), card: cards[i]});
-      }
     } catch (error) {
       console.error('Error loading course data:', error);
     }
