@@ -76,9 +76,10 @@ export default function ProgressDashboard(props) {
         units,
         onNextTask = (task) => {}
      } = props
-    const allTasks = units.map(u => u.studentLearningRoute).reduce((acc = [], current) => ([...acc, ...current])) 
-    const completedTasks = allTasks.filter(c => c.completed)
-    const pendingTasks = allTasks.filter(c => !c.completed)
+    const isLoading = units.length==0
+    const allTasks = isLoading ? [] : units.map(u => u.studentLearningRoute)?.reduce((acc = [], current) => ([...acc, ...current])) 
+    const completedTasks = isLoading ? [] : allTasks.filter(c => c.completed)
+    const pendingTasks = isLoading ? [] : allTasks.filter(c => !c.completed)
     const nextTask = pendingTasks[0]
     const onClick = () => {
         onNextTask(nextTask)
@@ -140,10 +141,12 @@ export default function ProgressDashboard(props) {
                     flexDirection: 'column'
                 }}>
                     <div style={styles.bold}> Siguiente Actividad: </div>
-                    <div style={{ fontWeight: 500 }}>{nextTask.title}</div>
+                    <div style={{ fontWeight: 500 }}>
+                        {nextTask ? nextTask?.title : 'No tienes actividades Pendientes'}
+                    </div>
                 </div>
             </div>
-            <button onClick={onClick}>
+            <button onClick={onClick} disabled={!nextTask}>
                 Comenzar {'>'}
             </button> 
         </div>
