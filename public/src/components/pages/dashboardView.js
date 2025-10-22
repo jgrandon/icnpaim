@@ -497,7 +497,7 @@ class DashboardView extends React.Component {
       .length > 0)
       */
     
-    const searchedCard = this.cardsRef.current.filter(r => r.current?.data['id'] == nextTask.id)
+    const searchedCard = this.cardsRef.current.filter(r => r.current?.getAttribute('data-id') == nextTask.id)
     console.log('refs', this.cardsRef)
     searchedCard.current.scrollIntoView()
     //this.notifyContentProgress(unit, nextTask)
