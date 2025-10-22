@@ -151,7 +151,7 @@ class DashboardView extends React.Component {
       overallProgress: 0,
       bbCourseId: null
     };
-    this.cardsRef = React.createRef([])
+    this.cardsRef = React.createRef()
   }
 
   async componentDidMount() {
@@ -254,11 +254,17 @@ class DashboardView extends React.Component {
         ).reduce((acc= [], current)=> [...acc, ...current])
 
         const cardsLength = cards.length
+        console.log('before setting reffs')
+
         if (this.cardsRef.current?.length !== cardsLength) {
-          if (!this.cardsRef.current) this.cardsRef.current = []
+          console.log('setting reffs')
+          if (!this.cardsRef.current) { 
+            this.cardsRef.current = []
+          }
           this.cardsRef.current = Array(cardsLength)
             .fill()
             .map((_, i) => this.cardsRef.current[i] || React.createRef());
+          console.log('cardsRef', this.cardsRef)
         }
       }
 /*
