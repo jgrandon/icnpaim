@@ -22,7 +22,7 @@ const getCurrentCard = (unit) => {
 	return unit.studentLearningRoute[currentIndex+1]
 }
 
-const ContentCard = forwardRef(function ContentCard(props, ref) {
+const ContentCard = forwardRef(function (props, ref) {
 	const { 
 		card = {},
 		onClick = () => {},
