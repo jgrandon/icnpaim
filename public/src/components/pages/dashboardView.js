@@ -240,10 +240,7 @@ class DashboardView extends React.Component {
           u.id == evaluatedUnit.id ? evaluatedUnit : u
         )
           */
-        this.setState({
-          units,
-          selectedUnitId: selectedUnit?.id
-        });
+
 
 
         //const { units } = this.state
@@ -266,6 +263,15 @@ class DashboardView extends React.Component {
             .map((_, i) => this.cardsRef.current[i] || React.createRef());
           console.log('cardsRef', this.cardsRef)
         }
+
+
+
+        this.setState({
+          units,
+          selectedUnitId: selectedUnit?.id
+        });
+
+
       }
 /*
       // Cargar progreso
