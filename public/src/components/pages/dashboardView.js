@@ -763,9 +763,9 @@ class DashboardView extends React.Component {
                           style={{ padding: 10 }}
                         >
                           {
-                          learningRoute?.map(card => (
+                          learningRoute?.map((card, index) => (
                             <ContentCard
-                              ref={el => this.cardsRef.current[i] = el}
+                              ref={el => this.cardsRef.current[index] = el}
                               key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress(unit, card)}
