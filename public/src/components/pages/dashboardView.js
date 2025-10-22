@@ -477,6 +477,7 @@ class DashboardView extends React.Component {
 
   focusOnNextTask (nextTask) {
     console.log('nextTask', nextTask)
+    console.log('nextTask => ', this.cardsRef)
     /*
     const { units } = this.state
     const unit = units.find(u => 
@@ -548,7 +549,7 @@ class DashboardView extends React.Component {
           </CardContent>
         </Card>
 
-        <ProgressDashboard units={units} onNextTask={this.focusOnNextTask}/>
+        <ProgressDashboard units={units} onNextTask={(nextTask) => this.focusOnNextTask(nextTask)}/>
 
         {/* Estadísticas del Curso */}
         {/*
