@@ -255,6 +255,7 @@ class DashboardView extends React.Component {
 
         const cardsLength = cards.length
         if (this.cardsRef.current?.length !== cardsLength) {
+          if (!this.cardsRef.current) this.cardsRef.current = []
           this.cardsRef.current = Array(cardsLength)
             .fill()
             .map((_, i) => this.cardsRef.current[i] || React.createRef());
