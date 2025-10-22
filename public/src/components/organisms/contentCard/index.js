@@ -42,6 +42,7 @@ const ContentCard = forwardRef(function ContentCard(props, ref) {
 	return (
 		<div
 			ref={ref}
+			data-id={card.id}
 			style={{
 				display: 'grid',
 				gridTemplateColumns: '6fr 1fr 6fr',

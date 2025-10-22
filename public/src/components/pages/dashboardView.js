@@ -152,7 +152,6 @@ class DashboardView extends React.Component {
       bbCourseId: null
     };
     this.cardsRef = React.createRef([])
-
   }
 
   async componentDidMount() {
@@ -246,16 +245,19 @@ class DashboardView extends React.Component {
           selectedUnitId: selectedUnit?.id
         });
 
-        
+
         //const { units } = this.state
-        const cards = (units.length > 0
+        const cards = (
+          units.length > 0
           ? units.map(u => u.studentLearningRoute)
-          : [[]]).reduce((acc= [], current)=> [...acc, ...current])
-        const cardsLength = cards
-        if (this.cardsRef.current.length !== cardsLength) {
+          : [[]]
+        ).reduce((acc= [], current)=> [...acc, ...current])
+
+        const cardsLength = cards.length
+        if (this.cardsRef.current?.length !== cardsLength) {
           this.cardsRef.current = Array(cardsLength)
             .fill()
-            .map((_, i) => this.cardsRef.current[i] || {ref: createRef(), card: cards[i]});
+            .map((_, i) => this.cardsRef.current[i] || React.createRef());
         }
       }
 /*
@@ -474,8 +476,17 @@ class DashboardView extends React.Component {
 
   focusOnNextTask (nextTask) {
     console.log('nextTask', nextTask)
-    const searchedCard = this.cardsRef.current.filter(r => r.card.id==nextTask.id)
-    searchedCard.ref.scrollIntoView()
+    /*
+    const { units } = this.state
+    const unit = units.find(u => 
+      u.studentLearningRoute.filter(c => c == nextTask)
+      .length > 0)
+      */
+    
+    const searchedCard = this.cardsRef.current.filter(r => r.current.data['id'] == nextTask.id)
+    console.log('refs', this.cardsRef)
+    searchedCard.current.scrollIntoView()
+    //this.notifyContentProgress(unit, nextTask)
   }
 
   render() {
@@ -746,7 +757,7 @@ class DashboardView extends React.Component {
                           {
                           learningRoute?.map(card => (
                             <ContentCard
-                              ref={el => this.cardsRef.current[i] = {ref : el, card}}
+                              ref={el => this.cardsRef.current[i] = el}
                               key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress(unit, card)}
