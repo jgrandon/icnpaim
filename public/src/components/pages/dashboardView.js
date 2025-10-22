@@ -497,7 +497,7 @@ class DashboardView extends React.Component {
       .length > 0)
       */
     
-    const searchedCard = this.cardsRef.current.filter(r => r.current.data['id'] == nextTask.id)
+    const searchedCard = this.cardsRef.current.filter(r => r.current?.data['id'] == nextTask.id)
     console.log('refs', this.cardsRef)
     searchedCard.current.scrollIntoView()
     //this.notifyContentProgress(unit, nextTask)
@@ -773,7 +773,7 @@ class DashboardView extends React.Component {
                           
                           learningRoute?.map((card, index) => (
                             <ContentCard
-                              ref={el => _this.cardsRef.current[index] = el}
+                              ref={el => _this.cardsRef.current[index].current = el}
                               key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress(unit, card)}
