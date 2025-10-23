@@ -23,7 +23,7 @@ export const ProgressIndicator = (props) => {
             style={{
                 height: '-webkit-fill-available',
                 paddingLeft: 5,
-                gridColumn: windowWidth < 800 ? 1 : 2,
+                gridColumn: windowWidth.current < 800 ? 1 : 2,
                 display: 'grid',
                 gridTemplateRows: '4fr 1fr 4fr',
                 gridRowStart: 1,

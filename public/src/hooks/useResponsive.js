@@ -1,11 +1,11 @@
-import React, {useState} from 'react'
+import React, {useRef} from 'react'
 
 export function useResponsive () {
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const windowWidth = useRef(window.innerWidth);
     
     useEffect(() => {
     const handleResize = () => {
-        setWindowWidth(window.innerWidth);
+        windowWidth.current = window.innerWidth;
     };
 
     window.addEventListener('resize', handleResize);

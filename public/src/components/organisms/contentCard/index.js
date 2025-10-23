@@ -56,7 +56,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: windowWidth < 800 ? 3 : index%2==0 ? 3 : 1
+				gridColumn: windowWidth.current < 800 ? 3 : index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
@@ -75,7 +75,7 @@ const ContentCard = forwardRef(function (props, ref) {
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: windowWidth < 800 ? 2 : (index%2==0 ? 1 : 3),
+					gridColumn: windowWidth.current < 800 ? 2 : (index%2==0 ? 1 : 3),
 					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,

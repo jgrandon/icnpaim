@@ -35,6 +35,7 @@ import parameters from '../../util/parameters';
 import ContentCard from '../organisms/contentCard/';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
+import { useResponsive } from '../../hooks/useResponsive'
 
 const params = parameters.getInstance();
  
@@ -422,6 +423,7 @@ class DashboardView extends React.Component {
   }
 
   render() {
+    const windowWidth = useResponsive()
     const _this = this
     const { classes } = this.props;
     const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;
@@ -588,8 +590,8 @@ class DashboardView extends React.Component {
 
         <div style={{
           // margin: '50px auto',
-          width: windowWidth < 800 ? 'fit-content' : 'unset',
-          maxWidth: windowWidth < 800 ? 'unset' :'800px',
+          width: windowWidth.current < 800 ? 'fit-content' : 'unset',
+          maxWidth: windowWidth.current < 800 ? 'unset' :'800px',
           margin: '70px auto',
           display: 'flex',
           flexDirection: 'column',
@@ -633,8 +635,8 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <div style={{
-                width: windowWidth < 800 ? 'fit-content' : 'unset',
-                maxWidth: windowWidth < 800 ? 'unset' :'800px',
+                width: windowWidth.current < 800 ? 'fit-content' : 'unset',
+                maxWidth: windowWidth.current < 800 ? 'unset' :'800px',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 'auto',
