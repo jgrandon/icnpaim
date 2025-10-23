@@ -1,4 +1,4 @@
-import React, {useRef} from 'react'
+import React, {useRef, useEffect} from 'react'
 
 export function useResponsive () {
     const windowWidth = useRef(window.innerWidth);
