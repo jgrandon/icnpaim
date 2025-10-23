@@ -12,7 +12,8 @@ const styles = {
         maxWidth: 850,
         boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
         borderRadius: '1rem',
-        padding: 32
+        padding: 32,
+        margin: 'auto'
     },
     titleContainer: {
         display: 'flex',

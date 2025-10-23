@@ -401,6 +401,7 @@ class DashboardView extends React.Component {
       this.handleCardComplete(unit.id, card.id)
     }
 
+
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
     const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == card.id)
     //restore default box-shadow
@@ -423,7 +424,7 @@ class DashboardView extends React.Component {
   render() {
     const _this = this
     const { classes } = this.props;
-    const { user, courses, selectedCourse, units, grades, loading, refreshingGrades, error, overallProgress } = this.state;
+    const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;
 
     if (loading) {
       return (
@@ -585,17 +586,19 @@ class DashboardView extends React.Component {
         )}
           */}
 
-        <div style={{
-          fontWeight: 900,
-          fontSize: '2.25rem',
-          lineHeight: '2.5rem'
-        }}>
-          Ruta de Aprendizaje
-        </div>
-        <div style={{
-          fontSize: '1.25rem'
-        }}>
-          Sigue el camino secuencial para completar todas las actividades del curso
+        <div style={{margin: 'auto'}}>
+          <div style={{
+            fontWeight: 900,
+            fontSize: '2.25rem',
+            lineHeight: '2.5rem'
+          }}>
+            Ruta de Aprendizaje
+          </div>
+          <div style={{
+            fontSize: '1.25rem'
+          }}>
+            Sigue el camino secuencial para completar todas las actividades del curso
+          </div>
         </div>
 
         {/* Unidades como Cards */}
@@ -622,16 +625,17 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <div style={{
-                width: 1200,
+                width: 800,
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                margin: 'auto'
               }}>
                 {units.map((unit, unitIndex) => {
                   const learningRoute = unit.studentLearningRoute
                   return (
-                    <div >
+                    <div key={uuidv4()}>
                       <div style={{
-                        width: 500,
+                        // width: 500,
                         display: 'flex',
                         justifyContent: 'space-between',
                         border: '2px rgb(229 231 235f)',
