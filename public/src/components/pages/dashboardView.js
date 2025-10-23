@@ -726,77 +726,65 @@ class DashboardView extends React.Component {
                 {units.map((unit, unitIndex) => {
                   const learningRoute = unit.studentLearningRoute
                   return (
-                    <Accordion 
-                      key={uuidv4()}
-                      square
-                      expanded={this.state.selectedUnitId === unit.id}
-                      onChange={() => this.handleAccordionChange(selectedCourse, unit)}
-                    >
-                      <AccordionSummary 
-                        aria-controls="panel1d-content"
-                        id="panel1d-header"
-                      >
+                    <div >
+                      <div style={{
+                        width: 500,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        border: '2px rgb(229 231 235f)',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '9999px',
+                        alignItems: 'center',
+                        boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
+                      }}>
                         <div style={{
-                          width: 500,
+                          width: '3rem',
+                          height: '3rem',
+                          border: `1px solid ${unit.color ?? 'gray'}`,
+                          borderRadius: '999px',
                           display: 'flex',
-                          justifyContent: 'space-between',
-                          border: '2px rgb(229 231 235f)',
-                          padding: '0.75rem 1.5rem',
-                          borderRadius: '9999px',
                           alignItems: 'center',
-                          boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
+                          justifyContent: 'center',
                         }}>
-                          <div style={{
-                            width: '3rem',
-                            height: '3rem',
-                            border: `1px solid ${unit.color ?? 'gray'}`,
-                            borderRadius: '999px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                            <School style={{
-                              width: 'calc(3rem * 0.7)',
-                              height: 'calc(3rem * 0.7)'
-                            }}/>
-                          </div>
-                          <div>
-                            <Typography variant="h4"
-                            style={{fontSize: '1.25rem'}}
-                            >{unit.title?.rendered || unit.title}</Typography>
-                            <Typography variant="h6"
-                            style={{fontSize: '0.85rem'}}
-                            >{unit.content?.rendered || unit.content}</Typography>
-                          </div>
-                          <div>
-                            {unit.studentLearningRoute?.length} actividades
-                          </div>
+                          <School style={{
+                            width: 'calc(3rem * 0.7)',
+                            height: 'calc(3rem * 0.7)'
+                          }}/>
                         </div>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {!unit.studentGrade
-                          ? <Typography variant="h6" style={{ color: 'black' }}>
-                              Aun no tienes nota de evaluación para esta unidad
-                            </Typography>
-                          : null}
-                        <Box 
-                          key={uuidv4()}
-                          style={{ padding: 10 }}
-                        >
-                          {
-                          
-                          learningRoute?.map((card, index) => (
-                            <ContentCard
-                              ref={el => _this.cardsRef.current[unitIndex][index].current = el}
-                              key={uuidv4()}
-                              card={card}
-                              onClick={() => this.notifyContentProgress(unit, card)}
-                              unit={unit}
-                            />
-                          ))}
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
+                        <div>
+                          <Typography variant="h4"
+                          style={{fontSize: '1.25rem'}}
+                          >{unit.title?.rendered || unit.title}</Typography>
+                          <Typography variant="h6"
+                          style={{fontSize: '0.85rem'}}
+                          >{unit.content?.rendered || unit.content}</Typography>
+                        </div>
+                        <div>
+                          {unit.studentLearningRoute?.length} actividades
+                        </div>
+                      </div>
+                      {!unit.studentGrade
+                        ? <Typography variant="h6" style={{ color: 'black' }}>
+                            Aun no tienes nota de evaluación para esta unidad
+                          </Typography>
+                        : null}
+                      <Box 
+                        key={uuidv4()}
+                        style={{ padding: 10 }}
+                      >
+                        {
+                        
+                        learningRoute?.map((card, index) => (
+                          <ContentCard
+                            ref={el => _this.cardsRef.current[unitIndex][index].current = el}
+                            key={uuidv4()}
+                            card={card}
+                            onClick={() => this.notifyContentProgress(unit, card)}
+                            unit={unit}
+                          />
+                        ))}
+                      </Box>
+                    </div>
                   );
                 })}
               </div>
