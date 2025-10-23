@@ -131,6 +131,16 @@ const styles = theme => ({
   }
 });
 
+const withResponsive = (WrappedComponent) => {
+  return function (props) {
+    const windowWidth = useResponsive();
+    return <WrappedComponent
+      {...props}
+      windowWidth={windowWidth}
+    />;
+  };
+}
+
 class DashboardView extends React.Component {
   constructor(props) {
     super(props);
@@ -423,9 +433,8 @@ class DashboardView extends React.Component {
   }
 
   render() {
-    const windowWidth = useResponsive()
     const _this = this
-    const { classes } = this.props;
+    const { classes, windowWidth } = this.props;
     const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;
 
     if (loading) {
@@ -834,4 +843,6 @@ class DashboardView extends React.Component {
   }
 }
 
-export default withStyles(styles)(DashboardView);
+export default withStyles(styles)(
+  withResponsive(DashboardView)
+);
