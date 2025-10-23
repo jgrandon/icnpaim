@@ -5,6 +5,7 @@ import {
     CheckCircleOutline as CompletedTasksIcon,
     TrackChanges as PendingTasksIcon
  } from '@material-ui/icons';
+import { LinearProgress } from '@material-ui/core';
 
 const styles = {
     progressDashboard : {
