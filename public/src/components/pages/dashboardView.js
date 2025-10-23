@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Typography from '@material-ui/core/Typography';
 import {
   Card,
@@ -133,10 +133,16 @@ const styles = theme => ({
 
 const withResponsive = (WrappedComponent) => {
   return function (props) {
+    const [width, setWidth] = useState(0)
     const windowWidth = useResponsive();
+
+    useEffect(()=> {
+      setWidth(windowWidth.current)
+    },[windowWidth.current])
+
     return <WrappedComponent
       {...props}
-      windowWidth={windowWidth}
+      windowWidth={width}
     />;
   };
 }
@@ -600,8 +606,8 @@ class DashboardView extends React.Component {
 
         <div style={{
           // margin: '50px auto',
-          width: windowWidth.current < 800 ? 'fit-content' : 'unset',
-          maxWidth: windowWidth.current < 800 ? 'unset' :'800px',
+          width: windowWidth < 800 ? 'fit-content' : 'unset',
+          maxWidth: windowWidth < 800 ? 'unset' :'800px',
           margin: '70px auto',
           display: 'flex',
           flexDirection: 'column',
@@ -645,8 +651,8 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <div style={{
-                width: windowWidth.current < 800 ? 'fit-content' : 'unset',
-                maxWidth: windowWidth.current < 800 ? 'unset' :'800px',
+                width: windowWidth < 800 ? 'fit-content' : 'unset',
+                maxWidth: windowWidth < 800 ? 'unset' :'800px',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 'auto',
