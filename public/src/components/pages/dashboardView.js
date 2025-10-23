@@ -33,9 +33,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
 import ContentCard from '../organisms/contentCard/';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
 
@@ -140,13 +137,10 @@ class DashboardView extends React.Component {
       user: null,
       courses: [],
       selectedCourse: null,
-      selectedUnitId: null,
       //learningEvaluation: 3,
       units: [],
-      grades: {},
       progress: [],
       loading: true,
-      refreshingGrades: false,
       error: null,
       overallProgress: 0,
       bbCourseId: null
@@ -232,18 +226,7 @@ class DashboardView extends React.Component {
       if (responseBody.success) {
         const { units /*: allUnits*/ } = responseBody
         console.log('responseBody success => ',responseBody )
-        const selectedUnit = units[0]
-        /*
-        const grade = await this.getUnitGrade(course.id, selectedUnit)
-        const evaluatedUnit = this.getEvaluatedUnit(selectedUnit, grade)
-        const units = allUnits.map( u =>
-          u.id == evaluatedUnit.id ? evaluatedUnit : u
-        )
-          */
 
-
-
-        //const { units } = this.state
         const cards = (
           units.length > 0
           ? units.map(u => u.studentLearningRoute)
@@ -279,8 +262,7 @@ class DashboardView extends React.Component {
 
 
         this.setState({
-          units,
-          selectedUnitId: selectedUnit?.id
+          units
         });
 
 
@@ -298,69 +280,6 @@ class DashboardView extends React.Component {
       console.error('Error loading course data:', error);
     }
   };
-
-  async getUnitGrade (courseId, unit) {
-    let learningRouteIndex
-    let evaluation
-    // Cargar notas
-    const { contentId } = unit
-    // const gradesResponse = await fetch(`/api/courses/${course.id}/grades`);
-    const gradesResponse = await fetch(`/api/evaluationGrade?courseId=${courseId}&contentId=${contentId}`);
-    console.log('grade response =>' , gradesResponse)
-    const { grade } = await gradesResponse.json();
-    console.log('grade =>' , grade)
-    if (grade.status == "NeedsGrading") {
-      console.log('no grade')
-      learningRouteIndex = 1
-      evaluation = 0
-      return
-    } else {
-      const {possible: maxScore, score} = grade.displayGrade
-      evaluation = score / maxScore
-      console.log('evaluation =>' , evaluation)
-      learningRouteIndex = evaluation >= 0.5
-        ? (evaluation >= 0.8 ? 1 : 2 ) : 3
-    }
-    console.log('learningRouteIndex =>' , learningRouteIndex)
-    //this.updateLearningEvaluation(learningRouteIndex)
-
-    return {
-        ...grade,
-        evaluation,
-        learningRouteIndex
-    };
-  }
- 
-
-  getEvaluatedUnit(rawUnit, grade) {
-    console.log('updateUnits => rawUnits => ', rawUnit)
-    
-    // const { learningEvaluation } = this.state
-    console.log('updateUnits => learningEvaluation => ', grade)
-
-    const studentLearningRoute = rawUnit.learningRoutes.find((lr, index) => 
-      index == grade.learningRouteIndex - 1
-    )
-    console.log('updateUnits => studentLearningRoute => ', studentLearningRoute)
-    return {
-      ...rawUnit,
-      studentLearningRoute,
-      studentGrade: grade
-    }
-  }
-
-  getLearningRouteColor (learningRoute) {
-    const colors = {
-      green : '#43e97b',
-      blue : '#4facfe',
-      red : 'rgb(250, 112, 154)'
-    }
-    const id = learningRoute[0]?.learningRoute
-    if (id == '1') return colors.green
-    else if (id == '2') return colors.blue
-    return colors.red
-
-  }
 
   handleCardComplete = async (unitId, cardId) => {
     try {
@@ -487,22 +406,6 @@ class DashboardView extends React.Component {
     //restore default box-shadow
     const color = searchedCard.current.getAttribute('data-default-shadow-color') ?? 'rgba(0, 0, 0, 0.15)'
     searchedCard.current.children[2].style['box-shadow'] = `${color} 1px 2px 6px 3px`
-  }
-
-
-  async  handleAccordionChange(course, unit) {
-    let unitGrade
-    const { grades: oldGrades } = this.state
-    if (!oldGrades[unit.id]) unitGrade = oldGrades[unit.id]
-    else unitGrade = await this.getUnitGrade(course.id, unit)
-
-    this.setState({
-      selectedUnitId : unit.id,
-      grades: {
-        ...oldGrades,
-        [unit.id]: unitGrade
-      }
-    })
   }
 
   focusOnNextTask (nextTask) {
