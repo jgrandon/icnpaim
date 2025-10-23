@@ -51,7 +51,8 @@ const ContentCard = forwardRef(function (props, ref) {
 				display: 'grid',
 				gridTemplateColumns: '6fr 1fr 6fr',
 				gridTemplateRows: '1fr',
-				alignItems: 'center'
+				alignItems: 'center',
+				justifyItems: 'center'
 			}}
 		>
 			{/* ghost div only for correct display */}
