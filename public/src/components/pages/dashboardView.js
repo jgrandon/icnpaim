@@ -476,11 +476,17 @@ class DashboardView extends React.Component {
     return colors[tipo] || '#718096';
   };
 
-  notifyContentProgress = (unit, content) => {
-    const isBlackboarActivity = !!content.url.split('ContentId%7C')[1]?.split('%')[0]
+  notifyContentProgress = (unit, card) => {
+    const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
     if (!isBlackboarActivity) {
-      this.handleCardComplete(unit.id, content.id)
+      this.handleCardComplete(unit.id, card.id)
     }
+
+    const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
+    const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == card.id)
+    //restore default box-shadow
+    const color = searchedCard.current.getAttribute('data-default-shadow-color') ?? 'rgba(0, 0, 0, 0.15)'
+    searchedCard.current.children[2].style['box-shadow'] = `${color} 1px 2px 6px 3px`
   }
 
 
@@ -502,17 +508,13 @@ class DashboardView extends React.Component {
   focusOnNextTask (nextTask) {
     console.log('nextTask', nextTask)
     console.log('nextTask => ', this.cardsRef)
-    /*
-    const { units } = this.state
-    const unit = units.find(u => 
-      u.studentLearningRoute.filter(c => c == nextTask)
-      .length > 0)
-      */
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
     const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == nextTask.id)
+    const color = searchedCard.current.getAttribute('data-color') ?? '#ec622b'
+    searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
     console.log('refs', this.cardsRef)
+    
     searchedCard.current.scrollIntoView()
-    //this.notifyContentProgress(unit, nextTask)
   }
 
   render() {

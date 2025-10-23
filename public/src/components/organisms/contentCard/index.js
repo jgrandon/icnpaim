@@ -43,6 +43,8 @@ const ContentCard = forwardRef(function (props, ref) {
 		<div
 			ref={ref}
 			data-id={card.id}
+			data-color={cardColor}
+			data-default-shadow-color="rgba(0, 0, 0, 0.15)"
 			style={{
 				display: 'grid',
 				gridTemplateColumns: '6fr 1fr 6fr',
@@ -79,6 +81,7 @@ const ContentCard = forwardRef(function (props, ref) {
 					color: 'black',
 					textDecoration: 'none',
 					boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+					transition: 'box-shadow 2s',
 					'&:hover': {
 						trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
 					}
