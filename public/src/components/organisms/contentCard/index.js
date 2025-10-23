@@ -7,6 +7,7 @@ import { getDefaultColor } from './colors'
 import { CardHeader } from './header'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 import { forwardRef } from 'react';
+import { useResponsive } from '../../../hooks/useResponsive'
 
 const getCurrentCard = (unit) => {
 	const iCards = unit.studentLearningRoute.length
@@ -28,6 +29,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		onClick = () => {},
 		unit
 	} = props
+	const windowWidth = useResponsive()
 	const { index, completed } = card
 	const nextCard = unit.studentLearningRoute[index + 1]
 	const prevCard = unit.studentLearningRoute[index - 1]
@@ -54,7 +56,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: index%2==0 ? 3 : 1
+				gridColumn: windowWidth < 800 ? 3 : index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
@@ -73,7 +75,7 @@ const ContentCard = forwardRef(function (props, ref) {
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: index%2==0 ? 1 : 3,
+					gridColumn: windowWidth < 800 ? 2 : (index%2==0 ? 1 : 3),
 					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,

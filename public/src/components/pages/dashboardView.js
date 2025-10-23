@@ -588,7 +588,8 @@ class DashboardView extends React.Component {
 
         <div style={{
           // margin: '50px auto',
-          maxWidth: '800px',
+          width: windowWidth < 800 ? 'fit-content' : 'unset',
+          maxWidth: windowWidth < 800 ? 'unset' :'800px',
           margin: '70px auto',
           display: 'flex',
           flexDirection: 'column',
@@ -632,7 +633,8 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <div style={{
-                width: 800,
+                width: windowWidth < 800 ? 'fit-content' : 'unset',
+                maxWidth: windowWidth < 800 ? 'unset' :'800px',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 'auto',
@@ -658,6 +660,7 @@ class DashboardView extends React.Component {
                           border: `1px solid ${unit.color ?? 'gray'}`,
                           borderRadius: '999px',
                           display: 'flex',
+                          gap: '15px',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}>

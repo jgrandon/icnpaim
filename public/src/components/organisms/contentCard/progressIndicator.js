@@ -1,6 +1,7 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
+import { useResponsive } from '../../../hooks/useResponsive';
 
 export const ProgressIndicator = (props) => {
     const { 
@@ -9,6 +10,7 @@ export const ProgressIndicator = (props) => {
         next = undefined,
         color = null
     } = props
+    const windowWidth = useResponsive()
     const isFirst = prev == undefined
     const isLast = next == undefined
     const inactiveColor = color ?? _INACTIVE_GRAY
@@ -21,9 +23,9 @@ export const ProgressIndicator = (props) => {
             style={{
                 height: '-webkit-fill-available',
                 paddingLeft: 5,
-                gridColumn: 2,
+                gridColumn: windowWidth < 800 ? 1 : 2,
                 display: 'grid',
-                gridTemplateRows: '3fr 1fr 3fr',
+                gridTemplateRows: '4fr 1fr 4fr',
                 gridRowStart: 1,
                 justifyContent: 'center',
                 justifyItems: 'center',
