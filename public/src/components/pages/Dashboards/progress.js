@@ -128,7 +128,7 @@ export default function ProgressDashboard(props) {
                 0%
             </div>
             <div styles={styles.generalProgressBar}>
-                Barra
+                <LinearProgress variant="determinate" value={completedTasks.length * 100 / allTasks.length} />
             </div>
         </div>
         <div style={styles.nextTask}>
