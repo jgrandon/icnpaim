@@ -253,16 +253,28 @@ class DashboardView extends React.Component {
         const cardsLength = cards.length
         console.log('before setting reffs')
 
-        if (this.cardsRef.current?.length !== cardsLength) {
+        //if (this.cardsRef.current?.length !== cardsLength) {
           console.log('setting reffs')
           if (!this.cardsRef.current) { 
-            this.cardsRef.current = []
+            this.cardsRef.current = [...units.map(u => [])]
           }
+
+          //organizar las referencias por unidad para que al asignarlas no se pisen los ids
+          this.cardsRef.current = units.map((u, uIndex) =>
+            Array(u.studentLearningRoute.length)
+              .fill()
+              .map((_, i) => 
+                this.cardsRef.current[uIndex][i] || React.createRef()
+              )
+          )
+
+          /*
           this.cardsRef.current = Array(cardsLength)
             .fill()
             .map((_, i) => this.cardsRef.current[i] || React.createRef());
+          */
           console.log('cardsRef', this.cardsRef)
-        }
+        //}
 
 
 
@@ -496,8 +508,8 @@ class DashboardView extends React.Component {
       u.studentLearningRoute.filter(c => c == nextTask)
       .length > 0)
       */
-    
-    const searchedCard = this.cardsRef.current.filter(r => r.current?.getAttribute('data-id') == nextTask.id)
+    const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
+    const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == nextTask.id)
     console.log('refs', this.cardsRef)
     searchedCard.current.scrollIntoView()
     //this.notifyContentProgress(unit, nextTask)
@@ -709,7 +721,7 @@ class DashboardView extends React.Component {
                 display: 'flex',
                 flexDirection: 'column'
               }}>
-                {units.map(unit => {
+                {units.map((unit, unitIndex) => {
                   const learningRoute = unit.studentLearningRoute
                   return (
                     <Accordion 
@@ -773,7 +785,7 @@ class DashboardView extends React.Component {
                           
                           learningRoute?.map((card, index) => (
                             <ContentCard
-                              ref={el => _this.cardsRef.current[index].current = el}
+                              ref={el => _this.cardsRef.current[unitIndex][index].current = el}
                               key={uuidv4()}
                               card={card}
                               onClick={() => this.notifyContentProgress(unit, card)}
