@@ -586,7 +586,14 @@ class DashboardView extends React.Component {
         )}
           */}
 
-        <div style={{margin: 'auto'}}>
+        <div style={{
+          // margin: '50px auto',
+          maxWidth: '800px',
+          margin: '70px auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
           <div style={{
             fontWeight: 900,
             fontSize: '2.25rem',
@@ -628,7 +635,8 @@ class DashboardView extends React.Component {
                 width: 800,
                 display: 'flex',
                 flexDirection: 'column',
-                margin: 'auto'
+                margin: 'auto',
+                gap: '100px'
               }}>
                 {units.map((unit, unitIndex) => {
                   const learningRoute = unit.studentLearningRoute
