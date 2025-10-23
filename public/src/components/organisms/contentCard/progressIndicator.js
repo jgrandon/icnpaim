@@ -15,8 +15,8 @@ export const ProgressIndicator = (props) => {
     const isLast = next == undefined
     const inactiveColor = color ?? _INACTIVE_GRAY
     const pipeColor = isActive ? _OK_GREEN : inactiveColor
-    const nextPipeColor = next?.completed ? _OK_GREEN : inactiveColor
-    const prevPipeColor = prev?.completed ? _OK_GREEN : inactiveColor
+    const nextPipeColor = next?.completed && isActive ? _OK_GREEN : inactiveColor
+    const prevPipeColor = prev?.completed && isActive ? _OK_GREEN : inactiveColor
 
     return (
         <div
