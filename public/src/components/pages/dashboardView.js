@@ -436,6 +436,7 @@ class DashboardView extends React.Component {
     const _this = this
     const { classes, windowWidth } = this.props;
     const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;
+    console.log('DashboardView => windowWidth', windowWidth)
 
     if (loading) {
       return (
