@@ -439,7 +439,7 @@ class DashboardView extends React.Component {
   }
 
   render() {
-    const isMobile = window.matchMedia('(max-width: 800)');
+    const isMobile = window.matchMedia('(max-width: 800)').matches
     const _this = this
     const { classes, windowWidth } = this.props;
     const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;

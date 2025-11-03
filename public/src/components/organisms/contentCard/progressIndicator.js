@@ -11,7 +11,7 @@ export const ProgressIndicator = (props) => {
         color = null
     } = props
     const windowWidth = useResponsive()
-    const isMobile = window.matchMedia('(max-width: 800)');
+    const isMobile = window.matchMedia('(max-width: 800)').matches
 
     const isFirst = prev == undefined
     const isLast = next == undefined

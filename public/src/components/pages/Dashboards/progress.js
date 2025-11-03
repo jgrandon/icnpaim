@@ -61,7 +61,7 @@ const styles = {
         justifyContent: 'space-between',
         color: 'rgb(36, 97, 233)',
         border: '1px solid rgb(191 219 254)',
-        backgroundColor: 'rgb(191 219 254 / .1)',
+        backgroundColor: 'rgb(191 219 254 / .2)',
         padding: 24
     },
     button: {
@@ -113,7 +113,13 @@ export default function ProgressDashboard(props) {
                 <div style={{
                     ...styles.icon,
                     backgroundColor: "rgb(22 163 74 / .2)"
-                }}><CompletedTasksIcon fill="rgb(22 163 74)"/></div>
+                }}>
+                    <CompletedTasksIcon style={{
+                        height: 24,
+                        width: 24,
+                        fill: "rgb(22 163 74)"
+                    }}/>
+                </div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(22 163 74)',
@@ -126,7 +132,13 @@ export default function ProgressDashboard(props) {
                 <div style={{
                     ...styles.icon,
                     backgroundColor: "rgb(37 99 235 / .2)"
-                }}><PendingTasksIcon fill="rgb(37 99 235)"/></div>
+                }}>
+                    <PendingTasksIcon style={{
+                        height: 24,
+                        width: 24,
+                        fill: "rgb(37 99 235)"
+                    }}/>
+                </div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(37 99 235)',
@@ -139,7 +151,12 @@ export default function ProgressDashboard(props) {
                 <div style={{
                     ...styles.icon,
                     backgroundColor: "rgb(50 50 50 / .2)"
-                }}><AllTasksIcon /></div>
+                }}>
+                    <AllTasksIcon style={{
+                        height: 24,
+                        width: 24,
+                    }} />
+                </div>
                 <div style={styles.detailNumber}>
                     {allTasks.length}
                 </div>
@@ -169,13 +186,17 @@ export default function ProgressDashboard(props) {
                 <div style={{
                     width: 48,
                     height: 48,
-                    backgroundColor: 'rgb(22 163 74)',
+                    backgroundColor: 'rgb(36, 97, 233)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
-                    <PendingTasksIcon fill="white" width={24} height={24}/>
+                    <PendingTasksIcon style={{
+                        fill: "white",
+                        width: 24,
+                        height: 24
+                    }}/>
                 </div>
                 <div style={{
                     display: 'flex',

@@ -29,7 +29,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		onClick = () => {},
 		unit
 	} = props
-	const isMobile = window.matchMedia('(max-width: 800)');//useResponsive()
+	const isMobile = window.matchMedia('(max-width: 800)').matches;//useResponsive()
 	const { index, completed } = card
 	const nextCard = unit.studentLearningRoute[index + 1]
 	const prevCard = unit.studentLearningRoute[index - 1]
