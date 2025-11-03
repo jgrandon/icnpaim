@@ -60,11 +60,14 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         color: 'rgb(36, 97, 233)',
-        border: '1px solid rgb(191 219 254)'
+        border: '1px solid rgb(191 219 254)',
+        backgroundColor: 'rgb(191 219 254 / .1)',
+        padding: 24
     },
     button: {
         width: 145,
         padding: '0.75rem 1.5rem',
+        backgroundColor: 'rgb(36, 97, 233)',
     },
     bold: {
         fontWeight: 700,
@@ -158,7 +161,17 @@ export default function ProgressDashboard(props) {
                 display: 'grid', 
                 gridTemplateColumns: '1fr 5fr'
             }}>
-                <div><PendingTasksIcon /></div>
+                <div style={{
+                    width: 48,
+                    height: 48,
+                    backgroundColor: 'rgb(191 219 254)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <PendingTasksIcon fill="white" width={24} height={24}/>
+                </div>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column'
@@ -169,7 +182,7 @@ export default function ProgressDashboard(props) {
                     </div>
                 </div>
             </div>
-            <button onClick={onClick} disabled={!nextTask}>
+            <button onClick={onClick} disabled={!nextTask} style={styles.button}>
                 Comenzar {'>'}
             </button> 
         </div>
