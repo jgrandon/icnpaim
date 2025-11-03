@@ -70,6 +70,15 @@ const styles = {
         fontWeight: 700,
         fontSize: '1.125rem',
         lineHeight: '1.75rem'
+    },
+    icon: {
+        widht: 80,
+        height: 80,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20
     }
 }
 
@@ -93,7 +102,10 @@ export default function ProgressDashboard(props) {
         </div>
         <div style={styles.tasksProgress}>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div><CompletedTasksIcon /></div>
+                <div style={{
+                    ...styles.icon,
+                    backgroundColor: "rgb(22 163 74 / .2)"
+                }}><CompletedTasksIcon color="rgb(22 163 74)"/></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(22 163 74)',
@@ -103,7 +115,10 @@ export default function ProgressDashboard(props) {
                 <div>Completadas</div>
             </div>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div><PendingTasksIcon /></div>
+                <div style={{
+                    ...styles.icon,
+                    backgroundColor: "rgb(37 99 235 / .2)"
+                }}><PendingTasksIcon /></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(37 99 235)',
@@ -113,7 +128,10 @@ export default function ProgressDashboard(props) {
                 <div>Pendientes</div>
             </div>
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
-                <div><AllTasksIcon /></div>
+                <div style={{
+                    ...styles.icon,
+                    backgroundColor: "rgb(50 50 50 / .2)"
+                }}><AllTasksIcon /></div>
                 <div style={styles.detailNumber}>
                     {allTasks.length}
                 </div>
