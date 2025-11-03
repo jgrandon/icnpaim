@@ -68,6 +68,10 @@ const styles = {
         width: 145,
         padding: '0.75rem 1.5rem',
         backgroundColor: 'rgb(36, 97, 233)',
+        color: 'white',
+        fontWeight: 500,
+        borderRadius: '0.5rem',
+        fontSize: '100%',
     },
     bold: {
         fontWeight: 700,
@@ -75,7 +79,7 @@ const styles = {
         lineHeight: '1.75rem'
     },
     icon: {
-        widht: 80,
+        width: 80,
         height: 80,
         borderRadius: '50%',
         display: 'flex',
@@ -107,7 +111,7 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    backgroundColor: "rgb(22 163 74 / .2)"
+                    fill: "rgb(22 163 74 / .2)"
                 }}><CompletedTasksIcon color="rgb(22 163 74)"/></div>
                 <div style={{
                     ...styles.detailNumber,
@@ -120,7 +124,7 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    backgroundColor: "rgb(37 99 235 / .2)"
+                    fill: "rgb(37 99 235 / .2)"
                 }}><PendingTasksIcon /></div>
                 <div style={{
                     ...styles.detailNumber,
@@ -133,7 +137,7 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    backgroundColor: "rgb(50 50 50 / .2)"
+                    fill: "rgb(50 50 50 / .2)"
                 }}><AllTasksIcon /></div>
                 <div style={styles.detailNumber}>
                     {allTasks.length}
@@ -174,7 +178,8 @@ export default function ProgressDashboard(props) {
                 </div>
                 <div style={{
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    marginLeft: '20px'
                 }}>
                     <div style={styles.bold}> Siguiente Actividad: </div>
                     <div style={{ fontWeight: 500 }}>
