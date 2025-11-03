@@ -29,7 +29,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		onClick = () => {},
 		unit
 	} = props
-	const windowWidth = useResponsive()
+	const isMobile = window.matchMedia('(max-width: 800)');//useResponsive()
 	const { index, completed } = card
 	const nextCard = unit.studentLearningRoute[index + 1]
 	const prevCard = unit.studentLearningRoute[index - 1]
@@ -57,7 +57,7 @@ const ContentCard = forwardRef(function (props, ref) {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: windowWidth.current < 800 ? 3 : index%2==0 ? 3 : 1
+				gridColumn: isMobile ? 3 : index%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
@@ -76,7 +76,7 @@ const ContentCard = forwardRef(function (props, ref) {
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: windowWidth.current < 800 ? 2 : (index%2==0 ? 1 : 3),
+					gridColumn: isMobile ? 2 : (index%2==0 ? 1 : 3),
 					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,

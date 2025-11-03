@@ -11,6 +11,8 @@ export const ProgressIndicator = (props) => {
         color = null
     } = props
     const windowWidth = useResponsive()
+    const isMobile = window.matchMedia('(max-width: 800)');
+
     const isFirst = prev == undefined
     const isLast = next == undefined
     const inactiveColor = color ?? _INACTIVE_GRAY
@@ -23,7 +25,7 @@ export const ProgressIndicator = (props) => {
             style={{
                 height: '-webkit-fill-available',
                 paddingLeft: 5,
-                gridColumn: windowWidth.current < 800 ? 1 : 2,
+                gridColumn: isMobile ? 1 : 2,
                 display: 'grid',
                 gridTemplateRows: '4fr 1fr 4fr',
                 gridRowStart: 1,

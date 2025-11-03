@@ -71,6 +71,7 @@ const styles = {
         color: 'white',
         fontWeight: 500,
         borderRadius: '0.5rem',
+        border: '3px solid rgb(36, 97, 233)',
         fontSize: '100%',
     },
     bold: {

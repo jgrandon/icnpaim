@@ -439,6 +439,7 @@ class DashboardView extends React.Component {
   }
 
   render() {
+    const isMobile = window.matchMedia('(max-width: 800)');
     const _this = this
     const { classes, windowWidth } = this.props;
     const { user, courses, selectedCourse, units, loading, error, overallProgress } = this.state;
@@ -606,8 +607,8 @@ class DashboardView extends React.Component {
 
         <div style={{
           // margin: '50px auto',
-          width: windowWidth < 800 ? 'fit-content' : 'unset',
-          maxWidth: windowWidth < 800 ? 'unset' :'800px',
+          width: isMobile ? 'fit-content' : 'unset',
+          maxWidth: isMobile ? 'unset' :'800px',
           margin: '70px auto',
           display: 'flex',
           flexDirection: 'column',
@@ -651,8 +652,8 @@ class DashboardView extends React.Component {
               </Card>
             ) : (              
               <div style={{
-                width: windowWidth < 800 ? 'fit-content' : 'unset',
-                maxWidth: windowWidth < 800 ? 'unset' :'800px',
+                width: isMobile ? 'fit-content' : 'unset',
+                maxWidth: isMobile ? 'unset' :'800px',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 'auto',
