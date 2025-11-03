@@ -143,7 +143,10 @@ export default function ProgressDashboard(props) {
             ...styles.bold
         }}>
             <div >Progreso General</div>
-            <div>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+            }}>
                 0%
             </div>
             <div styles={styles.generalProgressBar}>
