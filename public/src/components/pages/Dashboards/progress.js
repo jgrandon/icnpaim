@@ -111,8 +111,8 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    fill: "rgb(22 163 74 / .2)"
-                }}><CompletedTasksIcon color="rgb(22 163 74)"/></div>
+                    backgroundColor: "rgb(22 163 74 / .2)"
+                }}><CompletedTasksIcon fill="rgb(22 163 74)"/></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(22 163 74)',
@@ -124,8 +124,8 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    fill: "rgb(37 99 235 / .2)"
-                }}><PendingTasksIcon /></div>
+                    backgroundColor: "rgb(37 99 235 / .2)"
+                }}><PendingTasksIcon fill="rgb(37 99 235)"/></div>
                 <div style={{
                     ...styles.detailNumber,
                     color: 'rgb(37 99 235)',
@@ -137,7 +137,7 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    fill: "rgb(50 50 50 / .2)"
+                    backgroundColor: "rgb(50 50 50 / .2)"
                 }}><AllTasksIcon /></div>
                 <div style={styles.detailNumber}>
                     {allTasks.length}
@@ -168,7 +168,7 @@ export default function ProgressDashboard(props) {
                 <div style={{
                     width: 48,
                     height: 48,
-                    backgroundColor: 'rgb(191 219 254)',
+                    backgroundColor: 'rgb(22 163 74)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
