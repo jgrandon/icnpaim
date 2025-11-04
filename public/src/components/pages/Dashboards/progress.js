@@ -49,6 +49,7 @@ const styles = {
         lineHeight: '2.25rem'
     },
     generalProgress: {
+        padding: '100px 0px',
         display: 'grid',
         gridTemplateColumns: '10fr 1fr',
     },
@@ -60,18 +61,19 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         color: 'rgb(36, 97, 233)',
-        border: '1px solid rgb(191 219 254)',
-        backgroundColor: 'rgb(191 219 254 / .2)',
+        border: '1px solid rgb(36, 97, 233 / .5)',
+        backgroundColor: 'rgb(36, 97, 233 / .2)',
+        borderRadius: '0.75rem',
         padding: 24
     },
     button: {
         width: 145,
         padding: '0.75rem 1.5rem',
         backgroundColor: 'rgb(36, 97, 233)',
+        border: '3px solid rgb(36, 97, 233)',
         color: 'white',
         fontWeight: 500,
         borderRadius: '0.5rem',
-        border: '3px solid rgb(36, 97, 233)',
         fontSize: '100%',
     },
     bold: {
@@ -115,8 +117,8 @@ export default function ProgressDashboard(props) {
                     backgroundColor: "rgb(22 163 74 / .2)"
                 }}>
                     <CompletedTasksIcon style={{
-                        height: 24,
-                        width: 24,
+                        height: 40,
+                        width: 40,
                         fill: "rgb(22 163 74)"
                     }}/>
                 </div>
@@ -134,8 +136,8 @@ export default function ProgressDashboard(props) {
                     backgroundColor: "rgb(37 99 235 / .2)"
                 }}>
                     <PendingTasksIcon style={{
-                        height: 24,
-                        width: 24,
+                        height: 40,
+                        width: 40,
                         fill: "rgb(37 99 235)"
                     }}/>
                 </div>
@@ -150,11 +152,11 @@ export default function ProgressDashboard(props) {
             <div key={uuidv4()} style={styles.tasksProgressDetail}>
                 <div style={{
                     ...styles.icon,
-                    backgroundColor: "rgb(50 50 50 / .2)"
+                    backgroundColor: "rgb(50 50 50 / .1)"
                 }}>
                     <AllTasksIcon style={{
-                        height: 24,
-                        width: 24,
+                        height: 40,
+                        width: 40,
                     }} />
                 </div>
                 <div style={styles.detailNumber}>
