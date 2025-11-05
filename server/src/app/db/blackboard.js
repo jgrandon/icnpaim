@@ -6,15 +6,15 @@ const db = new JsonDB(new Config(`${config.database_directory}/blackboard`, true
 const tokenDB = new JsonDB(new Config(`${config.database_directory}/blackboard_token`, true, false, '/'));
 
 
-export async function getColumnId(contentId) {
+export async function getColumnId(courseId, contentId) {
     console.log('getColumnId')
     try {
-        const cachedContents = await db.getData('/content')
-        const contents = cachedContents ?? {}
-        console.log('getColumnId => contents => ', contents)
-        const searchedContent = contents[contentId]
-        console.log('getColumnId => contents => ', contents)
-        return searchedContent?.columnId
+        const cachedColumns = await db.getData(`/course/${courseId}/columns`)
+        const columns = cachedColumns ?? []
+        console.log('getColumnId => cached columns => ', cachedColumns)
+        const searchedColumn = columns.find(c => c.contentId === contentId)
+        console.log('getColumnId => columns => ', columns)
+        return searchedColumn?.id
     } catch (error) {
         return null
     }
@@ -32,11 +32,11 @@ export async function getContents(courseId) {
     }
 }
 
-export function updateContents(courseId, contents) {
-    db.push(`/course/${courseId}/content`, contents)
+export function updateColumns(courseId, columns) {
+    db.push(`/course/${courseId}/columns`, columns)
 }
 
-export function insertNewContent(contentId, body) {
+export function updateContents(contentId, body) {
     db.push('/content', {
         [contentId] : body
     })

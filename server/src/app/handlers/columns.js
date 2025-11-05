@@ -4,23 +4,23 @@ import * as cache from '../db/blackboard'
 import { escape, last } from 'lodash'
 
 export async function getColumnIdByContent (courseId, contentId) {
-    //console.log('getColumnsByContent => start')
-    const cachedColumnId = await cache.getColumnId(contentId)
-    //console.log('getColumnsByContent => cachedColumnId' , cachedColumnId)
+    console.log('getColumnsByContent => start')
+    const cachedColumnId = await cache.getColumnId(courseId, contentId)
+    console.log('getColumnsByContent => cachedColumnId' , cachedColumnId)
 
     if ( !!cachedColumnId ) return cachedColumnId
-    //console.log('getColumnsByContent => not cached')
+    console.log('getColumnsByContent => not cached')
 
     const apiClient = BlackBoardApiClient.getClient()
     //console.log('getColumnsByContent => apiClient', apiClient)
 
     const request = await apiClient.get(
-        `/v1/courses/${courseId}/contents/${contentId}`
+        `/v1/courses/${courseId}/gradebook/columns`
     )
-    //console.log('getColumnsByContent => request', request.data)
-    const content = request.data
-    const { gradeColumnId: columnId } = content.contentHandler
-    cache.insertNewContent(contentId, { columnId })
+    console.log('getColumnsByContent => columns length', request.data.length)
 
-    return columnId
+    const column = request.data.find(c => c.contentId == contentId)
+    cache.updateColumns(courseId, request.data)
+
+    return column?.id
 }

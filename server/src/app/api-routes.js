@@ -6,7 +6,7 @@ import request from 'request';
 import { getUnit } from './handlers/units'
 import { getCourseUnits, getLearningRoutes } from './handlers/units'
 import { getProgressByUnits } from './handlers/progress'
-import { getColumnIdByContent } from './handlers/columns'
+import * as columns from './handlers/columns'
 import * as grades from './handlers/grades'
 import * as students from './handlers/students'
 import { getContentsByCourseId } from './handlers/content';
@@ -339,7 +339,14 @@ router.get('/units', requireLTISession, async (req, res) => {
       const iContents = contents.length
       for (let i = 0; i<iContents; i++) {
         const currentContent = contents[i]
-        const columnId = currentContent.contentHandler?.gradeColumnId
+        let columnId = currentContent.contentHandler?.gradeColumnId
+
+        //get column
+        if (!columnId) {
+          columnId = await columns.getColumnIdByContent(courseId, currentContent.id)
+        }
+
+        //get grade
         let grade = null
         if (!!columnId) {
           grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
@@ -441,7 +448,7 @@ router.get('/units', requireLTISession, async (req, res) => {
     }
   })
 
-  
+  /*
 router.get('/evaluationGrade', requireLTISession, async (req, res) => {
   console.log('-------------------/evaluationGrade');
   try {
@@ -450,7 +457,7 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     console.log('>>>>>>>>>>>> /evaluationGrade >  req.ltiSession =>', req.ltiSession)
     //const jwt = req.ltiSession.jwt;
 
-    const { /*courseId,*/ contentId } = req.query
+    const {  contentId } = req.query
     const studentId = await students.getStudentId(bbStudentExternalId)
     const columnId = await getColumnIdByContent(bbCourseId, contentId)
     console.log('evaluationGrade => columnId => ', columnId)
@@ -472,5 +479,6 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
       });
     }
   })
+    */
 
 export default router;
