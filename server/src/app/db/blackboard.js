@@ -36,10 +36,8 @@ export function updateColumns(courseId, columns) {
     db.push(`/course/${courseId}/columns`, columns)
 }
 
-export function updateContents(contentId, body) {
-    db.push(`/course/${courseId}/contents`, {
-        [contentId] : body
-    })
+export function updateContents(courseId, contents) {
+    db.push(`/course/${courseId}/contents`, contents)
 }
 
 export async function getToken() {
