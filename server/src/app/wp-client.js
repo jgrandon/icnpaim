@@ -22,11 +22,12 @@ class WordPressClient {
     
     // Setup authentication
     this.client.interceptors.request.use((config) => {
+      /*
       console.log('WP API Request URL:', config.baseURL + config.url);
       console.log('WP API Method:', config.method?.toUpperCase());
       console.log('WP API User configured:', !!WP_USER);
       console.log('WP API Pass configured:', !!WP_PASS);
-      
+      */
       if (JWT_TOKEN) {
         config.headers.Authorization = `Bearer ${JWT_TOKEN}`;
         console.log('Using JWT authentication');
@@ -49,12 +50,14 @@ class WordPressClient {
     // Interceptor para logging
     this.client.interceptors.request.use(
       (config) => {
+        /*
         console.log('WP API Request:', {
           url: config.url,
           method: config.method,
           data: config.data,
           params: config.params
         });
+        */
         return config;
       },
       (error) => {
