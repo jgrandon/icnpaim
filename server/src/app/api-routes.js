@@ -340,10 +340,13 @@ router.get('/units', requireLTISession, async (req, res) => {
       for (let i = 0; i<iContents; i++) {
         const currentContent = contents[i]
         let columnId = currentContent.contentHandler?.gradeColumnId
-
+        console.log('current Content', currentContent.id)
         //get column
         if (!columnId) {
+          console.log('no column id')
           columnId = await columns.getColumnIdByContent(courseId, currentContent.id)
+          console.log('AFteR GETTING COLUMN id', columnId)
+
         }
 
         //get grade
