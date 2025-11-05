@@ -18,12 +18,12 @@ export async function getColumnId(courseId, contentId) {
     } catch (error) {
         return null
     }
-}
+}       
 
 export async function getContents(courseId) {
     console.log('getColumnId')
     try {
-        const cachedContents = await db.getData(`/course/${courseId}/content`)
+        const cachedContents = await db.getData(`/course/${courseId}/contents`)
         const contents = cachedContents ?? []
         return contents
     } catch (error) {
@@ -37,7 +37,7 @@ export function updateColumns(courseId, columns) {
 }
 
 export function updateContents(contentId, body) {
-    db.push('/content', {
+    db.push(`/course/${courseId}/contents`, {
         [contentId] : body
     })
 }
