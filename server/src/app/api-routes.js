@@ -378,7 +378,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         let learningRouteIndex = null
         let evaluation = null
         let grade = allGrades.find(g => g.contentId == u.contentId)?.grade
-        
+        console.log('grade => ',{unidad: u, grade})
         if (!grade || grade?.status == "NeedsGrading" ) {
           learningRouteIndex = 1
           evaluation = 0
@@ -407,7 +407,8 @@ router.get('/units', requireLTISession, async (req, res) => {
           } 
           return {
             ...c,
-            completed: !!grade
+            completed: !!grade,
+            grade
           }
         })
 
