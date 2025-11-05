@@ -329,25 +329,23 @@ router.get('/units', requireLTISession, async (req, res) => {
         ...cardsContentIds // cards contents
       ]
       
+      /*
       console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByCourseId(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
       console.log('>>>>>>/units => contents', contents)
-
+*/
 
       let allGrades = []
-      const iContents = contents.length
+      const iContents = contentIds.length
       for (let i = 0; i<iContents; i++) {
-        const currentContent = contents[i]
-        let columnId = currentContent.contentHandler?.gradeColumnId
-        console.log('current Content', currentContent.id)
+        const currentContentId = contentIds[i]
+        const columnId = await columns.getColumnIdByContent(bbCourseId, currentContentId)
+
+        console.log('current Content', currentContentId)
         //get column
-        if (!columnId) {
-          console.log('no column id')
-          columnId = await columns.getColumnIdByContent(bbCourseId, currentContent.id)
           console.log('AFteR GETTING COLUMN id', columnId)
 
-        }
 
         //get grade
         let grade = null
@@ -355,7 +353,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
         }
         allGrades.push({
-          contentId: currentContent.id,
+          contentId: currentContentId,
           columnId,
           grade
         })
