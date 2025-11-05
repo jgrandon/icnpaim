@@ -22,7 +22,8 @@ export async function getContentsByCourseId (courseId, ids) {
         )
         const newContents = request.data.results
         
-        console.log('newContents => ', newContents.length)
+        console.log('newContents length => ', newContents.length)
+        console.log('newContents => ', newContents.map(c => c.id))
         console.log('ids => ', ids)
         console.log('filtered newContents => ', newContents.filter(c => ids.includes(c.id)).length)
         /*
