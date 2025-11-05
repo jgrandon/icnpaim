@@ -344,7 +344,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         //get column
         if (!columnId) {
           console.log('no column id')
-          columnId = await columns.getColumnIdByContent(courseId, currentContent.id)
+          columnId = await columns.getColumnIdByContent(bbCourseId, currentContent.id)
           console.log('AFteR GETTING COLUMN id', columnId)
 
         }
