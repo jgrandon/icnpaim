@@ -377,14 +377,16 @@ router.get('/units', requireLTISession, async (req, res) => {
       const finalUnits = studentUnits.map(u => {
         let learningRouteIndex = null
         let evaluation = null
-        let grade = allGrades.find(g => g.contentId == u.contentId)?.grade
-        console.log('grade => ',{unidad: u, grade})
-        if (!grade || grade?.status == "NeedsGrading" ) {
+        let unitGrade = allGrades.find(g => g.contentId == u.contentId)?.grade
+        console.log('grade => ',{unidad: u, unitGrade})
+        if (!unitGrade || unitGrade?.status == "NeedsGrading" ) {
           learningRouteIndex = 1
           evaluation = 0
-          grade = {}
+          unitGrade = {
+            fake:true
+          }
         } else {
-          const {possible: maxScore, score} = grade.displayGrade
+          const {possible: maxScore, score} = unitGrade.displayGrade
           evaluation = score / maxScore
           console.log('evaluation =>' , evaluation)
           learningRouteIndex = evaluation >= 0.5
@@ -396,6 +398,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           //only blackboard activity cards
           const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
           const grade = allGrades.find(g => g.contentId == cardContentId)
+          console.log('cards grade =>', { card: c.id, grade})
           if (!!grade) {
             //update 
             wpClient.upsertProgress({
@@ -421,7 +424,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           studentLearningRoute: learningRoutes[learningRouteIndex-1],
           studentLearningIndex: learningRouteIndex,
           studentGrade: {
-            ...grade,
+            ...unitGrade,
             evaluation,
             learningRouteIndex
           }
