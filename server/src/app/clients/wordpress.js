@@ -18,15 +18,15 @@ class WordPressApi {
       
       // Setup authentication
       this.client.interceptors.request.use((config) => {
-        console.log('WP API Request URL:', config.baseURL + config.url)
-        console.log('WP API Method:', config.method?.toUpperCase())
-        console.log('WP API User configured:', WP_USER)
-        console.log('WP API Pass configured:', WP_PASS)
+        // console.log('WP API Request URL:', config.baseURL + config.url)
+        // console.log('WP API Method:', config.method?.toUpperCase())
+        // console.log('WP API User configured:', WP_USER)
+        // console.log('WP API Pass configured:', WP_PASS)
         if (WP_USER && WP_PASS) {
           const auth = Buffer.from(`${WP_USER}:${WP_PASS}`).toString('base64')
           config.headers.Authorization = `Basic ${auth}`
-          console.log('Using Basic Auth for user:', WP_USER)
-          console.log('Auth header length:', config.headers.Authorization.length)
+          // console.log('Using Basic Auth for user:', WP_USER)
+          // console.log('Auth header length:', config.headers.Authorization.length)
         } else {
           console.error('❌ NO WORDPRESS AUTHENTICATION CONFIGURED!')
           console.error('WP_USER:', WP_USER)
@@ -38,12 +38,14 @@ class WordPressApi {
       // Interceptor para logging
       this.client.interceptors.request.use(
         (config) => {
+          /*
           console.log('WP API Request:', {
             url: config.url,
             method: config.method,
             data: config.data,
             params: config.params
           });
+          */
           return config
         },
         (error) => {
@@ -54,11 +56,13 @@ class WordPressApi {
       
       this.client.interceptors.response.use(
         (response) => {
+          /*
           console.log('WP API Response:', {
             status: response.status,
             url: response.config.url,
             data: response.data
           })
+            */
           return response
         },
         (error) => {

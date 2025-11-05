@@ -40,6 +40,7 @@ class BlackBoardApiClient {
       // Interceptor para logging
       this.client.interceptors.request.use(
         async (config) => {
+          /*
           console.log(
             'interceptors.request.use => Authorization',
             config?.headers?.Authorization
@@ -48,20 +49,23 @@ class BlackBoardApiClient {
             'interceptors.request.use => config',
             config,
           )
+            */
           const isAuthReq = config.headers?.Authorization?.includes('Basic')
 
           if (!isAuthReq) {
             const token = await this.getToken()
-            console.log('interceptors.request.use => token => ', token)
+            // console.log('interceptors.request.use => token => ', token)
             config.headers.Authorization = `Bearer ${token}`
           }
 
+          /*
           console.log('BLACKBOARD API Request:', {
             url: config.url,
             method: config.method,
             data: config.data,
             params: config.params
           });
+          */
           return config
         },
         (error) => {
@@ -72,11 +76,13 @@ class BlackBoardApiClient {
       
       this.client.interceptors.response.use(
         (response) => {
+          /*
           console.log('BLACKBOARD API Response:', {
             status: response.status,
             url: response.config.url,
             data: response.data
           })
+            */
           return response
         },
         async (error) => {
