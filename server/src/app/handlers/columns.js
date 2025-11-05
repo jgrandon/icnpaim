@@ -17,10 +17,10 @@ export async function getColumnIdByContent (courseId, contentId) {
     const request = await apiClient.get(
         `/v1/courses/${courseId}/gradebook/columns`
     )
-    console.log('getColumnsByContent => columns length', request.data.length)
+    console.log('getColumnsByContent => columns length', request.data.results.length)
 
-    const column = request.data.find(c => c.contentId == contentId)
-    cache.updateColumns(courseId, request.data)
+    const column = request.data.results.find(c => c.contentId == contentId)
+    cache.updateColumns(courseId, request.data.results)
 
     return column?.id
 }
