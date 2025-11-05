@@ -22,6 +22,7 @@ export async function getContentsByCourseId (courseId, ids) {
         )
         const newContents = request.data.results
         console.log('newContents => ', newContents.length)
+        console.log('newContents => ', newContents.filter(c => ids.includes(c.id)).length)
         /*
         const column = request.data
         const { gradeColumnId: columnId } = column.contentHandler
