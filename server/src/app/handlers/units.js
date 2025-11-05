@@ -5,6 +5,7 @@ async function getUnits() {
 	const response = await WordPressApi.client.get(
 		`/unit?orderby=id&order=asc`
 	)
+	console.log('response.data => ',typeof response.data)
 
 	return response.data.map( u => getUnitData(u))
 }
