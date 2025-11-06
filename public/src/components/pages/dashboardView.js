@@ -29,6 +29,7 @@ import {
   Visibility,
   BarChart
 } from '@material-ui/icons';
+import Modal from '@material-ui/core/Modal';
 import { withStyles } from '@material-ui/core/styles';
 import { openSnackbar } from '../page_objects/snackbar';
 import parameters from '../../util/parameters';
@@ -36,6 +37,7 @@ import ContentCard from '../organisms/contentCard/';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
 import { useResponsive } from '../../hooks/useResponsive'
+import { Link } from 'react-router-dom'
 
 const params = parameters.getInstance();
  
@@ -160,7 +162,9 @@ class DashboardView extends React.Component {
       loading: true,
       error: null,
       overallProgress: 0,
-      bbCourseId: null
+      bbCourseId: null,
+      isModalOpen: false,
+      modalData: {}
     };
     this.cardsRef = React.createRef()
   }
@@ -298,6 +302,12 @@ class DashboardView extends React.Component {
     }
   };
 
+
+  handleModalClose() {
+    this.state.isModalOpen = false;
+    this.modalData = {}
+  }
+
   handleCardComplete = async (unitId, cardId) => {
     try {
       const response = await fetch('/api/progress', {
@@ -413,9 +423,14 @@ class DashboardView extends React.Component {
   };
 
   notifyContentProgress = (unit, card) => {
-    const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
-    if (!isBlackboarActivity) {
-      this.handleCardComplete(unit.id, card.id)
+    if (card.tipoActividad==='control') {
+      this.state.isModalOpen = true
+      this.modalData = {unit,card}
+    } else {
+      const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
+      if (!isBlackboarActivity) {
+        this.handleCardComplete(unit.id, card.id)
+      }
     }
 
 
@@ -817,6 +832,26 @@ class DashboardView extends React.Component {
             </CardContent>
           </Card>
         )}
+
+        <Modal
+          open={this.state.isModalOpen}
+          onClose={this.handleModalClose}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+        >
+          {this.state.modalData.card.title}
+          {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse.title} > ${this.state.modalData.unit.title} > ${this.state.modalData.card.title}`}
+          <Link
+            to={{ pathname: this.state.modalData.card?.url }}
+            target="_blank"
+          >Ir a blackboard</Link>
+          <button
+            onClick={()=> {
+              this.handleCardComplete(this.state.modalData.unit, this.state.modalData.card)
+              this.handleModalClose()
+            }}
+          >Marcar como completada</button>
+        </Modal>
 
         {/* Estado sin cursos */}
         {courses.length === 0 && !error && (
