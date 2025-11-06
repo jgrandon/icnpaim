@@ -839,8 +839,8 @@ class DashboardView extends React.Component {
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
         >
-          {this.state.modalData.card.title}
-          {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse.title} > ${this.state.modalData.unit.title} > ${this.state.modalData.card.title}`}
+          {this.state.modalData.card?.title}
+          {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse?.title} > ${this.state.modalData.unit?.title} > ${this.state.modalData.card?.title}`}
           <Link
             to={{ pathname: this.state.modalData.card?.url }}
             target="_blank"
