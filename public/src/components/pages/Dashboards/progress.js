@@ -174,7 +174,7 @@ export default function ProgressDashboard(props) {
                 display: 'flex',
                 justifyContent: 'flex-end',
             }}>
-                { allTasks.length == 0 ? '0' : completedTasks.length * 100 / allTasks.length } %
+                { allTasks.length == 0 ? '0' : Math.ceil(completedTasks.length * 100 / allTasks.length) } %
             </div>
             <div style={styles.generalProgressBar}>
                 <LinearProgress variant="determinate" value={completedTasks.length * 100 / allTasks.length} />
