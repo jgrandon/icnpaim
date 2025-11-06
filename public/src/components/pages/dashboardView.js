@@ -302,6 +302,10 @@ class DashboardView extends React.Component {
     }
   };
 
+  handleModalComplete() {
+    this.handleCardComplete(this.state.modalData.unit, this.state.modalData.card)
+    this.handleModalClose()
+  }
 
   handleModalClose() {
     this.state.isModalOpen = false;
@@ -846,10 +850,7 @@ class DashboardView extends React.Component {
             target="_blank"
           >Ir a blackboard</Link>
           <button
-            onClick={()=> {
-              this.handleCardComplete(this.state.modalData.unit, this.state.modalData.card)
-              this.handleModalClose()
-            }}
+            onClick={this.handleModalComplete}
           >Marcar como completada</button>
         </Modal>
 
