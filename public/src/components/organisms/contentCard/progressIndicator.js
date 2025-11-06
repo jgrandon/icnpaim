@@ -39,7 +39,7 @@ export const ProgressIndicator = (props) => {
                 key={uuidv4()}
                 style={{
                     backgroundColor: isFirst ? 'white' : prevPipeColor,
-                    opacity: prev?.completed ? 1 : 0.5,
+                    opacity: prev?.completed && isActive ? 1 : 0.5,
                     width: 5,
                     height: '6rem'
                 }}
@@ -67,7 +67,7 @@ export const ProgressIndicator = (props) => {
                 key={uuidv4()}
                 style={{
                     backgroundColor: isLast ? 'white' : nextPipeColor,
-                    opacity: next?.completed ? 1 : 0.5,
+                    opacity: next?.completed && isActive ? 1 : 0.5,
                     width: 5,
                     height: '6rem'
                 }}

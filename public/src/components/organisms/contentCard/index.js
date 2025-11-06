@@ -36,7 +36,7 @@ const ContentCard = forwardRef(function (props, ref) {
 	const isCurrentCard = getCurrentCard(unit)?.id == card.id
 	const { freeProgress: isFreeProgressEnabled } = unit
 	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
-	const color = unit.color || getDefaultColor(card.tipoActividad)
+	const color = unit.color || _INACTIVE_GRAY
 	const cardColor = completed
 		? _OK_GREEN 
 		: ( isFreeProgressEnabled || isCurrentCard ? color : _INACTIVE_GRAY )
