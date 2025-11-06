@@ -410,7 +410,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           } 
           return {
             ...c,
-            completed: !!grade,
+            completed: grade?.status == 'Graded',
             grade
           }
         })
