@@ -61,8 +61,8 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         color: 'rgb(36, 97, 233)',
-        border: '1px solid rgb(36, 97, 233 / .5)',
-        backgroundColor: 'rgb(36, 97, 233 / .2)',
+        border: '1px solid rgb(36 97 233 / .5)',
+        backgroundColor: 'rgb(36 97 233 / .2)',
         borderRadius: '0.75rem',
         padding: 24
     },
