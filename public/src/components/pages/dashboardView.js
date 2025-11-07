@@ -863,6 +863,7 @@ class DashboardView extends React.Component {
                   padding: 50,
                   display: 'flex',
                   flexDirection: 'column',
+                  borderRadius: 5,
                   gap: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -877,7 +878,7 @@ class DashboardView extends React.Component {
                     <strong></strong>
                     <p>{'> Cursos'}</p>
                     <p>{`> ${this.state.selectedCourse?.title}`}</p>
-                    <p>{`> ${this.state.modalData.unit?.title?.content}`}</p>
+                    <p>{`> ${this.state.modalData.unit?.title?.title}`}</p>
                     <p>{`> ${this.state.modalData.card?.title}`}</p>
                     <p></p>
 
