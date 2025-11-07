@@ -7,7 +7,7 @@ async function getUnits() {
 	)
 	console.log('response.data => ',typeof response.data)
 
-	return response.data.map( u => getUnitData(u))
+	return response.data.map( u => getUnitData(u, studentId))
 }
 
 export async function getUnit (unitId, courseId) {
@@ -26,9 +26,10 @@ export async function getUnit (unitId, courseId) {
 }
 
 /* Translates attributes from WordPress to ICNPAIM context */
-function getUnitData (unit) {
+function getUnitData (unit, studentId) {
 		const { id, status, title } = unit
-		const allCards = safeJsonParse(unit.meta.unit_cards) ?? []
+		const parsedCards = safeJsonParse(unit.meta.unit_cards) ?? []
+		const allCards = fixScormUrl(parsedCards, studentId)
 		console.log('getUnitData => cars number =>', allCards.length)
 		return {
 			id,
@@ -48,6 +49,19 @@ function clearContent(content) {
 	return content
 		.replaceAll('<p>','')
 		.replaceAll('</p>', '')
+}
+
+function fixScormUrl(cards, studentId) {
+	const userKey = 'UserId%7C'
+	return cards.map(c => {
+		const cardOldUserId = c.url.split(userKey)[1]?.split('&')[0]
+		if (!cardOldUserId) return c
+		const newUrl = c.url.replace(cardOldUserId, studentId )
+		return {
+			...c,
+			url: newUrl
+		}
+	})
 }
 
 export function getLearningRoutes(cards) {
@@ -79,8 +93,8 @@ function sortCardsByWeight (cards) {
 	return sortedCards.map((c, index) => ({...c, index}))
 }
 
-export async function getCourseUnits (searchedCourse) {
-	const units = await getUnits()
+export async function getCourseUnits (searchedCourse, studentId) {
+	const units = await getUnits(studentId)
 	return units.filter(
 		u => u.courseId == searchedCourse
 	)

@@ -282,10 +282,13 @@ router.get('/units', requireLTISession, async (req, res) => {
                                 .join(' ')
     */
 
+      const bbStudentId = await students.getStudentId(bbStudentExternalId)
+
+
       // const { id : courseId } = course
       console.log('>>>>>>>>>>>> /units > courseId =>',courseId)
 
-      const rawUnits = await getCourseUnits(courseId)
+      const rawUnits = await getCourseUnits(courseId, bbStudentId)
       console.log('>>>>>>>>>>>> /units > units =>', rawUnits)
 
       const progress = await getProgressByUnits(studentId, courseId)
@@ -309,7 +312,6 @@ router.get('/units', requireLTISession, async (req, res) => {
       }))
         */
 
-      const bbStudentId = await students.getStudentId(bbStudentExternalId)
 
       const contentKey = 'ContentId%7C'
       
