@@ -874,10 +874,10 @@ class DashboardView extends React.Component {
                     {this.state.modalData.card?.title}
                   </div>
                   <div style={{ fontSize: '0.75rem'}}>
-                    <p>Para acceder a este Control dirigete a Blackboard</p>
-                    <p><RightArrow/> {this.state.selectedCourse?.title}</p>
-                    <p><RightArrow/> {this.state.modalData.unit?.title?.rendered}</p>
-                    <p><RightArrow/> {this.state.modalData.card?.title}</p>
+                    <p style={{display: 'flex', alignItems: 'center'}}>Para acceder a este Control dirigete a Blackboard:</p>
+                    <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.selectedCourse?.title}</p>
+                    <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.modalData.unit?.title?.rendered}</p>
+                    <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.modalData.card?.title}</p>
                   </div>
                   <Link
                     //redirects to BlackBoard
