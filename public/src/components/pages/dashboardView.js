@@ -884,55 +884,54 @@ class DashboardView extends React.Component {
                     <p></p>
 
                   </div>
-                <Link
-                  to={{ pathname: this.state.modalData.card?.url }}
-                  target="_blank"
-                  style={{
-                        width: '10rem',
-                        padding: '0.5rem',
-                        borderRadius: '5px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        border: `2px solid #ec622b`,
-                        backgroundColor: '#ec622b',
-                        color: 'white',
-                        textDecoration: 'none',
-                        boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
-                        transition: 'box-shadow 2s',
-                        '&:hover': {
-                          trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
-                        }
-                  }}
-                >Ir a blackboard</Link>
-                <button
-                  onClick={() => this.handleModalComplete()}
-                  style={{
-                    width: '10rem',
-                    padding: '0.5rem',
-                    borderRadius: '5px',
-                    border: `2px solid  #4caf50`,
-                    backgroundColor: '#4caf50',
-                    color: 'white',
-                    textDecoration: 'none',
-                    boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
-                  }}
-                >Marcar como completada</button>
+                  <Link
+                    //redirects to BlackBoard
+                    to={{ pathname: 'https://udla.blackboard.com/ultra/courses/' }}
+                    target="_blank"
+                    style={{
+                          width: '10rem',
+                          padding: '0.5rem',
+                          borderRadius: '5px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          border: `2px solid #ec622b`,
+                          backgroundColor: '#ec622b',
+                          color: 'white',
+                          textDecoration: 'none',
+                          boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+                          transition: 'box-shadow 2s',
+                          '&:hover': {
+                            trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
+                          }
+                    }}
+                  >Ir a blackboard</Link>
+                  <button
+                    onClick={() => this.handleModalComplete()}
+                    style={{
+                      width: '10rem',
+                      padding: '0.5rem',
+                      borderRadius: '5px',
+                      border: `2px solid  #4caf50`,
+                      backgroundColor: '#4caf50',
+                      color: 'white',
+                      textDecoration: 'none',
+                      boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+                    }}
+                  >Marcar como completada</button>
 
-                <button
-                  style={{
-                    width: '10rem',
-                    padding: '0.5rem',
-                    borderRadius: '5px',
-                    border: `2px solid  black`,
-                    color: 'black',
-                    textDecoration: 'none',
-                    boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
-                  }}
-                onClick={ ()=>this.handleModalClose()}
-              > Cerrar </button>
-
+                  <button
+                    style={{
+                      width: '10rem',
+                      padding: '0.5rem',
+                      borderRadius: '5px',
+                      border: `2px solid  black`,
+                      color: 'black',
+                      textDecoration: 'none',
+                      boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+                    }}
+                    onClick={ ()=>this.handleModalClose()}
+                  > Cerrar </button>
                 </div>
-
               </div>
             </Modal>
         }
