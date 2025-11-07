@@ -858,7 +858,7 @@ class DashboardView extends React.Component {
                 justifyContent: 'center'
               }}>
                 <div style={{
-                  backgroundColor: white,
+                  backgroundColor: 'white',
                   height: 300,
                   width: 300
                 }}>
