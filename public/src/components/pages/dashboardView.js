@@ -858,12 +858,20 @@ class DashboardView extends React.Component {
                 justifyContent: 'center'
               }}>
                 <div style={{
-                  backgroundColor: 'white',
                   height: 300,
-                  width: 300
+                  width: 300,
+                  margin: 50,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'white'
                 }}>
-                {this.state.modalData.card?.title}
-                {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse?.title} > ${this.state.modalData.unit?.title} > ${this.state.modalData.card?.title}`}
+                  <div style={{ fontSize: '1.25rem', fontWeight: 500}}>
+                    {this.state.modalData.card?.title}
+                  </div>
+                  <div style={{ fontSize: '1rem'}}>
+                    {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse?.title} > ${this.state.modalData.unit?.title} > ${this.state.modalData.card?.title}`}
+                  </div>
                 <Link
                   to={{ pathname: this.state.modalData.card?.url }}
                   target="_blank"
