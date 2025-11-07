@@ -20,14 +20,7 @@ import {
 } from '@material-ui/core';
 import { 
   School, 
-  Assignment, 
-  PlayArrow, 
-  CheckCircle, 
-  Refresh,
-  TrendingUp,
-  OpenInNew,
-  Visibility,
-  BarChart
+  ChevronRight
 } from '@material-ui/icons';
 import Modal from '@material-ui/core/Modal';
 import { withStyles } from '@material-ui/core/styles';
@@ -132,6 +125,13 @@ const styles = theme => ({
     flexDirection: 'column'
   }
 });
+
+const RightArrow = () => {
+  return <ChevronRight style={{
+    color: '#ec622b',
+    marginRight: 10,
+  }}/>
+}
 
 const withResponsive = (WrappedComponent) => {
   return function (props) {
@@ -875,9 +875,9 @@ class DashboardView extends React.Component {
                   </div>
                   <div style={{ fontSize: '0.75rem'}}>
                     <p>Para acceder a este Control dirigete a Blackboard</p>
-                    <p>{`> ${this.state.selectedCourse?.title}`}</p>
-                    <p>{`> ${this.state.modalData.unit?.title?.rendered}`}</p>
-                    <p>{`> ${this.state.modalData.card?.title}`}</p>
+                    <p><RightArrow/> {this.state.selectedCourse?.title}</p>
+                    <p><RightArrow/> {this.state.modalData.unit?.title?.rendered}</p>
+                    <p><RightArrow/> {this.state.modalData.card?.title}</p>
                   </div>
                   <Link
                     //redirects to BlackBoard
