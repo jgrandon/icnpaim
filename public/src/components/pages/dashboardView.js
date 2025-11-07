@@ -308,8 +308,10 @@ class DashboardView extends React.Component {
   }
 
   handleModalClose() {
-    this.state.isModalOpen = false;
-    this.modalData = {}
+    this.setState({
+      isModalOpen: false,
+      modalData: {}
+    })
   }
 
   handleCardComplete = async (unitId, cardId) => {
@@ -430,10 +432,11 @@ class DashboardView extends React.Component {
     console.log('notifyContentProgress', card)
     if ( card.tipoActividad=='control' ) {
       console.log('es control', e)
-
       e.preventDefault()
-      this.modalData = {unit,card}
-      this.state.isModalOpen = true
+      this.setState({
+        isModalOpen:true,
+        modalData: {unit,card}
+      })
     } else {
       const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
       if (!isBlackboarActivity) {
