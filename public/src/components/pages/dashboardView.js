@@ -837,7 +837,7 @@ class DashboardView extends React.Component {
           </Card>
         )}
         {
-          !this.state.selectedCourse 
+          !this.state.selectedCourse && !!this.state.modalData.unit
           ? null 
           : (
             <Modal
