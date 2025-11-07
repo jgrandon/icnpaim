@@ -859,8 +859,8 @@ class DashboardView extends React.Component {
               }}>
                 <div style={{
                   height: 300,
-                  width: 300,
-                  margin: 50,
+                  width: 350,
+                  padding: 50,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -869,15 +869,57 @@ class DashboardView extends React.Component {
                   <div style={{ fontSize: '1.25rem', fontWeight: 500}}>
                     {this.state.modalData.card?.title}
                   </div>
-                  <div style={{ fontSize: '1rem'}}>
-                    {`Para acceder a este Control dirigete a Blackboard > Cursos > ${this.state.selectedCourse?.title} > ${this.state.modalData.unit?.title} > ${this.state.modalData.card?.title}`}
+                  <div style={{ fontSize: '0.75rem'}}>
+                    {`Para acceder a este Control dirigete a Blackboard > Cursos >  > ${this.state.modalData.unit?.title?.content} > ${this.state.modalData.card?.title}`}
+                    <p>Para acceder a este Control dirigete a Blackboard</p>
+                    <strong></strong>
+                    <p>{'> Cursos'}</p>
+                    <p>{`> ${this.state.selectedCourse?.title}`}</p>
+                    <p>{`> ${this.state.modalData.unit?.title?.content}`}</p>
+                    <p>{`> ${this.state.modalData.card?.title}`}</p>
+                    <p></p>
+
                   </div>
                 <Link
                   to={{ pathname: this.state.modalData.card?.url }}
                   target="_blank"
+                  style={{
+                        height: '12rem',
+                        width: '18rem',
+                        padding: '1.5rem',
+                        border: `2px solid #ec622b`,
+                        backgroundColor: '#ec622b',
+                        borderRadius: '1rem',
+                        gridRowStart: 1,
+                        display: 'grid',
+                        color: 'black',
+                        textDecoration: 'none',
+                        boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+                        transition: 'box-shadow 2s',
+                        '&:hover': {
+                          trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
+                        }
+                  }}
                 >Ir a blackboard</Link>
                 <button
                   onClick={() => this.handleModalComplete()}
+                    style={{
+                        height: '12rem',
+                        width: '18rem',
+                        padding: '1.5rem',
+                        border: `2px solid  #4caf50`,
+                        backgroundColor: '#4caf50',
+                        borderRadius: '1rem',
+                        gridRowStart: 1,
+                        display: 'grid',
+                        color: 'white',
+                        textDecoration: 'none',
+                        boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
+                        transition: 'box-shadow 2s',
+                        '&:hover': {
+                          trasnform : 'translate(2px, 2px) rotate(-2deg) skewX(0deg) skewY(0deg) scaleY(1.05) scaleX(1.05)'
+                        }
+                  }}
                 >Marcar como completada</button>
 
                 </div>
