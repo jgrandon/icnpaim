@@ -426,8 +426,10 @@ class DashboardView extends React.Component {
     return colors[tipo] || '#718096';
   };
 
-  notifyContentProgress = (unit, card) => {
+  notifyContentProgress = (e,unit, card) => {
+    console.log('notifyContentProgress', card)
     if (card.tipoActividad==='control') {
+      e.preventDefault()
       this.state.isModalOpen = true
       this.modalData = {unit,card}
     } else {
@@ -735,7 +737,7 @@ class DashboardView extends React.Component {
                             ref={el => _this.cardsRef.current[unitIndex][index].current = el}
                             key={uuidv4()}
                             card={card}
-                            onClick={() => this.notifyContentProgress(unit, card)}
+                            onClick={(e) => this.notifyContentProgress(e,unit, card)}
                             unit={unit}
                           />
                         ))}
