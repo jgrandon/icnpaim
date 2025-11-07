@@ -862,6 +862,7 @@ class DashboardView extends React.Component {
                   width: 350,
                   padding: 50,
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'white'
@@ -884,14 +885,11 @@ class DashboardView extends React.Component {
                   to={{ pathname: this.state.modalData.card?.url }}
                   target="_blank"
                   style={{
-                        height: '12rem',
-                        width: '18rem',
-                        padding: '1.5rem',
+                        width: '10rem',
+                        padding: '0.5rem',
+                        borderRadius: '5px',
                         border: `2px solid #ec622b`,
                         backgroundColor: '#ec622b',
-                        borderRadius: '1rem',
-                        gridRowStart: 1,
-                        display: 'grid',
                         color: 'black',
                         textDecoration: 'none',
                         boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
@@ -904,14 +902,11 @@ class DashboardView extends React.Component {
                 <button
                   onClick={() => this.handleModalComplete()}
                     style={{
-                        height: '12rem',
-                        width: '18rem',
-                        padding: '1.5rem',
+                        width: '10rem',
+                        padding: '0.5rem',
+                        borderRadius: '5px',
                         border: `2px solid  #4caf50`,
                         backgroundColor: '#4caf50',
-                        borderRadius: '1rem',
-                        gridRowStart: 1,
-                        display: 'grid',
                         color: 'white',
                         textDecoration: 'none',
                         boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
