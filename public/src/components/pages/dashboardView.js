@@ -842,7 +842,7 @@ class DashboardView extends React.Component {
           : (
             <Modal
               open={this.state.isModalOpen}
-              onClose={this.handleModalClose}
+              onClose={() => this.handleModalClose()}
               aria-labelledby="simple-modal-title"
               aria-describedby="simple-modal-description"
             >
@@ -853,7 +853,7 @@ class DashboardView extends React.Component {
                 target="_blank"
               >Ir a blackboard</Link>
               <button
-                onClick={this.handleModalComplete}
+                onClick={() => this.handleModalComplete()}
               >Marcar como completada</button>
             </Modal>
           )
