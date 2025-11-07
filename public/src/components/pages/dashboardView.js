@@ -841,9 +841,6 @@ class DashboardView extends React.Component {
           </Card>
         )}
         {
-          !this.state.selectedCourse && !!this.state.modalData.unit
-          ? null 
-          : (
             <Modal
               open={this.state.isModalOpen}
               onClose={() => this.handleModalClose()}
@@ -863,7 +860,6 @@ class DashboardView extends React.Component {
 
               </div>
             </Modal>
-          )
         }
 
         {/* Estado sin cursos */}
