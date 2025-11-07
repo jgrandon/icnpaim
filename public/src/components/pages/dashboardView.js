@@ -858,11 +858,12 @@ class DashboardView extends React.Component {
                 justifyContent: 'center'
               }}>
                 <div style={{
-                  height: 300,
+                  height: 450,
                   width: 350,
                   padding: 50,
                   display: 'flex',
                   flexDirection: 'column',
+                  gap: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'white'
@@ -888,9 +889,11 @@ class DashboardView extends React.Component {
                         width: '10rem',
                         padding: '0.5rem',
                         borderRadius: '5px',
+                        display: 'flex',
+                        justifyContent: 'center',
                         border: `2px solid #ec622b`,
                         backgroundColor: '#ec622b',
-                        color: 'black',
+                        color: 'white',
                         textDecoration: 'none',
                         boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
                         transition: 'box-shadow 2s',
