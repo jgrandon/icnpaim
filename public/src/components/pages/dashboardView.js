@@ -428,10 +428,10 @@ class DashboardView extends React.Component {
 
   notifyContentProgress = (e,unit, card) => {
     console.log('notifyContentProgress', card)
-    if (card.tipoActividad==='control') {
+    if ( card.tipoActividad=='control' ) {
       e.preventDefault()
-      this.state.isModalOpen = true
       this.modalData = {unit,card}
+      this.state.isModalOpen = true
     } else {
       const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
       if (!isBlackboarActivity) {
