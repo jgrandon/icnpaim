@@ -429,6 +429,8 @@ class DashboardView extends React.Component {
   notifyContentProgress = (e,unit, card) => {
     console.log('notifyContentProgress', card)
     if ( card.tipoActividad=='control' ) {
+      console.log('es control', e)
+
       e.preventDefault()
       this.modalData = {unit,card}
       this.state.isModalOpen = true
