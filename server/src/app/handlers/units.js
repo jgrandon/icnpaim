@@ -1,7 +1,7 @@
 import WordPressApi from '../clients/wordpress'
 import safeJsonParse from './../lib/safeJsonParse'
 
-async function getUnits() {
+async function getUnits(studentId) {
 	const response = await WordPressApi.client.get(
 		`/unit?orderby=id&order=asc`
 	)
