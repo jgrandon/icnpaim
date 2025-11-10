@@ -303,7 +303,7 @@ class DashboardView extends React.Component {
   };
 
   handleModalComplete() {
-    this.handleCardComplete(this.state.modalData.unit, this.state.modalData.card)
+    this.handleCardComplete(this.state.modalData.unit.id, this.state.modalData.card.id)
     this.handleModalClose()
   }
 
