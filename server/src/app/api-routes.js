@@ -54,7 +54,8 @@ router.get('/me', requireLTISession, (req, res) => {
       roles: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles'] || [],
       context: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'] || {},
       wpStudentId: req.ltiSession.wpStudentId,
-      wpCourseId: req.ltiSession.wpCourseId
+      wpCourseId: req.ltiSession.wpCourseId,
+      bbCourseId: req.ltiSession.bbCourseId
     };
 
     res.json(user);

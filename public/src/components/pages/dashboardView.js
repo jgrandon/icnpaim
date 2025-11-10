@@ -881,7 +881,7 @@ class DashboardView extends React.Component {
                   </div>
                   <Link
                     //redirects to BlackBoard
-                    to={{ pathname: 'https://udla.blackboard.com/ultra/courses/' }}
+                    to={{ pathname: `https://udla.blackboard.com/ultra/courses/${this.state.user.bbCourseId}/outline` }}
                     target="_blank"
                     style={{
                           width: '10rem',
