@@ -375,7 +375,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       })
         */
       console.log('>>>>>>/units => grades', allGrades)
-
+      // assign grades to units
       const finalUnits = studentUnits.map(u => {
         let learningRouteIndex = null
         let evaluation = null
@@ -395,6 +395,7 @@ router.get('/units', requireLTISession, async (req, res) => {
             ? (evaluation >= 0.8 ? 1 : 2 ) : 3
         }
 
+        // assign grades to cards
         const cards = u.cards.map(c => {
           if (c.completed || !c.url.includes(contentKey)) return c
           //only blackboard activity cards
@@ -403,12 +404,14 @@ router.get('/units', requireLTISession, async (req, res) => {
           console.log('cards grade =>', { card: c.id, grade})
           if (!!grade) {
             //update 
+            /*
             wpClient.upsertProgress({
               studentId,
               courseId: parseInt(courseId),
               unitId: parseInt(u.id),
               completedCardId: c.id
             });
+            */
           } 
           return {
             ...c,
