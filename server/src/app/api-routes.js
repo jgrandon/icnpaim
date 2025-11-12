@@ -387,7 +387,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         let learningRouteIndex = null
         let evaluation = null
         let unitGrade = allGrades.find(g => g.contentId == u.contentId)?.grade
-        console.log('grade => ',{unidad: u, unitGrade})
+        //console.log('grade => ',{unidad: u, unitGrade})
         if (!unitGrade || unitGrade?.status == "NeedsGrading" ) {
           learningRouteIndex = 1
           evaluation = 0
@@ -409,7 +409,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           //const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
           const grade = allGrades.find(g => g.contentId == c.contentId)
           const content = contents.find(ct => ct.id == c.contentId)
-          console.log('cards grade =>', { card: c.id, grade, })
+          //console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
             newProgress.push({
