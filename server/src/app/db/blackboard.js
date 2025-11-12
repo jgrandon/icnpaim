@@ -21,7 +21,7 @@ export async function getColumnId(courseId, contentId) {
 }       
 
 export async function getContents(courseId) {
-    console.log('getColumnId')
+    console.log('getContents')
     try {
         const cachedContents = await db.getData(`/course/${courseId}/contents`)
         const contents = cachedContents ?? []

@@ -402,7 +402,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         }
 
         // assign grades to cards
-        const cards = u.cards.map(c => {
+        const cards = u.cards.map(async c => {
           if (c.completed || !c.contentId) return c
           //only blackboard activity cards
           //const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
@@ -411,20 +411,20 @@ router.get('/units', requireLTISession, async (req, res) => {
           console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
-            /*
-            wpClient.upsertProgress({
+            
+            await wpClient.upsertProgress({
               studentId,
               courseId: parseInt(courseId),
               unitId: parseInt(u.id),
               completedCardId: c.id
             });
-            */
+            
           } 
           return {
             ...c,
             url: c.tipoActividad == 'control' //control or scorm
               ? `https://udla-staging.blackboard.com${content.links[0].href}`
-              : `https://udla-staging.blackboard.com/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentid}?courseId=${bbCourseId}`,
+              : `https://udla-staging.blackboard.com/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
             completed: grade?.status == 'Graded',
             grade
           }
