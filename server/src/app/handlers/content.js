@@ -13,6 +13,7 @@ export async function getContentsByIds (courseId, ids) {
 
     if ( notCached.length > 0 ) {
         contents = await getContents(courseId)
+        console.log('getContentsById => contents' , contents)
     }
     return contents.filter(c => ids.includes(c.id))
 }
@@ -36,7 +37,6 @@ export async function getContents(courseId) {
     
     console.log('newContents length => ', newContents.length)
     console.log('newContents => ', newContents.map(c => c.id))
-    console.log('ids => ', ids)
 
     /*
     const column = request.data
