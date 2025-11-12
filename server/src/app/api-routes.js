@@ -422,9 +422,9 @@ router.get('/units', requireLTISession, async (req, res) => {
           } 
           return {
             ...c,
-            url: c.tipoActividad == 'control' 
+            url: c.tipoActividad == 'control' //control or scorm
               ? `https://udla-staging.blackboard.com${content.links[0].href}`
-              : c.url,
+              : `https://udla-staging.blackboard.com/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentid}?courseId=${bbCourseId}`,
             completed: grade?.status == 'Graded',
             grade
           }

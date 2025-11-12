@@ -22,7 +22,7 @@ export async function getColumnIdByContent (courseId, contentId) {
     console.log('getColumnsByContent => columns length', allColumns.length)
 
     const column = allColumns.find(c => c.contentId == contentId)
-    if (!column) console.log('column not found: allColumns => ', allColumns)
+    //if (!column) console.log('column not found: allColumns => ', allColumns)
     cache.updateColumns(courseId, allColumns)
 
     return column?.id
