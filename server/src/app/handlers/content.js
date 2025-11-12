@@ -44,4 +44,5 @@ export async function getContents(courseId) {
     */
     cache.updateContents(courseId, newContents)
     contents = newContents
+    return contents
 }
