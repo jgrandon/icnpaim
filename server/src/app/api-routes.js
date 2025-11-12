@@ -427,6 +427,7 @@ router.get('/units', requireLTISession, async (req, res) => {
 
 
           console.log('>>>>>>>>>>< cardCompleted', grade?.status)
+          console.log('>>>>>>>>>>< cardCompleted type', typeof grade)
           return {
             ...c,
             url: c.tipoActividad == 'control' //control or scorm
