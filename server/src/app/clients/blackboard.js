@@ -167,7 +167,7 @@ class BlackBoardApiClient {
     try {
       console.log('getNewToken => try => ')
 			const auth = Buffer.from(`${BB_API_CLIENT_ID}:${BB_API_SECRET}`).toString('base64')
-      console.log('getNewToken => try => auth => ', auth)
+      //console.log('getNewToken => try => auth => ', auth)
 
 			const request = await this.client.post(
         '/v1/oauth2/token?grant_type=client_credentials',{},
@@ -178,8 +178,8 @@ class BlackBoardApiClient {
       )
       //console.log('getNewToken => request', request)
 			const {access_token: token} = request.data
-      console.log('getNewToken => request.status', request.status)
-      console.log('getNewToken => request', request)
+      //console.log('getNewToken => request.status', request.status)
+      //console.log('getNewToken => request', request)
 
 			console.log('getNewToken => token', token)
       cache.saveToken(token)
