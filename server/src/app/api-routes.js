@@ -412,15 +412,21 @@ router.get('/units', requireLTISession, async (req, res) => {
           console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
-          newProgress.push({
-            studentId,
-            courseId: parseInt(courseId),
-            unitId: parseInt(u.id),
-            completedCardId: c.id
-          });
+            newProgress.push({
+              studentId,
+              courseId: parseInt(courseId),
+              unitId: parseInt(u.id),
+              completedCardId: c.id
+            });
 
             
           } 
+
+
+
+
+
+          console.log('>>>>>>>>>>< cardCompleted', grade?.status)
           return {
             ...c,
             url: c.tipoActividad == 'control' //control or scorm
