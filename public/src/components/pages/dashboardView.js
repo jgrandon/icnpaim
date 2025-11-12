@@ -438,8 +438,8 @@ class DashboardView extends React.Component {
         modalData: {unit,card}
       })
     } else {
-      const isScorm = card.activityType.toLowerCase() == 'scorm'
-      const isControl = card.activityType.toLowerCase() == 'control'
+      const isScorm = card.tipoActividad.toLowerCase() == 'scorm'
+      const isControl = card.tipoActividad.toLowerCase() == 'control'
       if (!isControl && !isScorm) {
         this.handleCardComplete(unit.id, card.id)
       }
