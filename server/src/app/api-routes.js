@@ -334,7 +334,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       console.log('>>>>>>/units => contentIds', contentIds)
       const contents = await getContentsByIds(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
-      console.log('>>>>>>/units => contents', contents)
+      //console.log('>>>>>>/units => contents', contents)
 
       // fetch all contents
       // iterate cards looking for matches between contents and assessments on cards url
@@ -380,7 +380,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         }
       })
         */
-      console.log('>>>>>>/units => grades', allGrades)
+      //console.log('>>>>>>/units => grades', allGrades)
       let newProgress = []
       // assign grades to units
       const finalUnits = studentUnits.map(u => {
