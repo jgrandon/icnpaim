@@ -2,7 +2,7 @@ import { xor } from 'lodash'
 import BlackBoardApiClient from '../clients/blackboard'
 import * as cache from '../db/blackboard'
 
-export async function getContentsByCourseId (courseId, ids) {
+export async function getContentsByIds (courseId, ids) {
     console.log('getContentsById => start')
     let contents = []
     contents = await cache.getContents(courseId)
@@ -12,26 +12,36 @@ export async function getContentsByCourseId (courseId, ids) {
     console.log('getContentsById => notCached' , notCached)
 
     if ( notCached.length > 0 ) {
-        console.log('getContentsById => not cached')
-    
-        const apiClient = BlackBoardApiClient.getClient()
-        //console.log('getColumnsByContent => apiClient', apiClient)
-    
-        const request = await apiClient.get(
-            `/v1/courses/${courseId}/contents`
-        )
-        const newContents = request.data.results
-        
-        console.log('newContents length => ', newContents.length)
-        console.log('newContents => ', newContents.map(c => c.id))
-        console.log('ids => ', ids)
-        console.log('filtered newContents => ', newContents.filter(c => ids.includes(c.id)).length)
-        /*
-        const column = request.data
-        const { gradeColumnId: columnId } = column.contentHandler
-        */
-        cache.updateContents(courseId, newContents)
-        contents = newContents
+        contents = await getContents(courseId)
     }
     return contents.filter(c => ids.includes(c.id))
+}
+/*
+export async function getAllContents (courseId) {
+    let contents = await cache.getContents(courseId)
+    if (contents.length > 0) return contents 
+    else return await getContents(courseId)
+}
+*/
+export async function getContents(courseId) {
+    console.log('getContents => not cached')
+
+    const apiClient = BlackBoardApiClient.getClient()
+    //console.log('getColumnsByContent => apiClient', apiClient)
+
+    const request = await apiClient.get(
+        `/v1/courses/${courseId}/contents`
+    )
+    const newContents = request.data.results
+    
+    console.log('newContents length => ', newContents.length)
+    console.log('newContents => ', newContents.map(c => c.id))
+    console.log('ids => ', ids)
+
+    /*
+    const column = request.data
+    const { gradeColumnId: columnId } = column.contentHandler
+    */
+    cache.updateContents(courseId, newContents)
+    contents = newContents
 }

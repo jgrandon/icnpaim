@@ -438,8 +438,9 @@ class DashboardView extends React.Component {
         modalData: {unit,card}
       })
     } else {
-      const isBlackboarActivity = !!card.url.split('ContentId%7C')[1]?.split('%')[0]
-      if (!isBlackboarActivity) {
+      const isScorm = card.activityType.toLowerCase() == 'scorm'
+      const isControl = card.activityType.toLowerCase() == 'control'
+      if (!isControl && !isScorm) {
         this.handleCardComplete(unit.id, card.id)
       }
     }

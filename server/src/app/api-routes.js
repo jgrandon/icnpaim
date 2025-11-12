@@ -9,7 +9,7 @@ import { getProgressByUnits } from './handlers/progress'
 import * as columns from './handlers/columns'
 import * as grades from './handlers/grades'
 import * as students from './handlers/students'
-import { getContentsByCourseId } from './handlers/content';
+import { getContentsByIds } from './handlers/content';
 
 const router = express.Router();
 
@@ -285,7 +285,6 @@ router.get('/units', requireLTISession, async (req, res) => {
 
       const bbStudentId = await students.getStudentId(bbStudentExternalId)
 
-
       // const { id : courseId } = course
       console.log('>>>>>>>>>>>> /units > courseId =>',courseId)
 
@@ -320,11 +319,10 @@ router.get('/units', requireLTISession, async (req, res) => {
       // to read their grades later
       const cardsContentIds = studentUnits.map(
         u => u.cards.filter(
-          c => !c.completed && c.url.includes(contentKey)
-        ).map(c => {
-            return c.url.split(contentKey)[1].split('%')[0]
-        })
+          c => !c.completed && !!c.contentId
+        ).map(c => c.contentId)
       ).reduce((acc = [], a) => [...acc, ...a])
+
 
 
       const contentIds = [
@@ -332,12 +330,19 @@ router.get('/units', requireLTISession, async (req, res) => {
         ...cardsContentIds // cards contents
       ]
       
-      /*
+      
       console.log('>>>>>>/units => contentIds', contentIds)
-      const contents = await getContentsByCourseId(bbCourseId, contentIds)
+      const contents = await getContentsByIds(bbCourseId, contentIds)
       //  make only one request for al contents and filter for seached ids
       console.log('>>>>>>/units => contents', contents)
-*/
+
+      // fetch all contents
+      // iterate cards looking for matches between contents and assessments on cards url
+      //    on each card validate if control or scorm to add contentId to array
+      //    if control read url from content
+      // iterate over units to assign their grades
+
+
 
       let allGrades = []
       const iContents = contentIds.length
@@ -398,11 +403,12 @@ router.get('/units', requireLTISession, async (req, res) => {
 
         // assign grades to cards
         const cards = u.cards.map(c => {
-          if (c.completed || !c.url.includes(contentKey)) return c
+          if (c.completed || !c.contentId) return c
           //only blackboard activity cards
-          const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
-          const grade = allGrades.find(g => g.contentId == cardContentId)
-          console.log('cards grade =>', { card: c.id, grade})
+          //const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
+          const grade = allGrades.find(g => g.contentId == c.contentId)
+          const content = contents.find(ct => ct.id == c.contentId)
+          console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
             /*
@@ -416,6 +422,9 @@ router.get('/units', requireLTISession, async (req, res) => {
           } 
           return {
             ...c,
+            url: c.tipoActividad == 'control' 
+              ? `https://udla-staging.blackboard.com${content.links[0].href}`
+              : c.url,
             completed: grade?.status == 'Graded',
             grade
           }
