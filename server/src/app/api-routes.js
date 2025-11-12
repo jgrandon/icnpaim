@@ -403,7 +403,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         }
 
         // assign grades to cards
-        const cards = u.cards.map(async c => {
+        const cards = u.cards.map(c => {
           if (c.completed || !c.contentId) return c
           //only blackboard activity cards
           //const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
