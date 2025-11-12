@@ -28,9 +28,7 @@ export async function getUnit (unitId, courseId) {
 /* Translates attributes from WordPress to ICNPAIM context */
 function getUnitData (unit, studentId) {
 		const { id, status, title } = unit
-		const parsedCards = safeJsonParse(unit.meta.unit_cards) ?? []
-		const allCards = fixScormUrl(parsedCards, studentId)
-		console.log('getUnitData => cars number =>', allCards.length)
+		const cards = safeJsonParse(unit.meta.unit_cards) ?? []
 		return {
 			id,
 			status,
@@ -39,8 +37,8 @@ function getUnitData (unit, studentId) {
 			color: unit.meta.color,
 			freeProgress: unit.meta.free_progress,
 			courseId: unit.meta.course_id,
-			cards: allCards,
-			learningRoutes: getLearningRoutes(allCards),
+			cards,
+			//learningRoutes: getLearningRoutes(allCards),
 			contentId: unit.meta?.content_id ?? 0,
 		}
 }
