@@ -13,7 +13,7 @@ export async function getContentsByIds (courseId, ids) {
 
     if ( notCached.length > 0 ) {
         contents = await getContents(courseId)
-        console.log('getContentsById => contents' , contents)
+        //console.log('getContentsById => contents' , contents)
     }
     return contents.filter(c => ids.includes(c.id))
 }
