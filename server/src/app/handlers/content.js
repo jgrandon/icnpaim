@@ -33,16 +33,15 @@ export async function getContents(courseId) {
     const request = await apiClient.get(
         `/v1/courses/${courseId}/contents`
     )
-    const newContents = request.data.results
+    const contents = request.data.results
     
-    console.log('newContents length => ', newContents.length)
-    console.log('newContents => ', newContents.map(c => c.id))
+    console.log('newContents length => ', contents.length)
+    console.log('newContents => ', contents.map(c => c.id))
 
     /*
     const column = request.data
     const { gradeColumnId: columnId } = column.contentHandler
     */
-    cache.updateContents(courseId, newContents)
-    contents = newContents
+    cache.updateContents(courseId, contents)
     return contents
 }
