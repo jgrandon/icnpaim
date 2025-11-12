@@ -430,6 +430,7 @@ class DashboardView extends React.Component {
 
   notifyContentProgress = (e,unit, card) => {
     console.log('notifyContentProgress', card)
+    /*
     if ( card.tipoActividad=='control' ) {
       console.log('es control', e)
       e.preventDefault()
@@ -438,12 +439,13 @@ class DashboardView extends React.Component {
         modalData: {unit,card}
       })
     } else {
+      */
       const isScorm = card.tipoActividad.toLowerCase() == 'scorm'
       const isControl = card.tipoActividad.toLowerCase() == 'control'
       if (!isControl && !isScorm) {
         this.handleCardComplete(unit.id, card.id)
       }
-    }
+    // }
 
 
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
