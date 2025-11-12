@@ -454,7 +454,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       //  number on requests
 
       //notify new progress
-      for(i=0; i < newProgress.length; i++) {
+      for(let i=0; i < newProgress.length; i++) {
         const current = newProgress[i]
         await wpClient.upsertProgress(current);
       }
