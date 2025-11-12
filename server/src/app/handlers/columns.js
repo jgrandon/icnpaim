@@ -4,7 +4,8 @@ import * as cache from '../db/blackboard'
 import { escape, last } from 'lodash'
 
 export async function getColumnIdByContent (courseId, contentId) {
-    console.log('getColumnsByContent => start')
+    console.log('getColumnsByContent => start => courseId', courseId)
+    console.log('getColumnsByContent => start => contentId', contentId)
     const cachedColumnId = await cache.getColumnId(courseId, contentId)
     console.log('getColumnsByContent => cachedColumnId' , cachedColumnId)
 
