@@ -15,12 +15,14 @@ export async function getColumnIdByContent (courseId, contentId) {
     //console.log('getColumnsByContent => apiClient', apiClient)
 
     const request = await apiClient.get(
-        `/v1/courses/${courseId}/gradebook/columns`
+        `/v2/courses/${courseId}/gradebook/columns`
     )
-    console.log('getColumnsByContent => columns length', request.data.results.length)
+    const allColumns = request.data.results
+    console.log('getColumnsByContent => columns length', allColumns.length)
 
-    const column = request.data.results.find(c => c.contentId == contentId)
-    cache.updateColumns(courseId, request.data.results)
+    const column = allColumns.find(c => c.contentId == contentId)
+    if (!column) console.log('column not found: allColumns => ', allColumns)
+    cache.updateColumns(courseId, allColumns)
 
     return column?.id
 }
