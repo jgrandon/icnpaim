@@ -381,6 +381,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       })
         */
       console.log('>>>>>>/units => grades', allGrades)
+      let newProgress = []
       // assign grades to units
       const finalUnits = studentUnits.map(u => {
         let learningRouteIndex = null
@@ -411,13 +412,13 @@ router.get('/units', requireLTISession, async (req, res) => {
           console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
-            
-            await wpClient.upsertProgress({
-              studentId,
-              courseId: parseInt(courseId),
-              unitId: parseInt(u.id),
-              completedCardId: c.id
-            });
+          newProgress.push({
+            studentId,
+            courseId: parseInt(courseId),
+            unitId: parseInt(u.id),
+            completedCardId: c.id
+          });
+
             
           } 
           return {
@@ -451,7 +452,12 @@ router.get('/units', requireLTISession, async (req, res) => {
       //  check if there is a enpoint to get all grades 
       //  and filter by column_ids instead of doing x 
       //  number on requests
-      
+
+      //notify new progress
+      for(i=0; i < newProgress.length; i++) {
+        const current = newProgress[i]
+        await wpClient.upsertProgress(current);
+      }
 
       return res.json({
         success: true,
