@@ -326,7 +326,7 @@ router.get('/units', requireLTISession, async (req, res) => {
 
 
       const contentIds = [
-        ...studentUnits.map(u => u.contentId), // units contents
+        ...studentUnits.filter(u => u.contentId)?.map(u => u.contentId), // units contents
         ...cardsContentIds // cards contents
       ]
       
