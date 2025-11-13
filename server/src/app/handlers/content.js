@@ -15,7 +15,7 @@ export async function getContentsByIds (courseId, ids) {
         contents = await getContents(courseId)
         //console.log('getContentsById => contents' , contents)
     }
-    return contents.filter(c => ids.includes(c.id))
+    return contents//.filter(c => ids.includes(c.id))
 }
 /*
 export async function getAllContents (courseId) {
