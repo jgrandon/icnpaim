@@ -474,7 +474,8 @@ router.get('/units', requireLTISession, async (req, res) => {
       return res.json({
         success: true,
         units: finalUnits,
-        contents
+        contents,
+         allGrades
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);
