@@ -407,8 +407,12 @@ router.get('/units', requireLTISession, async (req, res) => {
           if (c.completed || !c.contentId) return c
           //only blackboard activity cards
           //const cardContentId = c.url.split(contentKey)[1]?.split('%')[0]
+          console.log('assigning grade to card => card contentId', c.contentId)
           const grade = allGrades.find(g => g.contentId == c.contentId)
+          console.log('assigning grade to card => grade', grade)
+
           const content = contents.find(ct => ct.id == c.contentId)
+          console.log('assigning grade to card => content', content)
           //console.log('cards grade =>', { card: c.id, grade, })
           if (!!grade) {
             //update 
