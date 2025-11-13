@@ -11,9 +11,9 @@ export async function getColumnId(courseId, contentId) {
     try {
         const cachedColumns = await db.getData(`/course/${courseId}/columns`)
         const columns = cachedColumns ?? []
-        console.log('getColumnId => cached columns => ', cachedColumns)
+        //console.log('getColumnId => cached columns => ', cachedColumns)
         const searchedColumn = columns.find(c => c.contentId === contentId)
-        console.log('getColumnId => columns => ', columns)
+        //console.log('getColumnId => columns => ', columns)
         return searchedColumn?.id
     } catch (error) {
         return null
