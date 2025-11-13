@@ -414,7 +414,7 @@ router.get('/units', requireLTISession, async (req, res) => {
           const content = contents.find(ct => ct.id == c.contentId)
           console.log('assigning grade to card => content', content)
           //console.log('cards grade =>', { card: c.id, grade, })
-          if (!!grade.grade && !c.completed) {
+          if (!!grade?.grade && !c.completed) {
             //update 
             newProgress.push({
               studentId,
