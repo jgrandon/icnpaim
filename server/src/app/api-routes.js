@@ -435,8 +435,8 @@ router.get('/units', requireLTISession, async (req, res) => {
           //console.log('>>>>>>>>>>< cardCompleted grade =>', grade)
           return {
             ...c,
-            url: c.tipoActividad == 'control' //control or scorm
-              ? `https://udla-staging.blackboard.com${content.links[0].href}`
+            url: c.tipoActividad == 'control' //control or scormlinks
+              ? 'kyaa'//`https://udla-staging.blackboard.com${content.links[0].href}`
               : `https://udla-staging.blackboard.com/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
             completed: grade?.grade?.status == 'Graded',
             grade
