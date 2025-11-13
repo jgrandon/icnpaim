@@ -7,7 +7,7 @@ export async function getContentsByIds (courseId, ids) {
     const apiClient = BlackBoardApiClient.getClient()
 
     for (let i = 0; i < ids.length; i++) {
-        const contentId = contents[i]
+        const contentId = ids[i]
         const cachedContent = await cache.getContent(courseId, contentId)
         if (!!cachedContent) contents.push(cachedContent)
 
@@ -19,6 +19,6 @@ export async function getContentsByIds (courseId, ids) {
         cache.updateContent(courseId, content)
         contents.push(content)
     }
-    
+
     return contents
 }
