@@ -473,7 +473,8 @@ router.get('/units', requireLTISession, async (req, res) => {
 
       return res.json({
         success: true,
-        units: finalUnits
+        units: finalUnits,
+        contents
       });
     } catch (error) {
       console.error('get Units failed:', error.response?.data);
