@@ -5,16 +5,16 @@ import * as cache from '../db/blackboard'
 export async function getContentsByIds (courseId, ids) {
     console.log('getContentsById => start')
     let contents = []
-    contents = await cache.getContents(courseId)
-    const cachedIds = contents.map(c => c.id)
-    const notCached = ids.filter(id => !cachedIds.includes(id))
+    //contents = await cache.getContents(courseId)
+    //const cachedIds = contents.map(c => c.id)
+    //const notCached = ids.filter(id => !cachedIds.includes(id))
 
-    console.log('getContentsById => notCached' , notCached)
+    //console.log('getContentsById => notCached' , notCached)
 
-    if ( notCached.length > 0 ) {
+    //if ( notCached.length > 0 ) {
         contents = await getContents(courseId)
         //console.log('getContentsById => contents' , contents)
-    }
+    //}
     return contents//.filter(c => ids.includes(c.id))
 }
 /*
