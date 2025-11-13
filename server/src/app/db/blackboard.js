@@ -78,6 +78,7 @@ export async function getGrades(courseId, columnId) {
         const grades = await db.getData(`/grades/${courseId}/${columnId}`)
         return grades ?? []
     } catch (error) {
+        console.warn(error)
         return []
     }
 }
