@@ -20,14 +20,14 @@ export async function getColumnId(courseId, contentId) {
     }
 }       
 
-export async function getContents(courseId) {
+export async function getContent(courseId, contentId) {
     console.log('getContents')
     try {
-        const cachedContents = await db.getData(`/course/${courseId}/contents`)
-        const contents = cachedContents ?? []
-        return contents
+        const cachedContent = await db.getData(`/course/${courseId}/content/${contentId}`)
+        const content = cachedContent ?? {}
+        return content
     } catch (error) {
-        console.error('BLACKBOARD DB: getContents error: ', error)
+        console.error('BLACKBOARD DB: getContent error: ', error)
         return []
     }
 }
@@ -36,8 +36,8 @@ export function updateColumns(courseId, columns) {
     db.push(`/course/${courseId}/columns`, columns)
 }
 
-export function updateContents(courseId, contents) {
-    db.push(`/course/${courseId}/contents`, contents)
+export function updateContent(courseId, content) {
+    db.push(`/course/${courseId}/content/${content.id}`, content)
 }
 
 export async function getToken() {
