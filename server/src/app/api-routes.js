@@ -423,9 +423,7 @@ router.get('/units', requireLTISession, async (req, res) => {
               unitId: parseInt(u.id),
               completedCardId: c.id
             });
-
-            
-          } 
+          }
 
 
 
@@ -438,7 +436,7 @@ router.get('/units', requireLTISession, async (req, res) => {
             ...c,
             url: c.tipoActividad == 'control' //control or scormlinks
               ? `${bbBasePath}${content?.links[0].href}`
-              : `$${bbBasePath}/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
+              : `${bbBasePath}/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
             completed: c.completed || grade?.grade?.status == 'Graded',
             grade
           }
