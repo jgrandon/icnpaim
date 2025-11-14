@@ -12,6 +12,7 @@ import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
 
 const router = express.Router();
+const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
@@ -436,8 +437,8 @@ router.get('/units', requireLTISession, async (req, res) => {
           return {
             ...c,
             url: c.tipoActividad == 'control' //control or scormlinks
-              ? `https://udla-staging.blackboard.com${content?.links[0].href}`
-              : `https://udla-staging.blackboard.com/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
+              ? `${bbBasePath}${content?.links[0].href}`
+              : `$${bbBasePath}/ultra/courses/${bbCourseId}/outline/scorm/overview/${c.contentId}?courseId=${bbCourseId}`,
             completed: c.completed || grade?.grade?.status == 'Graded',
             grade
           }
