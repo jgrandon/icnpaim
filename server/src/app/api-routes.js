@@ -319,7 +319,7 @@ router.get('/units', requireLTISession, async (req, res) => {
       // to read their grades later
       const cardsContentIds = studentUnits.map(
         u => u.cards.filter(
-          c => !c.completed && !!c.contentId
+          c => !!c.contentId
         ).map(c => c.contentId)
       ).reduce((acc = [], a) => [...acc, ...a])
 
