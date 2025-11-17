@@ -70,6 +70,8 @@ export const deleteAppById = (appId) => {
 export const getAuthFromState = (state) => {
   try {
     const index = auth.getIndex('.auth-data', state);
+    console.log('getAuthFromState => state', state)
+    console.log('getAuthFromState => index', index)
     return auth.getData(`.auth-data[${index}].auth`);
   } catch (error) {
     return error;
@@ -108,6 +110,8 @@ export const insertNewAuthToken = async (state, token, type) => {
   console.log('insertNewAuthToken => token',token ) 
   console.log('insertNewAuthToken => type',type ) 
   const index = auth.getIndex('.auth-data', state, 'state');
+  console.log('insertNewAuthToken => index',index ) 
+
   try {
     auth.push(`.auth-data[${index}]`, {
       'auth': {
