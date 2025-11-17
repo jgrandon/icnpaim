@@ -18,6 +18,9 @@ const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 const requireLTISession = async (req, res, next) => {
   try {
     const sessionId = req.cookies?.ltiState || req.session?.ltiState;
+    console.log('requireLTISession => sessionId', sessionId)
+    console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
+    console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
     if (!sessionId) {
       return res.status(401).json({ error: 'No LTI session found' });
     }
