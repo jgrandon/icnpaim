@@ -104,6 +104,9 @@ export const insertNewState = async (state) => {
 };
 
 export const insertNewAuthToken = async (state, token, type) => {
+  console.log('insertNewAuthToken => state',state ) 
+  console.log('insertNewAuthToken => token',token ) 
+  console.log('insertNewAuthToken => type',type ) 
   const index = auth.getIndex('.auth-data', state, 'state');
   try {
     auth.push(`.auth-data[${index}]`, {
