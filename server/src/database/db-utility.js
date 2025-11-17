@@ -69,7 +69,7 @@ export const deleteAppById = (appId) => {
 
 export const getAuthFromState = (state) => {
   try {
-    const index = auth.getIndex('.auth-data', state);
+    const index = auth.getIndex('.auth-data', state, 'state');
     console.log('getAuthFromState => state', state)
     console.log('getAuthFromState => index', index)
     return auth.getData(`.auth-data[${index}].auth`);
