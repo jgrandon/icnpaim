@@ -169,7 +169,7 @@ class WordPressClient {
         console.log('Creating new course with payload:', payload);
         post = await this.create('course', payload);
         // Create sample units for new courses
-        await this.createSampleUnits(post.id);
+        //await this.createSampleUnits(post.id);
       }
 
       console.log('Course operation result:', post);
