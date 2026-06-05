@@ -176,6 +176,8 @@ class DashboardView extends React.Component {
   async componentDidMount() {
     try {
       //bypass lti integration
+      console.log('DashboardView => componentDidMount => nodeEnv', nodeEnv)
+
       if (nodeEnv=='development') {
         console.log('DashboardView => componentDidMount => DEVELOPMENT')
   

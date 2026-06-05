@@ -21,31 +21,33 @@
     "rules": {
         "indent": [
             "error",
-            2
+            4
         ],
         "linebreak-style": [
             "error",
-            "unix"
+            "windows"
         ],
         "quotes": [
             "error",
             "single"
         ],
         "semi": [
-            "error",
-            "always"
+            "warn",
+            "never"
         ],
         "array-bracket-spacing": [
             "warn",
             "always"
         ],
-      "jsx-quotes": [
-        "warn",
-        "prefer-single"
-      ],
-      "react/display-name": [
-        "off"
-      ]
+        "jsx-quotes": [
+            "warn",
+            "prefer-single"
+        ],
+        
+        "react/display-name": [
+            "off"
+        ],
+        "react/prop-types": "off"
     },
   "ignorePatterns": [
     "*.md",
