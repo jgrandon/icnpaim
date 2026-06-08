@@ -17,7 +17,7 @@ export default function UnitsAdmin() {
             const data = await API.getAll()
             setUnits(data)
         } catch (err) {
-            console.error('Failed to load units', err)
+            console.error('Fail to load units', err)
         } finally {
             setLoading(false)
         }
@@ -33,7 +33,7 @@ export default function UnitsAdmin() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!formData.name || formData.position === '') return alert('Name and Position are required')
+        if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
 
         try {
             if (editingId) {
@@ -64,7 +64,7 @@ export default function UnitsAdmin() {
     }
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this unit?')) return
+        if (!window.confirm('Estas seguro de eliminar esta Unidad?')) return
         try {
             await API.delete(id)
             setUnits(units.filter((u) => u.id !== id))
@@ -75,12 +75,12 @@ export default function UnitsAdmin() {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
-            <h2>Unit Management Suite (CRUD)</h2>
+            <h2>Unidades</h2>
 
             {/* --- FORM SECTION --- */}
             <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', marginBottom: '30px', padding: '15px', background: '#f5f5f5', borderRadius: '6px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Name *</label>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Nombre *</label>
                     <input type='text' name='name' value={formData.name} onChange={handleInputChange} placeholder='Unit Name' required style={{ padding: '6px' }} />
                 </div>
 
@@ -90,12 +90,12 @@ export default function UnitsAdmin() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Position *</label>
+                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Posicion *</label>
                     <input type='number' name='position' value={formData.position} onChange={handleInputChange} placeholder='0' required style={{ padding: '6px', width: '80px' }} />
                 </div>
 
                 <button type='submit' style={{ padding: '8px 16px', background: editingId ? '#e67e22' : '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                    {editingId ? 'Update Unit' : 'Add Unit'}
+                    {editingId ? 'Actualizar Unidad' : 'Agregar Unidad'}
                 </button>
 
                 {editingId && (
@@ -112,16 +112,16 @@ export default function UnitsAdmin() {
                     <thead>
                         <tr style={{ borderBottom: '2px solid #ddd', background: '#eaedd1' }}>
                             <th style={{ padding: '10px' }}>ID</th>
-                            <th style={{ padding: '10px' }}>Name</th>
-                            <th style={{ padding: '10px' }}>Color Preview</th>
-                            <th style={{ padding: '10px' }}>Position</th>
-                            <th style={{ padding: '10px', textAlign: 'right' }}>Actions</th>
+                            <th style={{ padding: '10px' }}>Nombre</th>
+                            <th style={{ padding: '10px' }}>Color</th>
+                            <th style={{ padding: '10px' }}>Posición</th>
+                            <th style={{ padding: '10px', textAlign: 'right' }}>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {units.length === 0 ? (
                             <tr>
-                                <td colSpan='5' style={{ padding: '20px', textAlign: 'center', color: '#777' }}>No units found. Add one above!</td>
+                                <td colSpan='5' style={{ padding: '20px', textAlign: 'center', color: '#777' }}>No se encontraron unidades. Agrega una!</td>
                             </tr>
                         ) : (
                             units.map((unit) => (
@@ -137,10 +137,10 @@ export default function UnitsAdmin() {
                                     <td style={{ padding: '10px' }}>{unit.position}</td>
                                     <td style={{ padding: '10px', textAlign: 'right' }}>
                                         <button onClick={() => startEdit(unit)} style={{ marginRight: '6px', padding: '4px 8px', background: '#3498db', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
-                                        Edit
+                                        Modificar
                                         </button>
                                         <button onClick={() => handleDelete(unit.id)} style={{ padding: '4px 8px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
-                                        Delete
+                                        Eliminar
                                         </button>
                                     </td>
                                 </tr>
