@@ -26,6 +26,3 @@ se requiere tener servidores y conexion a blackboard
 - corregir deployment
 - evaluacion de nota
 - optimizacion de consultas
-
-
-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
