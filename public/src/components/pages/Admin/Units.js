@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import API from '../../../services/units'
 
-// --- MOCK API HANDLERS (Replace these with your actual backend fetch/axios calls) ---
-const mockAPI = {
-    getAll: async () => [
-        { id: 1, name: 'Main Unit', color: '#ff0000', position: 1 },
-        { id: 2, name: 'Backup Unit', color: '#0000ff', position: 2 },
-    ],
-    create: async (unit) => ({ ...unit, id: Date.now() }), // temporary ID generation
-    update: async (id, unit) => ({ ...unit, id }),
-    delete: async (id) => true,
-};
-
-export default function UnitCRUD() {
+export default function UnitsAdmin() {
     const [ units, setUnits ] = useState([])
     const [ formData, setFormData ] = useState({ name: '', color: '#000000', position: '' })
     const [ editingId, setEditingId ] = useState(null)
     const [ loading, setLoading ] = useState(false)
-    // Load units on component mount
+
     useEffect(() => {
         loadUnits()
     }, [])
@@ -24,7 +14,7 @@ export default function UnitCRUD() {
     const loadUnits = async () => {
         setLoading(true)
         try {
-            const data = await mockAPI.getAll() // Replace with: fetch('/api/units').then(res => res.json())
+            const data = await API.getAll()
             setUnits(data)
         } catch (err) {
             console.error('Failed to load units', err)
@@ -33,7 +23,6 @@ export default function UnitCRUD() {
         }
     }
 
-    // Handle Form Inputs
     const handleInputChange = (e) => {
         const { name, value } = e.target
         setFormData((prev) => ({
@@ -42,7 +31,6 @@ export default function UnitCRUD() {
         }))
     }
 
-    // Handle Submit (Create or Update)
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!formData.name || formData.position === '') return alert('Name and Position are required')
@@ -50,12 +38,12 @@ export default function UnitCRUD() {
         try {
             if (editingId) {
             // Update Action
-                const updatedUnit = await mockAPI.update(editingId, formData)
+                const updatedUnit = await API.updateUnit({...formData, id: editingId})
                 setUnits(units.map((u) => (u.id === editingId ? updatedUnit : u)))
                 setEditingId(null)
             } else {
             // Create Action
-                const newUnit = await mockAPI.create(formData)
+                const newUnit = await API.updateUnit(formData)
                 setUnits([ ...units, newUnit ])
             }
             // Reset form
@@ -65,23 +53,20 @@ export default function UnitCRUD() {
         }
     }
 
-    // Set form up for Editing
     const startEdit = (unit) => {
         setEditingId(unit.id)
         setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
     }
 
-    // Cancel Editing
     const cancelEdit = () => {
         setEditingId(null)
         setFormData({ name: '', color: '#000000', position: '' })
     }
 
-    // Handle Delete
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this unit?')) return
         try {
-            await mockAPI.delete(id)
+            await API.delete(id)
             setUnits(units.filter((u) => u.id !== id))
         } catch (err) {
             console.error('Delete failed', err)
@@ -120,7 +105,6 @@ export default function UnitCRUD() {
                 )}
             </form>
 
-            {/* --- DATA TABLE SECTION --- */}
             {loading ? (
                 <p>Loading units...</p>
             ) : (
