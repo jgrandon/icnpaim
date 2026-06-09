@@ -22,9 +22,9 @@ CREATE TABLE Unit (
 
 CREATE TABLE Content (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    level INT,
+	title varchar(255) NOT NULL,
     type varchar(255),
-    url varchar(255),
+    url varchar(255) NOT NULL,
     unit_id INT,
     CONSTRAINT FK_UnitContent
         FOREIGN KEY (unit_id) REFERENCES Unit(id)

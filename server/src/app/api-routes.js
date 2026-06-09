@@ -11,6 +11,7 @@ import * as grades from './handlers/grades'
 import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
 import * as unitsHandler from './handlers/v2/units'
+import * as contentsHandler from './handlers/v2/contents'
 
 const router = express.Router();
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
@@ -524,7 +525,7 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
   })
     */
 
-
+// Units
 router.post('/v2/units', async (req, res) => {
     const data = req.body
     let unit
@@ -549,6 +550,39 @@ router.get('/v2/units', async (req, res) => {
 router.delete('/v2/units', async (req, res) => {
     const id = req.body.id
     await unitsHandler.deleteUnit(id)
+    return res.status(200).json({
+        ok: true
+    })
+})
+
+
+// Contents
+router.get('/v2/contents', async (req, res) => {
+    const data = req.body
+    const contents = await contentsHandler.getAllContents(data)
+    return res.status(200).json({
+        ok: true,
+        contents
+    })
+})
+
+router.post('/v2/contents', async (req, res) => {
+    const data = req.body
+    let content
+    if (!data.id) {
+        content = await contentsHandler.createContent(data)
+    } else {
+        content = await contentsHandler.updateContent(data)
+    }
+    return res.status(200).json({
+        ok: true,
+        content
+    })
+})
+
+router.delete('/v2/contents', async (req, res) => {
+    const id = req.body.id
+    await contentsHandler.deleteContent(id)
     return res.status(200).json({
         ok: true
     })
