@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import ContentsAdmin from './Contents'
 import API from '../../../services/units'
 
 export default function UnitsAdmin() {
@@ -81,7 +82,7 @@ export default function UnitsAdmin() {
             <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', marginBottom: '30px', padding: '15px', background: '#f5f5f5', borderRadius: '6px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Nombre *</label>
-                    <input type='text' name='name' value={formData.name} onChange={handleInputChange} placeholder='Unit Name' required style={{ padding: '6px' }} />
+                    <input type='text' name='name' value={formData.name} onChange={handleInputChange} placeholder='Nombre Unidad' required style={{ padding: '6px' }} />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -104,6 +105,8 @@ export default function UnitsAdmin() {
                     </button>
                 )}
             </form>
+
+            <ContentsAdmin />
 
             {loading ? (
                 <p>Loading units...</p>

@@ -1,0 +1,25 @@
+.modal {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* align-content: center; */
+    justify-content: center;
+}
+
+.modalContent {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.modalTitle {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    min-width: 300px;
+    width: stretch;
+    max-width: 700px;
+}
+
