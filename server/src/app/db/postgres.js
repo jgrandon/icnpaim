@@ -1,6 +1,6 @@
-import { Client } from 'pg'
+import { Pool } from 'pg'
 
-const client = new Client({
+const pool = new Pool({
     user: 'postgres',
     password: 'postgresql',
     host: '127.0.0.1',
@@ -8,4 +8,8 @@ const client = new Client({
     database: 'icnpaim',
 })
 
-export default client
+pool.on('error', (err, client) => {
+    console.error('Unexpected error on idle PostgreSQL client:', err)
+    process.exit(-1)
+})
+export default pool
