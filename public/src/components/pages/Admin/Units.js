@@ -5,7 +5,7 @@ import API from '../../../services/units'
 export default function UnitsAdmin() {
     const [ units, setUnits ] = useState([])
     const [ formData, setFormData ] = useState({ name: '', color: '#000000', position: '' })
-    const [ editingId, setEditingId ] = useState(null)
+    const [ selectedUnitId, setSelectedUnitId ] = useState(null)
     const [ loading, setLoading ] = useState(false)
 
     useEffect(() => {
@@ -37,11 +37,11 @@ export default function UnitsAdmin() {
         if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
 
         try {
-            if (editingId) {
+            if (selectedUnitId) {
             // Update Action
-                const updatedUnit = await API.updateUnit({...formData, id: editingId})
-                setUnits(units.map((u) => (u.id === editingId ? updatedUnit : u)))
-                setEditingId(null)
+                const updatedUnit = await API.updateUnit({...formData, id: selectedUnitId})
+                setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
+                setSelectedUnitId(null)
             } else {
             // Create Action
                 const newUnit = await API.updateUnit(formData)
@@ -55,12 +55,12 @@ export default function UnitsAdmin() {
     }
 
     const startEdit = (unit) => {
-        setEditingId(unit.id)
+        setSelectedUnitId(unit.id)
         setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
     }
 
     const cancelEdit = () => {
-        setEditingId(null)
+        setSelectedUnitId(null)
         setFormData({ name: '', color: '#000000', position: '' })
     }
 
@@ -95,18 +95,18 @@ export default function UnitsAdmin() {
                     <input type='number' name='position' value={formData.position} onChange={handleInputChange} placeholder='0' required style={{ padding: '6px', width: '80px' }} />
                 </div>
 
-                <button type='submit' style={{ padding: '8px 16px', background: editingId ? '#e67e22' : '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                    {editingId ? 'Actualizar Unidad' : 'Agregar Unidad'}
+                <button type='submit' style={{ padding: '8px 16px', background: selectedUnitId ? '#e67e22' : '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    {selectedUnitId ? 'Actualizar Unidad' : 'Agregar Unidad'}
                 </button>
 
-                {editingId && (
+                {selectedUnitId && (
                     <button type='button' onClick={cancelEdit} style={{ padding: '8px 12px', background: '#95a5a6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                         Cancel
                     </button>
                 )}
             </form>
 
-            <ContentsAdmin />
+            <ContentsAdmin unitId={selectedUnitId}/>
 
             {loading ? (
                 <p>Loading units...</p>

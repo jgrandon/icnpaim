@@ -1,11 +1,15 @@
 const contentServices = {
     updateContent: async (data) => {
+        const { unitId } = data
         try {
-            const response = await fetch('/api/v2/contents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
+            const response = await fetch(
+                `/api/v2/units/${unitId}/contents`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }
+            )
             if (!response.ok) {
                 throw new Error(`Failed to update content: ${response.status}`)
             }
@@ -16,11 +20,15 @@ const contentServices = {
             throw error
         }
     },
-    getAll: async () => {
+    getAll: async (unitId) => {
         try {
-            const response = await fetch('/api/v2/contents')
+            const response = await fetch(
+                `/api/v2/units/${unitId}/contents`
+            )
             if (!response.ok) {
-                throw new Error(`Failed to get all contents: ${response.status}`)
+                throw new Error(
+                    `Failed to get all contents: ${response.status}`
+                )
             }
             const { contents } = await response.json()
             return contents
@@ -29,15 +37,16 @@ const contentServices = {
             throw error
         }
     },
-    delete: async (id) => {
+    delete: async (unitId, id) => {
         try {
-            const response = await fetch('/api/v2/contents', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({id})
-            })
+            const response = await fetch(
+                `/api/v2/units/${id}/contents`,
+                { method: 'DELETE' }
+            )
             if (!response.ok) {
-                throw new Error(`Failed to detele content: ${response.status}`)
+                throw new Error(
+                    `Failed to detele content: ${response.status}`
+                )
             }
             await response.json()
             return

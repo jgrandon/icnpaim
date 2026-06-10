@@ -557,16 +557,18 @@ router.delete('/v2/units', async (req, res) => {
 
 
 // Contents
-router.get('/v2/contents', async (req, res) => {
-    const data = req.body
-    const contents = await contentsHandler.getAllContents(data)
+router.get('/v2/units/:unitId/contents', async (req, res) => {
+    const { unitId } = req.params
+    const contents = await contentsHandler.getAllContents(unitId)
     return res.status(200).json({
         ok: true,
+        unitId,
         contents
     })
 })
 
-router.post('/v2/contents', async (req, res) => {
+router.post('/v2/units/:unitId/contents', async (req, res) => {
+    const { unitId } = req.params
     const data = req.body
     let content
     if (!data.id) {
@@ -580,9 +582,9 @@ router.post('/v2/contents', async (req, res) => {
     })
 })
 
-router.delete('/v2/contents', async (req, res) => {
-    const id = req.body.id
-    await contentsHandler.deleteContent(id)
+router.delete('/v2/units/:unitId/contents', async (req, res) => {
+    const { unitId } = req.params
+    await contentsHandler.deleteContent(unitId)
     return res.status(200).json({
         ok: true
     })

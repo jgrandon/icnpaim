@@ -1,14 +1,19 @@
 import React, { useState } from 'react'
+import API from '../../../../services/contents'
 import * as styles from './form.module.css'
+
 
 const _EMPTY_CONTENT = { title: '', type: '', url: '' }
 
-export default function ContentsForm () {
+export default function ContentsForm ({ unitId }) {
     const [ formData, setFormData ] = useState(_EMPTY_CONTENT)
     const [ editingId, setEditingId ] = useState(null)
     //const [ loading, setLoading ] = useState(false)
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        const content = await API.updateContent({...formData, unitId})
+        return content
     }
 
     const handleInputChange = (e) => {

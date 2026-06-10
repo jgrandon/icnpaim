@@ -9,16 +9,16 @@ async function ensureConnection() {
     }
 }
 
-export async function getAllContents() {
+export async function getAllContents(unitId) {
     await ensureConnection()
-    const res = await client.query('SELECT * FROM content')
+    const res = await client.query('SELECT * FROM content WHERE unit_id=$1', [ unitId ])
     return res.rows
 }
 
 export async function createContent({ title, type, url, unitId }) {
     await ensureConnection()
     const res = await client.query(
-        'INSERT INTO content (name, color, position, bb_id) VALUES ($1, $2, $3, $4) RETURNING *',
+        'INSERT INTO content (title, type, url, unit_id) VALUES ($1, $2, $3, $4) RETURNING *',
         [ title, type || 'Contenido', url, unitId ]
     )
     return res.rows[0]
