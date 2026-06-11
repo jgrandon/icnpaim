@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import ContentsAdmin from './Contents'
-import API from '../../../services/units'
+import ContentsAdmin from '../Contents'
+import { v4 as uuidv4 } from 'uuid'
+import Accordion from '@material-ui/core/Accordion'
+import AccordionDetails from '@material-ui/core/AccordionDetails'
+import AccordionSummary from '@material-ui/core/AccordionSummary'
+import Unitform from './unitForm'
+
+import API from '../../../../services/units'
+import * as styles from './units.module.css'
 
 export default function UnitsAdmin() {
     const [ units, setUnits ] = useState([])
@@ -53,17 +60,18 @@ export default function UnitsAdmin() {
             console.error('Save failed', err)
         }
     }
-
+    /*
     const startEdit = (unit) => {
         setSelectedUnitId(unit.id)
         setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
     }
+    */
 
     const cancelEdit = () => {
         setSelectedUnitId(null)
         setFormData({ name: '', color: '#000000', position: '' })
     }
-
+    /*
     const handleDelete = async (id) => {
         if (!window.confirm('Estas seguro de eliminar esta Unidad?')) return
         try {
@@ -71,6 +79,25 @@ export default function UnitsAdmin() {
             setUnits(units.filter((u) => u.id !== id))
         } catch (err) {
             console.error('Delete failed', err)
+        }
+    }
+*/
+
+    const handleAccordionChange = (panel) => (e, isExpanded) => {
+        setSelectedUnitId(isExpanded ? panel : false )
+    }
+
+    const handleUnitsUpdate = (action, updatedUnit) => {
+        console.log('handleUnitsUpdate', {action,updatedUnit})
+        if (action == 'added') {
+            console.log('added')
+            setUnits([ ...units, updatedUnit ])
+        } if (action == 'updated') {
+            console.log('updated')
+            setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
+        } if (action == 'removed') {
+            console.log('removed')
+            setUnits(units.filter((u) => u.id !== updatedUnit.id))
         }
     }
 
@@ -106,11 +133,43 @@ export default function UnitsAdmin() {
                 )}
             </form>
 
-            <ContentsAdmin unitId={selectedUnitId}/>
+
 
             {loading ? (
                 <p>Loading units...</p>
-            ) : (
+            ) : (<div>
+                {
+                    units.map((unit) => (
+                        <Accordion
+                            key={uuidv4()}
+                            expanded={selectedUnitId === unit.id}
+                            onChange={handleAccordionChange(unit.id)}
+                        >
+                            <AccordionSummary className={styles.accordion}>
+                                <div 
+                                    className={styles.colorIndicator}
+                                    style={{
+                                        backgroundColor: unit.color
+                                    }}
+                                ></div>
+                                {unit.name}
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Unitform
+                                    unit={unit}
+                                    updateCallback={handleUnitsUpdate}
+                                />
+                                <ContentsAdmin unitId={selectedUnitId}/>
+                            </AccordionDetails>
+                        </Accordion> 
+                    ))
+                }
+            </div>
+            )}
+        </div>
+    )
+}
+{/*
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr style={{ borderBottom: '2px solid #ddd', background: '#eaedd1' }}>
@@ -151,7 +210,4 @@ export default function UnitsAdmin() {
                         )}
                     </tbody>
                 </table>
-            )}
-        </div>
-    )
-}
+*/}
