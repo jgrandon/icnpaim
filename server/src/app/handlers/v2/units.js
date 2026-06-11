@@ -1,5 +1,6 @@
 import client from '../../db/postgres'
-
+import * as contentsHandler from './contents'
+// import * as learningRoutesHandler from './learningRoutes'
 /**
  * CRUD handlers for the Unit table in PostgreSQL.
  * 
@@ -37,11 +38,20 @@ export async function getUnitById(id) {
 export async function createUnit({ name, color, position }) {
     await ensureConnection()
     const bbId = '123' //mock blackBoard content Id
+
     const res = await client.query(
         'INSERT INTO unit (name, color, position, bb_id) VALUES ($1, $2, $3, $4) RETURNING *',
         [ name, color || null, position, bbId ]
     )
-    return res.rows[0]
+    const newUnit = res.rows[0]
+    /*
+    const defaultGradesBreakPoint = [ 4,5.5 ]
+    createLearningRoutes(
+        newUnit,
+        defaultGradesBreakPoint
+    )
+    */
+    return newUnit
 }
 
 export async function updateUnit({ id, name, color, position }) {
@@ -55,6 +65,8 @@ export async function updateUnit({ id, name, color, position }) {
 
 export async function deleteUnit(id) {
     await ensureConnection()
+    await contentsHandler.deleteByUnit(id)
+
     const res = await client.query(
         'DELETE FROM unit WHERE id = $1 RETURNING *', 
         [ id ]

@@ -46,3 +46,12 @@ export async function deleteContent(id) {
     )
     return res.rows[0] || null
 }
+
+export async function deleteByUnit(unitId) {
+    await ensureConnection()
+    const res = await client.query(
+        'DELETE FROM content WHERE unit_id = $1 RETURNING *', 
+        [ unitId ]
+    )
+    return res.rows || null
+}
