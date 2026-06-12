@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import API from '../../../../services/units'
+import * as styles from '../form.module.css'
 
 export default function UnitForm ({
     unit, 
     updateCallback = () => {}
 }) {
-    //const [ units, setUnits ] = useState([])
     const [ modified, setModified ] = useState(false)
     const [ formData, setFormData ] = useState({ name: unit, color: '#000000', position: '' })
-    //const [ selectedUnitId, setSelectedUnitId ] = useState(null)
 
     useEffect(()=> {
         resetFormData()
@@ -80,25 +79,18 @@ export default function UnitForm ({
 
     return (
         <form
+            className={styles.form}
             onSubmit={handleSubmit}
-            style={{
-                display: 'flex',
-                gap: '10px',
-                alignItems: 'flex-end',
-                marginBottom: '30px',
-                padding: '15px',
-                background: '#f5f5f5',
-                borderRadius: '6px'
-            }}
         >
-
             <input
                 name='id'
                 type='hidden'
                 value={formData.id}
             />
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Nombre *</label>
+            <div className={styles.inputWrapper}>
+                <label
+                    className={styles.label}
+                >Nombre</label>
                 <input
                     type='text'
                     name='name'
@@ -106,25 +98,26 @@ export default function UnitForm ({
                     onChange={handleInputChange}
                     placeholder='Nombre Unidad'
                     required
-                    style={{ padding: '6px' }}
+                    className={styles.input}
                 />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label
-                    style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}
-                >Color</label>
+            <div className={styles.inputWrapper}>
+                <label className={styles.label} > Color </label>
                 <input
                     type='color'
                     name='color'
+                    className={styles.color}
+                    visibility={false}
                     value={formData.color}
                     onChange={handleInputChange}
-                    style={{ padding: '2px', width: '60px', height: '32px' }}
                 />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Posicion *</label>
+            <div className={styles.inputWrapper}>
+                <label
+                    className={styles.label}
+                >Posicion</label>
                 <input
                     type='number'
                     name='position'
@@ -132,7 +125,7 @@ export default function UnitForm ({
                     onChange={handleInputChange}
                     placeholder='0'
                     required
-                    style={{ padding: '6px', width: '80px' }}    
+                    className={styles.input}
                 />
             </div>
 

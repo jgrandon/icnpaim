@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import API from '../../../../services/contents'
-import * as styles from './form.module.css'
+import * as styles from '../form.module.css'
 
 
 const _EMPTY_CONTENT = { title: '', type: '', url: '' }

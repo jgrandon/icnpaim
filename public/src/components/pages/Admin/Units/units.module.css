@@ -7,3 +7,11 @@
     width: 10px;
     height: 20px;
 }
+
+.header {
+    display: flex;
+    justify-content: space-arround;
+}
+.tabWrapper {
+    padding: 10px;
+}

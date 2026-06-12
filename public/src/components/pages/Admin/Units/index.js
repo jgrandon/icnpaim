@@ -5,13 +5,21 @@ import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
 import Unitform from './unitForm'
+import Modal from '@material-ui/core/Modal'
+import VerticalTabs from '../../../organisms/VerticalTabs'
+
+/*
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
+import AppBar from '@material-ui/core/AppBar'
+*/
 
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
 
 export default function UnitsAdmin() {
+    const [ isModalOpen, setModalOpen ] = useState(false)
     const [ units, setUnits ] = useState([])
-    const [ formData, setFormData ] = useState({ name: '', color: '#000000', position: '' })
     const [ selectedUnitId, setSelectedUnitId ] = useState(null)
     const [ loading, setLoading ] = useState(false)
 
@@ -31,57 +39,6 @@ export default function UnitsAdmin() {
         }
     }
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({
-            ...prev,
-            [name]: name === 'position' ? parseInt(value, 10) || '' : value,
-        }))
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
-
-        try {
-            if (selectedUnitId) {
-            // Update Action
-                const updatedUnit = await API.updateUnit({...formData, id: selectedUnitId})
-                setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
-                setSelectedUnitId(null)
-            } else {
-            // Create Action
-                const newUnit = await API.updateUnit(formData)
-                setUnits([ ...units, newUnit ])
-            }
-            // Reset form
-            setFormData({ name: '', color: '#000000', position: '' })
-        } catch (err) {
-            console.error('Save failed', err)
-        }
-    }
-    /*
-    const startEdit = (unit) => {
-        setSelectedUnitId(unit.id)
-        setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
-    }
-    */
-
-    const cancelEdit = () => {
-        setSelectedUnitId(null)
-        setFormData({ name: '', color: '#000000', position: '' })
-    }
-    /*
-    const handleDelete = async (id) => {
-        if (!window.confirm('Estas seguro de eliminar esta Unidad?')) return
-        try {
-            await API.delete(id)
-            setUnits(units.filter((u) => u.id !== id))
-        } catch (err) {
-            console.error('Delete failed', err)
-        }
-    }
-*/
 
     const handleAccordionChange = (panel) => (e, isExpanded) => {
         setSelectedUnitId(isExpanded ? panel : false )
@@ -103,36 +60,23 @@ export default function UnitsAdmin() {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
-            <h2>Unidades</h2>
-
-            {/* --- FORM SECTION --- */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', marginBottom: '30px', padding: '15px', background: '#f5f5f5', borderRadius: '6px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Nombre *</label>
-                    <input type='text' name='name' value={formData.name} onChange={handleInputChange} placeholder='Nombre Unidad' required style={{ padding: '6px' }} />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Color</label>
-                    <input type='color' name='color' value={formData.color} onChange={handleInputChange} style={{ padding: '2px', width: '60px', height: '32px' }} />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Posicion *</label>
-                    <input type='number' name='position' value={formData.position} onChange={handleInputChange} placeholder='0' required style={{ padding: '6px', width: '80px' }} />
-                </div>
-
-                <button type='submit' style={{ padding: '8px 16px', background: selectedUnitId ? '#e67e22' : '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                    {selectedUnitId ? 'Actualizar Unidad' : 'Agregar Unidad'}
+            <div className={styles.header}>
+                <h2>Unidades</h2>
+                <button
+                    onClick={() => setModalOpen(true)}
+                    style={{
+                        padding: '8px 16px',
+                        background: '#2ecc71',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    Agregar Unidad
                 </button>
-
-                {selectedUnitId && (
-                    <button type='button' onClick={cancelEdit} style={{ padding: '8px 12px', background: '#95a5a6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        Cancel
-                    </button>
-                )}
-            </form>
-
+            </div>
 
 
             {loading ? (
@@ -155,20 +99,57 @@ export default function UnitsAdmin() {
                                 {unit.name}
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Unitform
-                                    unit={unit}
-                                    updateCallback={handleUnitsUpdate}
-                                />
-                                <ContentsAdmin unitId={selectedUnitId}/>
+                                <VerticalTabs color={unit.color}>
+                                    <div data-title='Datos'
+                                        className={styles.tabWrapper}
+                                    >
+                                        <Unitform
+                                            unit={unit}
+                                            updateCallback={handleUnitsUpdate}
+                                        />
+                                    </div>
+                                    <div data-title='Contenidos'
+                                        className={styles.tabWrapper}
+                                    >
+                                        <ContentsAdmin unitId={selectedUnitId}/>
+                                    </div>
+                                    <div data-title='Rutas Aprendizaje'
+                                        className={styles.tabWrapper}
+                                    >
+                                        Rutas
+                                    </div>
+                                </VerticalTabs>
                             </AccordionDetails>
                         </Accordion> 
                     ))
                 }
             </div>
             )}
+            <Modal
+                open={isModalOpen}
+                className={styles.modal}
+                onClose={() => setModalOpen(false)}
+                aria-labelledby='simple-modal-title'
+                aria-describedby='simple-modal-description'
+            >
+                <div className={styles.modalContent}>
+                    <div className={styles.modalTitle}>
+                        <div>Nueva Unidad</div>
+                        <button onClose={() => setModalOpen(false)}> X </button>
+                    </div>
+                    <Unitform
+                        unit={{}}
+                        updateCallback={handleUnitsUpdate}
+                    />
+                </div>
+            </Modal>
         </div>
     )
 }
+
+
+
+
 {/*
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
