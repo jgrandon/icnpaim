@@ -15,7 +15,7 @@ export default function UnitForm ({
 
     const resetFormData = () => {
         setFormData({
-            id: unit.id ?? null,
+            id: unit.id ?? '',
             name: unit.name ?? '',
             color: unit.color ?? '#000000',
             position: unit.position ?? ''
@@ -108,7 +108,6 @@ export default function UnitForm ({
                     type='color'
                     name='color'
                     className={styles.color}
-                    visibility={false}
                     value={formData.color}
                     onChange={handleInputChange}
                 />

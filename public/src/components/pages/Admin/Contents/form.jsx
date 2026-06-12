@@ -5,15 +5,21 @@ import * as styles from '../form.module.css'
 
 const _EMPTY_CONTENT = { title: '', type: '', url: '' }
 
-export default function ContentsForm ({ unitId }) {
-    const [ formData, setFormData ] = useState(_EMPTY_CONTENT)
-    const [ editingId, setEditingId ] = useState(null)
-    //const [ loading, setLoading ] = useState(false)
+export default function ContentsForm ({
+    unitId,
+    content = {},
+    updateCallback = () => {}
+}) {
+    const [ formData, setFormData ] = useState(
+        content.id ? content : _EMPTY_CONTENT
+    )
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const content = await API.updateContent({...formData, unitId})
-        return content
+        const updatedContent = await API.updateContent({...formData, unitId})
+        const action = formData.id ? 'updated' : 'added'
+        updateCallback(action, updatedContent)
+        return updatedContent
     }
 
     const handleInputChange = (e) => {
@@ -25,8 +31,7 @@ export default function ContentsForm ({ unitId }) {
     }
 
     const cancelEdit = () => {
-        setEditingId(null)
-        setFormData(_EMPTY_CONTENT)
+        updateCallback('cenceled', {})
     }
 
     return (
@@ -34,13 +39,19 @@ export default function ContentsForm ({ unitId }) {
             onSubmit={handleSubmit}
             className={styles.form}
         >
+            <input
+                name='id'
+                type='hidden'
+                value={content.id ?? ''}
+            />
+
             <div className={styles.inputWrapper}>
                 <label className={styles.label}>Título *</label>
                 <input
                     type='text'
                     name='title'
                     className={styles.input}
-                    value={formData.name}
+                    value={formData.title}
                     onChange={handleInputChange}
                     placeholder='Título'
                     required
@@ -76,12 +87,12 @@ export default function ContentsForm ({ unitId }) {
                 type='submit'
                 className={styles.submitButton}
                 style={{
-                    background: editingId ? '#e67e22' : '#2ecc71'
+                    background: content.id ? '#e67e22' : '#2ecc71'
                 }}>
-                {editingId ? 'Actualizar Unidad' : 'Agregar Unidad'}
+                {content.id ? 'Actualizar Unidad' : 'Agregar Unidad'}
             </button>
 
-            {editingId && (
+            {content.id && (
                 <button
                     type='button'
                     onClick={cancelEdit}

@@ -30,7 +30,7 @@ export async function updateContent({ id, title, type, url, unitId }) {
         `UPDATE content SET 
         title = $1,
         type = $2,
-        url = $3
+        url = $3,
         unit_id = $4
         WHERE id = $5 RETURNING *`,
         [ title, type || 'Contenido', url, unitId, id ]

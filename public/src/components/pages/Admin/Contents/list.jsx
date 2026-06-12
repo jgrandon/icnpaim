@@ -4,7 +4,11 @@ import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
 
-export default function ContentsList ({contents}) {
+export default function ContentsList ({
+    contents,
+    onEdit,
+    onRemove
+}) {
     
     return (
         <div>
@@ -22,8 +26,8 @@ export default function ContentsList ({contents}) {
                                 <div>{c.type}</div>
                                 <div>{c.url}</div>
                             </div>
-                            <button>Editar</button>
-                            <button>eliminar</button>
+                            <button onClick={() => onEdit(c)}>Editar</button>
+                            <button onClick={() => onRemove(c)}>eliminar</button>
                         </AccordionDetails>
                     </Accordion>
                 ))
