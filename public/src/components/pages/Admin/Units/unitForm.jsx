@@ -7,7 +7,7 @@ export default function UnitForm ({
     updateCallback = () => {}
 }) {
     const [ modified, setModified ] = useState(false)
-    const [ formData, setFormData ] = useState({ name: unit, color: '#000000', position: '' })
+    const [ formData, setFormData ] = useState({ id: '', name: unit, color: '#000000', position: '' })
 
     useEffect(()=> {
         resetFormData()
