@@ -4,6 +4,10 @@ import ContentForm from './form'
 import * as styles from './contents.module.css'
 import ContentsList from './list'
 import API from '../../../../services/contents'
+import AddIcon from '@material-ui/icons/Add'
+import CloseIcon from '@material-ui/icons/Close'
+import TooltipIconButton from '../../../organisms/TooltipIconButton'
+import Typography from '@material-ui/core/Typography'
 
 export default function ContentsAdmin ({ unitId = null }) {
     const [ isModalOpen, setModalOpen ] = useState(false)
@@ -28,40 +32,44 @@ export default function ContentsAdmin ({ unitId = null }) {
             console.log('updated')
             setContents(contents.map((u) => (u.id === updatedContent.id ? updatedContent : u)))
         } if (action == 'removed') {
-            console.log('removed')
-            setContents(contents.filter((u) => u.id !== updatedContent.id))
-        } if (action == 'cenceled') {
-            console.log('cenceled')
+            console.log('updated')
             setContents(contents.filter((u) => u.id !== updatedContent.id))
         }
         setEditedContent({})
         setModalOpen(false)
     }
 
-    const handleEdit = (targetContent) => {
+    const handleContentClick = (targetContent) => {
         setEditedContent(targetContent)
         setModalOpen(true)
     }
 
-    const handleRemove = async (targetContent) => {
-        const ok = confirm(`¿Estas seguro de eliminar el contenido ${targetContent.title}?`)
-        if (!ok) return
-
-        console.log('handleRemove')
-        await API.delete(unitId, targetContent.id)
-        console.log('removed')
-        setContents(contents.filter((u) => u.id !== targetContent.id))
-    }
-
     return (
         <div>
-            <div>Contenidos</div>
+            <div className={styles.titleWrapper} >
+                <div className={styles.title}>
+                    <Typography variant='h2'>
+                        Contenidos
+                    </Typography>
+                </div>
+                <TooltipIconButton
+                    title='Agregar Nuevo Contenido'
+                    onClick={() => setModalOpen(true)}
+                >
+                    <AddIcon 
+                        style={{
+                            color: 'white',
+                            backgroundColor: 'green'
+                        }}
+                    />
+                </TooltipIconButton>
+            </div>
+
             <ContentsList
                 contents={contents}
-                onEdit={handleEdit}
-                onRemove={handleRemove}
+                onContentClick={handleContentClick}
             />
-            <button onClick={() => setModalOpen(true)}> + Agregar nuevo contenido</button>
+
             <Modal
                 open={isModalOpen}
                 className={styles.modal}
@@ -72,7 +80,12 @@ export default function ContentsAdmin ({ unitId = null }) {
                 <div className={styles.modalContent}>
                     <div className={styles.modalTitle}>
                         <div>Contenido</div>
-                        <button onClick={() => setModalOpen(false)}> X </button>
+                        <TooltipIconButton
+                            title='Cerrar'
+                            onClick={() => setModalOpen(false)}
+                        >
+                            <CloseIcon />
+                        </TooltipIconButton>
                     </div>
                     <ContentForm
                         unitId={unitId}
