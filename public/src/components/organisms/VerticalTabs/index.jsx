@@ -36,8 +36,9 @@ const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
-        display: 'flex',
         height: 'auto',
+        display: 'grid',
+        gridTemplateColumns: '1fr 3fr'
     },
     leftAlignedTab: {
         '& .MuiTab-wrapper': {
