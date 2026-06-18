@@ -7,7 +7,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary'
 import Unitform from './unitForm'
 import Modal from '@material-ui/core/Modal'
 import VerticalTabs from '../../../organisms/VerticalTabs'
-
+// import Draggable from '../../../organisms/Draggable'
+//import DragDropList from '../../../organisms/dndtest'
 /*
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
@@ -16,6 +17,7 @@ import AppBar from '@material-ui/core/AppBar'
 
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
+import LearningRoutesAdmin from '../LearningRoutes'
 
 export default function UnitsAdmin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
@@ -111,12 +113,12 @@ export default function UnitsAdmin() {
                                     <div data-title='Contenidos'
                                         className={styles.tabWrapper}
                                     >
-                                        <ContentsAdmin unitId={selectedUnitId}/>
+                                        <ContentsAdmin unitId={unit.id}/>
                                     </div>
                                     <div data-title='Rutas Aprendizaje'
                                         className={styles.tabWrapper}
                                     >
-                                        Rutas
+                                        <LearningRoutesAdmin unitId={unit.id} />
                                     </div>
                                 </VerticalTabs>
                             </AccordionDetails>
@@ -143,6 +145,11 @@ export default function UnitsAdmin() {
                     />
                 </div>
             </Modal>
+
+            {/*
+                <Draggable />
+                <DragDropList />
+            */}
         </div>
     )
 }
