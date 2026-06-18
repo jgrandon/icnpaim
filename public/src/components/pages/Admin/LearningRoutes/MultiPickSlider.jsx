@@ -112,7 +112,6 @@ export default function MultiNodeSlider(props) {
             }
             const level = i+1
             console.log('calculateRoutes => add', {level, minGrade, maxGrade})
-
             newRoutes.push({level, minGrade, maxGrade})
         }
         setRoutes(newRoutes)
@@ -129,7 +128,7 @@ export default function MultiNodeSlider(props) {
                 justifyContent='center'
                 alignItems='center'
             >
-                <Grid item xs={8}>
+                <Grid item xs={9} gap={20}> 
                     <Slider
                         value={nodes}
                         onChange={handleSliderChange}
@@ -140,8 +139,7 @@ export default function MultiNodeSlider(props) {
                         valueLabelDisplay='auto' // Shows value bubble on hover/drag
                     />
                 </Grid>
-                <Grid item xs={4}>
-
+                <Grid item xs={3}>
                     <ButtonGroup variant='contained' color='primary' aria-label='contained secondary button group'>
                         <Button aria-label='add' onClick={addNode}>
                             <AddIcon />
