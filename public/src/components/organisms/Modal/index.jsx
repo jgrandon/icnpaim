@@ -3,6 +3,8 @@ import{ Modal as MuiModal } from '@material-ui/core'
 import * as styles from './modal.module.css'
 import CloseIcon from '@material-ui/icons/Close'
 import Tooltip from '@material-ui/core/Tooltip'
+import Typography from '@material-ui/core/Typography'
+
 
 export default function Modal (props) {
     const {
@@ -20,10 +22,10 @@ export default function Modal (props) {
             aria-describedby='modal-description'
         >
             <div className={styles.content}>
-                <div className={styles.header}>    
-                    <div className={styles.title}>
-                        <stong>{title}</stong>
-                    </div>
+                <div className={styles.header}>
+                    <Typography>
+                        <strong>{title}</strong>
+                    </Typography>
                     <Tooltip title='Cerrar'>
                         <CloseIcon className={styles.closeButton} />
                     </Tooltip>
