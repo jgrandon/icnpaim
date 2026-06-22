@@ -118,7 +118,7 @@ export default function UnitsAdmin() {
                                     <div data-title='Rutas Aprendizaje'
                                         className={styles.tabWrapper}
                                     >
-                                        <LearningRoutesAdmin unitId={unit.id} />
+                                        <LearningRoutesAdmin unit={unit} />
                                     </div>
                                 </VerticalTabs>
                             </AccordionDetails>

@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 import MultiNodeSlider from './MultiPickSlider'
 import SettingsIcon from '@material-ui/icons/Settings'
 import TooltipIconButton from '../../../organisms/TooltipIconButton'
-import Modal from '@material-ui/core/Modal'
+import Modal from '../../../organisms/Modal'
 import * as styles from './learningRoutes.module.css'
 import Grid from '@material-ui/core/Grid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
-import ContentPicker from './contentPicker'
+import ContentSelector from './ContentSelector'
 import { v4 as uuidv4 } from 'uuid'
 
 
-export default function LearningRoutesAdmin ({ unitId }) {
+export default function LearningRoutesAdmin ({ unit }) {
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [ learningRoutes, setLearningRoutes ] = useState([])
     const [ selectedLR, setSelectedLR ] = useState(null) // Learning Route shown in modal
@@ -27,13 +27,17 @@ export default function LearningRoutesAdmin ({ unitId }) {
             }
             return {
                 ...d,
-                unitId,
+                unitId: unit.id,
                 contents: previousLR.contents ?? []
             }
         })
         console.log('handleSettingsAccept => newLR', newLR)
         setLearningRoutes(newLR)
         closeModal()
+    }
+
+    const handleContentsAccept = (newContents) => {
+
     }
 
     return (
@@ -84,24 +88,25 @@ export default function LearningRoutesAdmin ({ unitId }) {
                     ))
                 }
             </VerticalTabs>
-            
 
             <Modal
                 open={isModalOpen}
-                className={styles.modal}
                 onClose={closeModal}
-                aria-labelledby='modal-title'
-                aria-describedby='modal-description'
+                title={selectedLR
+                    ? `${unit.name} > Ruta Nivel ${selectedLR.level}:`
+                    : 'Rango de notas:'}
             >
-                <div className={styles.modalContent}>
-                    {
-                        selectedLR 
-                            ? (
-                                <ContentPicker learningRoute={selectedLR}/>
-                            ) 
-                            : (<MultiNodeSlider onAccept={handleSettingsAccept}/>)
-                    }
-                </div>
+                {
+                    selectedLR 
+                        ? (
+                            <ContentSelector
+                                learningRoute={selectedLR}
+                                onAccept={handleContentsAccept}
+                                onCancel={closeModal}
+                            />
+                        ) 
+                        : (<MultiNodeSlider onAccept={handleSettingsAccept}/>)
+                }
             </Modal>
         </div>
     )

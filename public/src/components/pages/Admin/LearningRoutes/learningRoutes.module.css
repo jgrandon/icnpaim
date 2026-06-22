@@ -27,3 +27,27 @@
     color: white;
     background-color: green;
 }
+
+.contentSelector {
+    width: 400;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.contentSelectorRow {
+    height: 20px;
+    width: stretch;
+    border: 1px solid;
+    padding: 5px 10px;
+} 
+
+.contentSelectorRow:hover {
+    background-color: lightyellow;
+}
+
+.contentSelectorButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}

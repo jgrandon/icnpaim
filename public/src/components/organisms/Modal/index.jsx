@@ -23,7 +23,7 @@ export default function Modal (props) {
         >
             <div className={styles.content}>
                 <div className={styles.header}>
-                    <Typography>
+                    <Typography className={styles.title}>
                         <strong>{title}</strong>
                     </Typography>
                     <Tooltip title='Cerrar'>
