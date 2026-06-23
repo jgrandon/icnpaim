@@ -1,0 +1,61 @@
+/* Modern Card Item */
+.content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover State */
+.content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Inner Layout Structure */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Typography */
+.title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.link {
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-decoration: none;
+  width: fit-content;
+  transition: color 0.15s ease;
+}
+
+.link:hover {
+  color: #0d6efd; /* Subtle visual feedback if a user hovers over the URL */
+  text-decoration: underline;
+}
+
+/* Modern Badges */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #264653; /* Keeps your dark teal motif but looks cleaner */
+  color: #ffffff;
+}
