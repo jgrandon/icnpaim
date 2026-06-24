@@ -66,9 +66,9 @@
     "install": "npm ci --ignore-scripts",
     "build-server": "babel server/src -d server/lib --source-maps",
     "build-public": "NODE_OPTIONS=--openssl-legacy-provider webpack",
-    "prestart": "npm run build-server && npm run build-public",
+    "build": "npm run build-server && npm run build-public",
     "start": "node server/lib/server.js",
-    "dev": "npm run prestart && npm run start"
+    "dev": "npm run build && npm run start"
   },
   "browserslist": [
     "last 2 version",
