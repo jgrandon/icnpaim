@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import ContentsAdmin from '../Contents'
+import ContentsAdmin from '../ContentsAdmin'
 import { v4 as uuidv4 } from 'uuid'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
@@ -61,7 +61,7 @@ export default function UnitsAdmin() {
     }
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
+        <div className={styles.admin}>
             <div className={styles.header}>
                 <h2>Unidades</h2>
                 <button
