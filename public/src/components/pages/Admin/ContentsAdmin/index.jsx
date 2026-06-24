@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import Modal from '@material-ui/core/Modal'
 import ContentForm from './form'
 import * as styles from './contents.module.css'
-import ContentsList from './list'
 import API from '../../../../services/contents'
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
 import TooltipIconButton from '../../../organisms/TooltipIconButton'
 import Typography from '@material-ui/core/Typography'
+import Content from '../Content'
+import {Button} from '@material-ui/core';
+import { v4 as uuidv4 } from 'uuid'
 
 export default function ContentsAdmin ({ unitId = null }) {
     const [ isModalOpen, setModalOpen ] = useState(false)
@@ -48,27 +50,31 @@ export default function ContentsAdmin ({ unitId = null }) {
         <div>
             <div className={styles.titleWrapper} >
                 <div className={styles.title}>
-                    <Typography variant='h2'>
+                    <Typography variant='h4'>
                         Contenidos
                     </Typography>
                 </div>
-                <TooltipIconButton
+                <Button
+                    startIcon={<AddIcon />}
+                    variant={'contained'}
+                    color={'secondary'}
+                    className={styles.addButton}
                     title='Agregar Nuevo Contenido'
                     onClick={() => setModalOpen(true)}
-                >
-                    <AddIcon 
-                        style={{
-                            color: 'white',
-                            backgroundColor: 'green'
-                        }}
-                    />
-                </TooltipIconButton>
+                >Nuevo Contenido</Button>
             </div>
-
-            <ContentsList
-                contents={contents}
-                onContentClick={handleContentClick}
-            />
+            
+            <div className={styles.listContainer}>
+                {
+                    contents.map((c) => (
+                        <Content
+                            key={uuidv4()}
+                            content={c}
+                            onClick={handleContentClick}
+                        />
+                    ))
+                }
+            </div>
 
             <Modal
                 open={isModalOpen}
