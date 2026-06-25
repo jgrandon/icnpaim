@@ -1,25 +1,37 @@
 import React, { useState, useEffect } from 'react'
-import ContentsAdmin from '../ContentsAdmin'
-import { v4 as uuidv4 } from 'uuid'
+import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
-import Unitform from './unitForm'
 import Modal from '@material-ui/core/Modal'
+import { v4 as uuidv4 } from 'uuid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
-// import Draggable from '../../../organisms/Draggable'
-//import DragDropList from '../../../organisms/dndtest'
-/*
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
-import AppBar from '@material-ui/core/AppBar'
-*/
-
+import Unitform from './unitForm'
+import ContentsAdmin from '../ContentsAdmin'
+import LearningRoutesAdmin from '../LearningRoutes'
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
-import LearningRoutesAdmin from '../LearningRoutes'
 
-export default function UnitsAdmin() {
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#ec622b', // Your custom primary color
+      // Optional: 'light', 'dark', and 'contrastText' (text color) 
+      // will be automatically calculated if you don't provide them.
+      contrastText: '#ffffff', 
+    },
+  },
+});
+
+export default function UnitsAdmin () {
+    return (
+        <ThemeProvider theme={theme}>
+            <Admin />
+        </ThemeProvider>
+    )
+}
+
+function Admin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [ units, setUnits ] = useState([])
     const [ selectedUnitId, setSelectedUnitId ] = useState(null)
