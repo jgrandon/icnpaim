@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import ContentsAPI from '../../../../services/contents'
-import { v4 as uuidv4 } from 'uuid'
-import * as styles from './learningRoutes.module.css'
-import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
 import SaveIcon from '@material-ui/icons/Save'
 import CloseIcon from '@material-ui/icons/Close'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
+import { v4 as uuidv4 } from 'uuid'
+import ContentsAPI from '../../../../../services/contents'
+import Content from '../../Content'
+import * as styles from './ContentSelector.module.css'
+
 
 export default function ContentSelector (props) {
     const { learningRoute, onAccept, onCancel } = props
@@ -39,10 +41,23 @@ export default function ContentSelector (props) {
     }
 
     return (
-        <div className={styles.contentSelector}>
-            { contents.map( c => (
+        <div className={styles.wrapper}>
+            <div className={styles.list}>
+                { contents.map( c => (
+                        <div key={uuidv4()}
+                            className={styles.selectableRow}
+                            style={{ backgroundColor: isSelected(c) ? 'gray' : 'white' }}
+                        >
+                            <Content
+                                content={c}
+                                onClick={() => handleClick(c)}
+                            />
+                        </div>
+                )) }
+            </div>
+
+            {/*
                 <div key={ uuidv4() }
-                    onClick={() => handleClick(c)}
                     className={styles.contentSelectorRow}
                     style={{
                         backgroundColor: isSelected(c) ? 'gray' : 'white'
@@ -51,7 +66,8 @@ export default function ContentSelector (props) {
                     <div>{ c.type }</div>
                     <div>{ c.title }</div>
                 </div>
-            )) }
+            */}
+            
             <div className={styles.contentSelectorButtons}>
                 <ButtonGroup variant='contained' color='primary' aria-label='contained secondary button group'>
                     <Button

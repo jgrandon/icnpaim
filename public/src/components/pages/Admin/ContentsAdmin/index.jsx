@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Modal from '@material-ui/core/Modal'
 import ContentForm from './form'
-import * as styles from './contents.module.css'
+import * as styles from './contentsAdmin.module.css'
 import API from '../../../../services/contents'
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
@@ -48,16 +48,11 @@ export default function ContentsAdmin ({ unitId = null }) {
 
     return (
         <div>
-            <div className={styles.titleWrapper} >
-                <div className={styles.title}>
-                    <Typography variant='h4'>
-                        Contenidos
-                    </Typography>
-                </div>
+            <div className={styles.header} >
                 <Button
                     startIcon={<AddIcon />}
                     variant={'contained'}
-                    color={'secondary'}
+                    color={'primary'}
                     className={styles.addButton}
                     title='Agregar Nuevo Contenido'
                     onClick={() => setModalOpen(true)}
