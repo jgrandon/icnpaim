@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
 import ContentSelector from './ContentSelector'
 import { v4 as uuidv4 } from 'uuid'
-import Content from '../Content'
+import ContentSorter from './ContentSorter'
 
 export default function LearningRoutesAdmin ({ unit }) {
     const [ isModalOpen, setModalOpen ] = useState(false)
@@ -110,13 +110,23 @@ export default function LearningRoutesAdmin ({ unit }) {
                                     />
                                 </TooltipIconButton>
                             </div>
-                            { lr.contents.map(c => (
-                                <Content
-                                    key={uuidv4()}
-                                    content={c}
-                                    onClick={() => {}}
-                                />
-                            ))}
+
+                            <ContentSorter contents={lr.contents} />
+                        {/*}
+                            <ReactSortable list={state} setList={setState}>
+                                { lr.contents.map(c => (
+                                    {state.map((item) => (
+                                    <div key={item.id}>
+                                        <Content
+                                            key={uuidv4()}
+                                            content={c}
+                                            onClick={() => {}}
+                                        />
+                                    </div>
+                                    ))}
+                                ))}
+                            </ReactSortable>
+                            */}
                         </div>
                     ))
                 }
