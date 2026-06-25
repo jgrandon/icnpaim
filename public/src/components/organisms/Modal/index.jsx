@@ -27,7 +27,9 @@ export default function Modal (props) {
                         <strong>{title}</strong>
                     </Typography>
                     <Tooltip title='Cerrar'>
-                        <CloseIcon className={styles.closeButton} />
+                        <CloseIcon 
+                            onClick={onClose}
+                            className={styles.closeButton} />
                     </Tooltip>
                 </div>
 
