@@ -1,12 +1,7 @@
-.titleWrapper {
+.header {
     display: flex;
-    justify-content: space-between;
-}
-
-.title {
-    display: flex;
-    align-items: center;
-    padding: 12px;
+    justify-content: flex-end;;
+    padding: 20px 0px;
 }
 
 .addButton {
@@ -15,14 +10,15 @@
 }
 
 .listContainer {
-    font-family: -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: #f8f9fa;
-    width: 100%;
+    width: stretch;
     max-width: 600px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 25px;
+    overflow: auto;
+    max-height: 200px;
 }
 
 .modal {
