@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
 import ContentSelector from './ContentSelector'
 import { v4 as uuidv4 } from 'uuid'
-
+import Content from '../Content'
 
 export default function LearningRoutesAdmin ({ unit }) {
     const [ isModalOpen, setModalOpen ] = useState(false)
@@ -36,8 +36,37 @@ export default function LearningRoutesAdmin ({ unit }) {
         closeModal()
     }
 
-    const handleContentsAccept = (newContents) => {
+    const handleContentsAccept = (updatedLevel, selectedContents) => {
+        setLearningRoutes(prev => {
+            const updatedLR = prev.find(lr => lr.level == updatedLevel)
+            const otherLR = prev.filter(lr => lr.level != updatedLevel)
+            // remove all non selected contents and sort
+            const oldContents = updatedLR.contents.filter(
+                c => !!( selectedContents.find(sc => sc.id == sc.id) )
+            ).sort((a, b) => (a.order - b.order))
 
+            // remove from selected all prev contents
+            const newContents = selectedContents.filter(
+                sc => !( oldContents.find(oc => oc.id == sc.id)) 
+            )
+
+            // add remaining contents at the end
+            const updatedContents = [ 
+                ...oldContents, 
+                ...newContents
+            ].map((nc, index) => ({ ...nc, order: index })) // assign order attr to all new contents
+            
+            // update Learning Routes
+            const allLR = [
+                ...otherLR,
+                { ...updatedLR, contents: updatedContents}
+            ].sort((a, b) => (a.level - b.level))
+            console.log('handleContentsAccept => setLearningRoutes', allLR)
+            return allLR
+        })
+
+        closeModal()
+        // setSelectedLR(null)
     }
 
     return (
@@ -81,9 +110,13 @@ export default function LearningRoutesAdmin ({ unit }) {
                                     />
                                 </TooltipIconButton>
                             </div>
-                            { lr.contents.map(c => {
-                                <div>{c.title}</div>
-                            })}
+                            { lr.contents.map(c => (
+                                <Content
+                                    key={uuidv4()}
+                                    content={c}
+                                    onClick={() => {}}
+                                />
+                            ))}
                         </div>
                     ))
                 }
