@@ -1,0 +1,20 @@
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.clean,
+.touched,
+.saving,
+.saved,
+.error {
+    font-size: 1rem;
+    padding: 10px 0px;
+}
+
+.clean { color: gray; }
+.touched { color: orange; }
+.saving { color: blue }
+.saved { color: green; }
+.error { color: red; }
