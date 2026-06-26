@@ -45,8 +45,10 @@ export default function ContentSelector (props) {
             <div className={styles.list}>
                 { contents.map( c => (
                     <div key={uuidv4()}
-                        className={styles.selectableRow}
-                        style={{ backgroundColor: isSelected(c) ? 'gray' : 'white' }}
+                        className={`
+                            ${styles.selectableRow} 
+                            ${isSelected(c) ? styles.selected : ''}
+                        `}
                     >
                         <Content
                             content={c}
