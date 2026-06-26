@@ -12,7 +12,7 @@ import * as styles from './ContentSelector.module.css'
 export default function ContentSelector (props) {
     const { learningRoute, onAccept, onCancel } = props
     const [ contents, setContents ]= useState(learningRoute.contents)
-    const [ selectedContents, setSelectedContents ] = useState([])
+    const [ selectedContents, setSelectedContents ] = useState(learningRoute.contents)
 
 
     useEffect(() => {
@@ -28,8 +28,8 @@ export default function ContentSelector (props) {
     const handleClick = (content) => {
         console.log('handleClick', selectedContents, content)
         if (isSelected(content)) {
-            setSelectedContents(prev => 
-                prev.filter(sc => sc.title != content.title))
+            setSelectedContents(prev =>
+                prev.filter(sc => sc.id != content.id))
         }
         else {
             setSelectedContents(prev => [ ...prev, content ])
@@ -37,22 +37,22 @@ export default function ContentSelector (props) {
     }
 
     const isSelected = (content) => {
-        return selectedContents.find(sc => sc.title == content.title)
+        return selectedContents.find(sc => sc.id == content.id)
     }
 
     return (
         <div className={styles.wrapper}>
             <div className={styles.list}>
                 { contents.map( c => (
-                        <div key={uuidv4()}
-                            className={styles.selectableRow}
-                            style={{ backgroundColor: isSelected(c) ? 'gray' : 'white' }}
-                        >
-                            <Content
-                                content={c}
-                                onClick={() => handleClick(c)}
-                            />
-                        </div>
+                    <div key={uuidv4()}
+                        className={styles.selectableRow}
+                        style={{ backgroundColor: isSelected(c) ? 'gray' : 'white' }}
+                    >
+                        <Content
+                            content={c}
+                            onClick={() => handleClick(c)}
+                        />
+                    </div>
                 )) }
             </div>
 
