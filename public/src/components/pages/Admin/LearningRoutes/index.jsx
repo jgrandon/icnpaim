@@ -12,7 +12,7 @@ import ContentSorter from './ContentSorter'
 import API from '../../../../services/learningRoutes'
 import SavingState from './SavingState'
 
-export default function LearningRoutesAdmin ({ unit }) {
+export default function LearningRoutesAdmin (props) {
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [ learningRoutes, setLearningRoutes ] = useState([])
     const [ selectedLR, setSelectedLR ] = useState(null) // Learning Route shown in modal
@@ -27,8 +27,8 @@ export default function LearningRoutesAdmin ({ unit }) {
         }
     }, [])
 
-    const handleSettingsAccept = (data) => {
-        console.log('handleSettingsAccept => data', data)
+    const handleSchemaUpdate = (data) => {
+        console.log('handleSchemaUpdate => data', data)
         const newLR = data.map(d => {
             const previousLR = learningRoutes.filter(lr => lr.level == d.level)
             if (!previousLR) {
@@ -36,16 +36,17 @@ export default function LearningRoutesAdmin ({ unit }) {
             }
             return {
                 ...d,
-                unitId: unit.id,
+                unitId: props.unit.id,
                 contents: previousLR.contents ?? []
             }
         })
-        console.log('handleSettingsAccept => newLR', newLR)
+        console.log('handleSchemaUpdate => newLR', newLR)
         setLearningRoutes(newLR)
+        saveSchemaChanges(newLR)
         closeModal()
     }
 
-    const handleContentsAccept = (updatedLevel, selectedContents) => {
+    const handleAddOrRemove = (updatedLevel, selectedContents) => {
         setLearningRoutes(prev => {
             const updatedLR = prev.find(lr => lr.level == updatedLevel)
             const otherLR = prev.filter(lr => lr.level != updatedLevel)
@@ -70,14 +71,14 @@ export default function LearningRoutesAdmin ({ unit }) {
                 ...otherLR,
                 { ...updatedLR, contents: updatedContents }
             ].sort((a, b) => (a.level - b.level))
-            console.log('handleContentsAccept => setLearningRoutes', allLR)
+            console.log('handleAddOrRemove => setLearningRoutes', allLR)
 
             setSelectedLR({ ...updatedLR, contents: updatedContents })
             return allLR
         })
 
-        saveChanges({
-            unitId: unit.id,
+        saveContentChanges({
+            unitId: props.unit.id,
             level: selectedLR.level,
             contents: selectedLR.contents
         })
@@ -86,23 +87,24 @@ export default function LearningRoutesAdmin ({ unit }) {
     }
 
 
-    const handleContentUpdate = async (contents) => {
+    const handleOrderUpdate = async (contents) => {
         const { level } = selectedLR
         console.log('onchange', {level, contents})
         setSavingState('touched')
         if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
         savingTimerRef.current = setTimeout(async () => {
-            alert('5 seconds have passed!')
-            await saveChanges({
-                unitId: unit.id,
+            console.log('5 seconds have passed!')
+            await saveContentChanges({
+                unitId: props.unit.id,
                 level,
                 contents
             })
         }, 5000)
     }
 
-    const saveChanges = async (data) => {
-        alert('saveChanges')
+
+    const saveContentChanges = async (data) => {
+        alert('saveContentChanges')
         try {
             setSavingState('saving')
             await API.updateContents(data)
@@ -110,6 +112,19 @@ export default function LearningRoutesAdmin ({ unit }) {
         } catch (error) {
             console.warn('updateContents API ERROR', error)
             setSavingState('error')
+        }
+    }
+
+    const saveSchemaChanges = async (data) => {
+        alert('saveSchemaChanges')
+        const unitId = props.unit.id
+        try {
+            //setSavingState('saving')
+            await API.updateSchema(unitId, data)
+            //setSavingState('saved')
+        } catch (error) {
+            console.warn('updateSchema API ERROR', error)
+            //setSavingState('error')
         }
     }
 
@@ -123,6 +138,7 @@ export default function LearningRoutesAdmin ({ unit }) {
                     title='Configurar Rutas Aprendizaje'
                     onClick={() => {
                         setSelectedLR(null)
+                        if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
                         openModal()
                     }}
                 >
@@ -157,7 +173,7 @@ export default function LearningRoutesAdmin ({ unit }) {
 
                             <ContentSorter
                                 contents={lr.contents}
-                                onChange={handleContentUpdate}
+                                onChange={handleOrderUpdate}
                             />
 
                             <SavingState state={savingState}/>
@@ -170,7 +186,7 @@ export default function LearningRoutesAdmin ({ unit }) {
                 open={isModalOpen}
                 onClose={closeModal}
                 title={selectedLR
-                    ? `${unit.name} > Ruta Nivel ${selectedLR.level}:`
+                    ? `${props.unit.name} > Ruta Nivel ${selectedLR.level}:`
                     : 'Rango de notas:'}
             >
                 {
@@ -178,11 +194,11 @@ export default function LearningRoutesAdmin ({ unit }) {
                         ? (
                             <ContentSelector
                                 learningRoute={selectedLR}
-                                onAccept={handleContentsAccept}
+                                onAccept={handleAddOrRemove}
                                 onCancel={closeModal}
                             />
                         ) 
-                        : (<MultiNodeSlider onAccept={handleSettingsAccept}/>)
+                        : (<MultiNodeSlider onAccept={handleSchemaUpdate}/>)
                 }
             </Modal>
         </div>
