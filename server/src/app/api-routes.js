@@ -12,6 +12,7 @@ import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
 import * as unitsHandler from './handlers/v2/units'
 import * as contentsHandler from './handlers/v2/contents'
+import * as LRHandler from './handlers/v2/learningRoutes'
 
 const router = express.Router();
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
@@ -587,6 +588,17 @@ router.delete('/v2/units/:unitId/contents', async (req, res) => {
     await contentsHandler.deleteContent(unitId)
     return res.status(200).json({
         ok: true
+    })
+})
+
+//
+router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
+    const { unitId } = req.params
+    const data = req.body
+    const learningRoutes = await LRHandler.updateSchema(unitId, data)
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
     })
 })
 
