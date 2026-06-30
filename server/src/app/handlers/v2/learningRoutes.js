@@ -36,10 +36,10 @@ export async function createLearningRoutes(unitId, breakPoints) {
 }
 */
 export async function updateSchema (unitId, data) {
-    disableHigerLevels(data.length)
-    const dbUpdate = data.map(async (learningRoute) => {
-        const { level, minGrade, maxGrade } = learningRoute
-
+    disableHigerLevels(unitId, data.length)
+    const schemas = []
+    for (let i = 0; i < data.length; i++) {
+        const { level, minGrade, maxGrade } = data[i]
         const res = await client.query(
             `INSERT INTO learningrouteschema (level, min_grade, max_grade, unit_id, enabled) 
             VALUES ( $1, $2, $3, $4, TRUE ) 
@@ -51,14 +51,16 @@ export async function updateSchema (unitId, data) {
             RETURNING *`,
             [ level, minGrade, maxGrade, unitId ]
         )
-        return res.rows[0]
-    })
-
-    return dbUpdate
+        schemas.push( res.rows[0] )
+    }
+    return schemas
 }
 
 export async function disableHigerLevels (unitId, maxLevel) {
-    const res = await client.query(`UPDATE learningrouteschema SET enabled = FALSE  WHERE unit_id = $1 AND level > $2 RETURNING *`,
+    console.log('disableHigerLevels', unitId, maxLevel)
+    const res = await client.query(
+        `UPDATE learningrouteschema SET enabled = FALSE  
+        WHERE unit_id = $1 AND level > $2 RETURNING *`,
         [ unitId, maxLevel ]
     )
     return res.rows
