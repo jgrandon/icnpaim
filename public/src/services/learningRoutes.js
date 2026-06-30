@@ -1,13 +1,13 @@
 const learningRouteServices = {
     updateContents: async (data) => {
-        const { unitId, lrLevel } = { data }
+        const { unitId, lrId } = data
         try {
             const response = await fetch(
-                `/api/v2/units/${unitId}/lr/${lrLevel}/contents`,
+                `/api/v2/units/${unitId}/lr/${lrId}/contents`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data.contents)
                 }
             )
             if (!response.ok) {
