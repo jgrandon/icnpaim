@@ -591,12 +591,15 @@ router.delete('/v2/units/:unitId/contents', async (req, res) => {
     })
 })
 
+
+
 //
 router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
     const { unitId } = req.params
     const data = req.body
-    const learningRoutes = await LRHandler.updateSchema(unitId, data)
+    await LRHandler.updateSchema(unitId, data)
     //TODO: find learningRouteData registers
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
 
     return res.status(200).json({
         ok: true,
@@ -607,7 +610,21 @@ router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
 router.get('/v2/units/:unitId/lr', async (req, res) => {
     const { unitId } = req.params
     const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
+    })
+})
+
+router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
+    const { unitId, ldId } = req.params
+    const data = req.body
+    const update = await LRHandler.updateLRContents(ldId, data)
+
+    console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
     //TODO: find learningRouteData registers
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
 
     return res.status(200).json({
         ok: true,

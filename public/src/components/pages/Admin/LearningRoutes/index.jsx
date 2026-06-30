@@ -31,6 +31,7 @@ export default function LearningRoutesAdmin (props) {
     const loadLearningRoutes = async () => {
         const data = await API.getLearningRoutes(props.unit.id)
         setLearningRoutes(data)
+        setSelectedLR(data[0])
     }
 
     const handleSchemaUpdate = (data) => {
@@ -77,31 +78,35 @@ export default function LearningRoutesAdmin (props) {
                 { ...updatedLR, contents: updatedContents }
             ].sort((a, b) => (a.level - b.level))
             console.log('handleAddOrRemove => setLearningRoutes', allLR)
-
-            setSelectedLR({ ...updatedLR, contents: updatedContents })
+            const newLR = { ...updatedLR, contents: updatedContents }
+            saveContentChanges({
+                unitId: props.unit.id,
+                lrId: newLR.id,
+                contents: newLR.contents
+            })
+            setSelectedLR(newLR)
             return allLR
         })
 
-        saveContentChanges({
-            unitId: props.unit.id,
-            level: selectedLR.level,
-            contents: selectedLR.contents
-        })
         closeModal()
         // setSelectedLR(null)
     }
 
 
     const handleOrderUpdate = async (contents) => {
+        setSelectedLR(prev => ({ ...prev, contents }))
+        setLearningRoutes(prev => prev.map(p => {
+            if (p.id == selectedLR.id) return { ...p, contents }
+            else return p
+        }))
         const { level } = selectedLR
         console.log('onchange', {level, contents})
         setSavingState('touched')
         if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
         savingTimerRef.current = setTimeout(async () => {
-            console.log('5 seconds have passed!')
-            await saveContentChanges({
+            const data = {
                 unitId: props.unit.id,
-                level,
+                lrId: selectedLR.id,
                 contents
             }
             console.log('5 seconds have passed!', data)
