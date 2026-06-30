@@ -66,6 +66,57 @@ export async function disableHigerLevels (unitId, maxLevel) {
     return res.rows
 }
 
+export async function getLearningRoutes(unitId) {
+    const res = await client.query(
+        `SELECT
+            lrs.id, level, min_grade,
+            max_grade, unit_id, position,
+            content_id
+        FROM LearningRouteSchema AS lrs
+        LEFT JOIN LearningRouteData AS lrd
+            ON lrs.id = lrd.learning_route_id
+        WHERE lrs.unit_id=$1 AND lrs.enabled = TRUE;`,
+        [ unitId ]
+    )
+    let learningRoutes = []
+
+    res.rows.map(currentLR => {
+        const { id, level, min_grade, max_grade, unit_id, position, content_id } = currentLR
+        const wasAdded = !!learningRoutes.find(lr => lr.id == currentLR.id)
+        const content = currentLR.position 
+            ? { position: position,
+                contentId: content_id }
+            : null
+        const lr = {
+            id,
+            level,
+            minGrade: min_grade,
+            maxGrade: max_grade,
+            unitId: unit_id
+        }
+        if ( wasAdded ) {
+            learningRoutes.map(addedLR => {
+                if (addedLR.id == lr.id) { //match duplicated lr
+                    return {
+                        ...addedLR,
+                        contents: [ // update lr contents
+                            ...addedLR.contents,
+                            content
+                        ]
+                    }
+                }
+                else return addedLR //bypass lr
+            })
+        } else {
+            learningRoutes.push({
+                ...lr,
+                contents: content==null ? [] : [ content ]
+            })
+        }
+    })
+    return learningRoutes
+}
+
 /*
 export async function createLearningRoute ({ level, minGrade, maxGrade, unitId }) {
     const res = await client.query(

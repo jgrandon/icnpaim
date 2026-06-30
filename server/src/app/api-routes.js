@@ -596,11 +596,22 @@ router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
     const { unitId } = req.params
     const data = req.body
     const learningRoutes = await LRHandler.updateSchema(unitId, data)
+    //TODO: find learningRouteData registers
+
     return res.status(200).json({
         ok: true,
         learningRoutes
     })
 })
 
+router.get('/v2/units/:unitId/lr', async (req, res) => {
+    const { unitId } = req.params
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    //TODO: find learningRouteData registers
 
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
+    })
+})
 export default router

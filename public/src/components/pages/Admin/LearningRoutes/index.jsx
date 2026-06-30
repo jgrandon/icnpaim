@@ -22,10 +22,16 @@ export default function LearningRoutesAdmin (props) {
     const savingTimerRef = useRef(null)
 
     useEffect(() => {
+        loadLearningRoutes()
         return () => {
             if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
         }
     }, [])
+
+    const loadLearningRoutes = async () => {
+        const data = await API.getLearningRoutes(props.unit.id)
+        setLearningRoutes(data)
+    }
 
     const handleSchemaUpdate = (data) => {
         console.log('handleSchemaUpdate => data', data)
@@ -41,8 +47,7 @@ export default function LearningRoutesAdmin (props) {
             }
         })
         console.log('handleSchemaUpdate => newLR', newLR)
-        setLearningRoutes(newLR)
-        saveSchemaChanges(newLR)
+        saveSchemaChanges(newLR)   
         closeModal()
     }
 
@@ -102,7 +107,6 @@ export default function LearningRoutesAdmin (props) {
         }, 5000)
     }
 
-
     const saveContentChanges = async (data) => {
         alert('saveContentChanges')
         try {
@@ -120,7 +124,8 @@ export default function LearningRoutesAdmin (props) {
         const unitId = props.unit.id
         try {
             //setSavingState('saving')
-            await API.updateSchema(unitId, data)
+            const updatedLR = await API.updateSchema(unitId, data)
+            setLearningRoutes(updatedLR)
             //setSavingState('saved')
         } catch (error) {
             console.warn('updateSchema API ERROR', error)
