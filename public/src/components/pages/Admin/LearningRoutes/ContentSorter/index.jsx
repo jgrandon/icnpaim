@@ -20,10 +20,11 @@ export default function ContentSorter ({
                 setList={setSorted}
                 onSort={() => {
                     console.log('onSort', sorted)
-                    onChange([ ...sorted ])}
-                }
+                    const data = sorted.map((d,index) =>  ({ ...d, order: index }))
+                    onChange(data) 
+                }}
                 onChange={() => console.log('onChange')}
-                onUpdate={() => console.log('onUpdate', )}    
+                onUpdate={() => console.log('onUpdate', )} 
             >
                 {sorted.map((item) => (
                     <div key={item.id}>
