@@ -103,7 +103,9 @@ export default function LearningRoutesAdmin (props) {
                 unitId: props.unit.id,
                 level,
                 contents
-            })
+            }
+            console.log('5 seconds have passed!', data)
+            await saveContentChanges(data)
         }, 5000)
     }
 
