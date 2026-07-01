@@ -32,7 +32,8 @@ export default function Modal (props) {
                             className={styles.closeButton} />
                     </Tooltip>
                 </div>
-
+                <hr />
+                
                 {props.children}
 
                 {
