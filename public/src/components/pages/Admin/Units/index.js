@@ -13,15 +13,17 @@ import API from '../../../../services/units'
 import * as styles from './units.module.css'
 
 const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#ec622b', // Your custom primary color
-      // Optional: 'light', 'dark', and 'contrastText' (text color) 
-      // will be automatically calculated if you don't provide them.
-      contrastText: '#ffffff', 
+    palette: {
+        primary: {
+            main: '#ec622b',
+            contrastText: '#ffffff', 
+        },
+        secondary: {
+            main: '#07111d',
+            contrastText: '#fff',
+        }
     },
-  },
-});
+})
 
 export default function UnitsAdmin () {
     return (
