@@ -69,23 +69,26 @@ export default function ContentSelector (props) {
                     <div>{ c.title }</div>
                 </div>
             */}
-            
+            <hr />
             <div className={styles.contentSelectorButtons}>
-                <ButtonGroup variant='contained' color='primary' aria-label='contained secondary button group'>
-                    <Button
-                        aria-label='add'
-                        startIcon={<SaveIcon />}
-                        onClick={() => onAccept(learningRoute.level, selectedContents)}
-                    >
-                        Aceptar
-                    </Button>
-                    <Button
-                        aria-label='reset'
-                        startIcon={<CloseIcon />}
-                        onClick={onCancel}>
-                        
-                    </Button>
-                </ButtonGroup>
+                <Button
+                    color='primary'
+                    size='small'
+                    variant='contained'
+                    aria-label='add'
+                    startIcon={<SaveIcon />}
+                    onClick={() => onAccept(learningRoute.level, selectedContents)}
+                >
+                    Aceptar
+                </Button>
+                <Button
+                    size='small'
+                    aria-label='reset'
+                    variant='outlined'
+                    startIcon={<CloseIcon />}
+                    onClick={onCancel}>
+                    Cancelar
+                </Button>
             </div>
         </div>
     )
