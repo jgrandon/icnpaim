@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import MultiNodeSlider from './MultiPickSlider'
 import SettingsIcon from '@material-ui/icons/Settings'
+import EditIcon from '@material-ui/icons/Edit'
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 import TooltipIconButton from '../../../organisms/TooltipIconButton'
 import Modal from '../../../organisms/Modal'
 import * as styles from './learningRoutes.module.css'
-import Grid from '@material-ui/core/Grid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
 import ContentSelector from './ContentSelector'
 import { v4 as uuidv4 } from 'uuid'
@@ -143,24 +145,22 @@ export default function LearningRoutesAdmin (props) {
     return (
         <div>
             <Grid container
-                alignContent='space-between'
+                justifyContent='flex-start'
+                style={{ padding: '0px 0px 10px 0px' }}
             >
-                
-                <TooltipIconButton
-                    title='Configurar Rutas Aprendizaje'
+                <Button
+                    variant='contained'
+                    color='primary'
+                    size='small'
+                    startIcon={<SettingsIcon />}
                     onClick={() => {
                         setSelectedLR(null)
                         if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
                         openModal()
                     }}
                 >
-                    <SettingsIcon 
-                        style={{
-                            color: 'white',
-                            backgroundColor: 'gray'
-                        }}
-                    />
-                </TooltipIconButton>
+                    Configurar Rutas
+                </Button>
             </Grid>
 
             <VerticalTabs>
@@ -168,20 +168,24 @@ export default function LearningRoutesAdmin (props) {
                     learningRoutes.map(lr => (
                         <div key={uuidv4()}
                             data-title={`Nivel ${lr.level}`}
+                            onClick={() => {
+                                console.log('cambiando LR id', lr)
+                                setSelectedLR(lr)}
+                            }
                         >
-                            <div onClick={() => setSelectedLR(lr)}>
-                                <TooltipIconButton
-                                    title='Configurar Rutas Aprendizaje'
+                            <Grid container
+                                justifyContent='flex-end'
+                            >
+                                <Button
+                                    variant='outlined'
+                                    color='primary'
+                                    size='small'
+                                    startIcon={<EditIcon />}
                                     onClick={openModal}
                                 >
-                                    <SettingsIcon 
-                                        style={{
-                                            color: 'white',
-                                            backgroundColor: 'gray'
-                                        }}
-                                    />
-                                </TooltipIconButton>
-                            </div>
+                                    Agregar o Quitar
+                                </Button>
+                            </Grid>
 
                             <ContentSorter
                                 contents={lr.contents}

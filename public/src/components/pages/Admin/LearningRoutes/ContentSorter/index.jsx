@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 import Content from '../../Content'
 import { v4 as uuidv4 } from 'uuid'
@@ -8,11 +8,7 @@ export default function ContentSorter ({
     onChange = () => {}
 }) {
     const [ sorted, setSorted ] = useState(contents)
-/*
-    useEffect(()=> {
-        setSorted(contents)
-    }, [])
-*/
+
     return (
         <div>
             <ReactSortable 
@@ -27,7 +23,7 @@ export default function ContentSorter ({
                 onUpdate={() => console.log('onUpdate', )} 
             >
                 {sorted.map((item) => (
-                    <div key={item.id}>
+                    <div key={item.id} style={{ cursor:'grab', margin: '5px 0px' }}>
                         <Content
                             key={uuidv4()}
                             content={item}
