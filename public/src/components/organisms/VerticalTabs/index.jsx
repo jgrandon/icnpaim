@@ -73,6 +73,7 @@ export default function VerticalTabs(props) {
                         <Tab 
                             label={child.props['data-title']} {...a11yProps(index)}
                             className={classes.leftAlignedTab}
+                            onClick={child.props['onClick']}
                         />
                     ))
                 }
