@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 import Content from '../../Content'
 import { v4 as uuidv4 } from 'uuid'
+import * as styles from './ContentSorter.module.css'
 
 export default function ContentSorter ({ 
     contents, 
@@ -10,7 +11,7 @@ export default function ContentSorter ({
     const [ sorted, setSorted ] = useState(contents)
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             <ReactSortable 
                 list={sorted}
                 setList={setSorted}

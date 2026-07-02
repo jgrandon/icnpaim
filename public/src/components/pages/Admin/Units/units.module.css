@@ -18,10 +18,12 @@
 
 .header {
     display: flex;
-    justify-content: space-arround;
+    justify-content: space-between;
+    align-items: center;
 }
 .tabWrapper {
     padding: 10px;
     min-width: 200px;
     max-width: 600px;
+    width: fit-content;
 }

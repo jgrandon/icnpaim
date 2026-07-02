@@ -3,7 +3,9 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
-import Modal from '@material-ui/core/Modal'
+import Button from '@material-ui/core/Button'
+import AddIcon from '@material-ui/icons/Add'
+import Modal from '../../../organisms/Modal'
 import { v4 as uuidv4 } from 'uuid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
 import Unitform from './unitForm'
@@ -65,12 +67,15 @@ function Admin() {
         if (action == 'added') {
             console.log('added')
             setUnits([ ...units, updatedUnit ])
+            setModalOpen(false)
         } if (action == 'updated') {
             console.log('updated')
             setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
         } if (action == 'removed') {
             console.log('removed')
             setUnits(units.filter((u) => u.id !== updatedUnit.id))
+        } if (action == 'canceled') {
+            setModalOpen(false)
         }
     }
 
@@ -78,20 +83,17 @@ function Admin() {
         <div className={styles.admin}>
             <div className={styles.header}>
                 <h2>Unidades</h2>
-                <button
+
+                <Button
+                    variant='contained'
+                    color='primary'
+                    size='small'
+                    startIcon={<AddIcon />}
                     onClick={() => setModalOpen(true)}
-                    style={{
-                        padding: '8px 16px',
-                        background: '#2ecc71',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
+                    style={{ height: '30px' }}
                 >
                     Agregar Unidad
-                </button>
+                </Button>
             </div>
 
 
@@ -115,7 +117,7 @@ function Admin() {
                                 {unit.name}
                             </AccordionSummary>
                             <AccordionDetails>
-                                <VerticalTabs color={unit.color}>
+                                <VerticalTabs orientation='horizontal'>
                                     <div data-title='Datos'
                                         className={styles.tabWrapper}
                                     >
@@ -159,10 +161,6 @@ function Admin() {
                     />
                 </div>
             </Modal>
-
-            {/*
-                <Draggable />
-                <DragDropList />
             */}
         </div>
     )

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import API from '../../../../services/units'
 import * as styles from '../form.module.css'
+import SaveIcon from '@material-ui/icons/Save'
+import CloseIcon from '@material-ui/icons/Close'
+import DeleteIcon from '@material-ui/icons/Delete'
+import Button from '@material-ui/core/Button'
 
 export default function UnitForm ({
     unit, 
@@ -79,9 +83,16 @@ export default function UnitForm ({
 
     return (
         <form
-            className={styles.form}
+            style={{
+                width: '350px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}
             onSubmit={handleSubmit}
         >
+            <div className={styles.form}>
             <input
                 name='id'
                 type='hidden'
@@ -128,30 +139,50 @@ export default function UnitForm ({
                 />
             </div>
 
-            <button
-                type='submit'
-                style={{ padding: '8px 16px', background: unit ? '#e67e22' : '#2ecc71', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-                {unit ? 'Actualizar' : 'Agregar'}
-            </button>
+            </div>
+            
+            <hr />
+            <div className={styles.buttons}>
 
-            {modified && (
-                <button 
-                    type='button'
-                    onClick={cancelEdit} style={{ padding: '8px 12px', background: '#95a5a6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                    Cancel
-                </button>
+
+                {cancel && (
+                    <Button
+                        variant='outlined'
+                        color='primary'
+                        size='small'
+                        startIcon={<CloseIcon />}
+                        style={{ height: '30px' }}
+                        onClick={cancelEdit} 
+                    >
+                        {modified ? 'Cancelar' : 'Cerrar'}
+                    </Button>
             )}
 
             {unit.id && (
-                <button
+                    <Button
+                        variant='outlined'
+                        color='primary'
+                        size='small'
+                        startIcon={<DeleteIcon />}
+                        style={{ height: '30px' }}
                     onClick={handleDelete}
-                    style={{ padding: '4px 8px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                    > Eliminar
+                    </Button>
+                )}
+
+                {modified && (
+                    <Button
+                        type='submit'
+                        variant='contained'
+                        color='primary'
+                        size='small'
+                        startIcon={<SaveIcon />}
+                        style={{ height: '30px' }}
                 >
-                Eliminar
-                </button>
+                        {unit.id ? 'Actualizar' : 'Agregar'}
+                    </Button>
             )}
+            </div>
         </form>
     )
 }

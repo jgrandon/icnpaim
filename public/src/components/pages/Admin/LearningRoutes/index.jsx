@@ -4,9 +4,7 @@ import SettingsIcon from '@material-ui/icons/Settings'
 import EditIcon from '@material-ui/icons/Edit'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
-import TooltipIconButton from '../../../organisms/TooltipIconButton'
 import Modal from '../../../organisms/Modal'
-import * as styles from './learningRoutes.module.css'
 import VerticalTabs from '../../../organisms/VerticalTabs'
 import ContentSelector from './ContentSelector'
 import { v4 as uuidv4 } from 'uuid'
@@ -117,7 +115,7 @@ export default function LearningRoutesAdmin (props) {
     }
 
     const saveContentChanges = async (data) => {
-        alert('saveContentChanges')
+        //alert('saveContentChanges')
         try {
             setSavingState('saving')
             await API.updateContents(data)
@@ -129,7 +127,7 @@ export default function LearningRoutesAdmin (props) {
     }
 
     const saveSchemaChanges = async (data) => {
-        alert('saveSchemaChanges')
+        //alert('saveSchemaChanges')
         const unitId = props.unit.id
         try {
             //setSavingState('saving')
@@ -149,7 +147,7 @@ export default function LearningRoutesAdmin (props) {
                 style={{ padding: '0px 0px 10px 0px' }}
             >
                 <Button
-                    variant='contained'
+                    variant='outlined'
                     color='primary'
                     size='small'
                     startIcon={<SettingsIcon />}
@@ -173,11 +171,18 @@ export default function LearningRoutesAdmin (props) {
                                 setSelectedLR(lr)}
                             }
                         >
+                            <ContentSorter
+                                contents={lr.contents}
+                                onChange={handleOrderUpdate}
+                            />
+
+                            <SavingState state={savingState}/>
+                            
                             <Grid container
                                 justifyContent='flex-end'
                             >
                                 <Button
-                                    variant='outlined'
+                                    variant='contained'
                                     color='primary'
                                     size='small'
                                     startIcon={<EditIcon />}
@@ -186,13 +191,6 @@ export default function LearningRoutesAdmin (props) {
                                     Agregar o Quitar
                                 </Button>
                             </Grid>
-
-                            <ContentSorter
-                                contents={lr.contents}
-                                onChange={handleOrderUpdate}
-                            />
-
-                            <SavingState state={savingState}/>
                         </div>
                     ))
                 }
