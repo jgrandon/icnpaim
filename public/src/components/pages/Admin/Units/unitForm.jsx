@@ -7,7 +7,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import Button from '@material-ui/core/Button'
 
 export default function UnitForm ({
-    unit, 
+    unit,
+    cancel = false, // has cancel button
     updateCallback = () => {}
 }) {
     const [ modified, setModified ] = useState(false)
@@ -40,7 +41,7 @@ export default function UnitForm ({
         if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
 
         try {
-            if (unit) {
+            if (unit.id) {
             // Update Action
                 const updatedUnit = await API.updateUnit({ ...formData })
                 //setSelectedUnitId(null)
@@ -50,7 +51,7 @@ export default function UnitForm ({
                 const newUnit = await API.updateUnit(formData)
                 updateCallback('added', newUnit)
             }
-            alert('Datos Guardados')
+            //alert('Datos Guardados')
         } catch (err) {
             console.error('Save failed', err)
         }
@@ -64,6 +65,7 @@ export default function UnitForm ({
     
     const cancelEdit = (e) => {
         e.preventDefault()
+        updateCallback('canceled', unit)
         setModified(false)
         resetFormData()
     }
@@ -93,51 +95,51 @@ export default function UnitForm ({
             onSubmit={handleSubmit}
         >
             <div className={styles.form}>
-            <input
-                name='id'
-                type='hidden'
-                value={formData.id}
-            />
-            <div className={styles.inputWrapper}>
-                <label
-                    className={styles.label}
-                >Nombre</label>
                 <input
-                    type='text'
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder='Nombre Unidad'
-                    required
-                    className={styles.input}
+                    name='id'
+                    type='hidden'
+                    value={formData.id}
                 />
-            </div>
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Nombre</label>
+                    <input
+                        type='text'
+                        name='name'
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder='Nombre Unidad'
+                        required
+                        className={styles.input}
+                    />
+                </div>
 
-            <div className={styles.inputWrapper}>
-                <label className={styles.label} > Color </label>
-                <input
-                    type='color'
-                    name='color'
-                    className={styles.color}
-                    value={formData.color}
-                    onChange={handleInputChange}
-                />
-            </div>
+                <div className={styles.inputWrapper}>
+                    <label className={styles.label} > Color </label>
+                    <input
+                        type='color'
+                        name='color'
+                        className={styles.color}
+                        value={formData.color}
+                        onChange={handleInputChange}
+                    />
+                </div>
 
-            <div className={styles.inputWrapper}>
-                <label
-                    className={styles.label}
-                >Posicion</label>
-                <input
-                    type='number'
-                    name='position'
-                    value={formData.position}
-                    onChange={handleInputChange}
-                    placeholder='0'
-                    required
-                    className={styles.input}
-                />
-            </div>
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Posicion</label>
+                    <input
+                        type='number'
+                        name='position'
+                        value={formData.position}
+                        onChange={handleInputChange}
+                        placeholder='0'
+                        required
+                        className={styles.input}
+                    />
+                </div>
 
             </div>
             
@@ -156,16 +158,16 @@ export default function UnitForm ({
                     >
                         {modified ? 'Cancelar' : 'Cerrar'}
                     </Button>
-            )}
+                )}
 
-            {unit.id && (
+                {unit.id && (
                     <Button
                         variant='outlined'
                         color='primary'
                         size='small'
                         startIcon={<DeleteIcon />}
                         style={{ height: '30px' }}
-                    onClick={handleDelete}
+                        onClick={handleDelete}
                     > Eliminar
                     </Button>
                 )}
@@ -178,10 +180,10 @@ export default function UnitForm ({
                         size='small'
                         startIcon={<SaveIcon />}
                         style={{ height: '30px' }}
-                >
+                    >
                         {unit.id ? 'Actualizar' : 'Agregar'}
                     </Button>
-            )}
+                )}
             </div>
         </form>
     )

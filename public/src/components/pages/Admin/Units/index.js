@@ -143,25 +143,18 @@ function Admin() {
                 }
             </div>
             )}
+
             <Modal
                 open={isModalOpen}
-                className={styles.modal}
                 onClose={() => setModalOpen(false)}
-                aria-labelledby='simple-modal-title'
-                aria-describedby='simple-modal-description'
+                title='Nueva Unidad'
             >
-                <div className={styles.modalContent}>
-                    <div className={styles.modalTitle}>
-                        <div>Nueva Unidad</div>
-                        <button onClose={() => setModalOpen(false)}> X </button>
-                    </div>
-                    <Unitform
-                        unit={{}}
-                        updateCallback={handleUnitsUpdate}
-                    />
-                </div>
+                <Unitform
+                    unit={{}}
+                    updateCallback={handleUnitsUpdate}
+                    cancel
+                />
             </Modal>
-            */}
         </div>
     )
 }
