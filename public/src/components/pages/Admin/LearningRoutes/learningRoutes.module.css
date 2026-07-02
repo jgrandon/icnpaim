@@ -1,0 +1,29 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 1rem;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.00938em;
+
+    thead {
+        tr {
+            border-bottom: 2px solid #c7c7c7;
+            background: #c7c7c7;
+            th { padding: 10px; }
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid #c7c7c7;
+            td { padding: 10px; }
+        }
+    }
+}
+
+.saveButton {
+    color: white;
+    background-color: green;
+}

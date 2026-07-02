@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import API from '../../../../services/contents'
-import TooltipIconButton from '../../../organisms/TooltipIconButton'
 import CloseIcon from '@material-ui/icons/Close'
 import SaveIcon from '@material-ui/icons/Save'
-import DeleteIcon from '@material-ui/icons/Delete'
+import Button from '@material-ui/core/Button'
+import API from '../../../../services/contents'
 import * as styles from '../form.module.css'
 
 const _EMPTY_CONTENT = { title: '', type: '', url: '' }
@@ -16,6 +15,7 @@ export default function ContentsForm ({
     const [ formData, setFormData ] = useState(
         content.id ? content : _EMPTY_CONTENT
     )
+    const [ touched, setTouched ] = useState(false)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -26,6 +26,7 @@ export default function ContentsForm ({
     }
 
     const handleInputChange = (e) => {
+        setTouched(true)
         const { name, value } = e.target
         setFormData((prev) => ({
             ...prev,
@@ -35,16 +36,6 @@ export default function ContentsForm ({
 
     const cancelEdit = () => {
         updateCallback('cenceled', {})
-    }
-
-    const handleRemove = async () => {
-        const ok = confirm(`¿Estas seguro de eliminar el contenido ${content.title}?`)
-        if (!ok) return
-
-        console.log('handleRemove')
-        await API.delete(unitId, content.id)
-        console.log('removed')
-        updateCallback('removed', content)
     }
 
     return (
@@ -95,43 +86,25 @@ export default function ContentsForm ({
                 />
             </div>
 
-            <div className={styles.modalButtons}>
+            <hr />
 
-                <TooltipIconButton
-                    title={content.id ? 'Guardar Contenido' : 'Agregar Contenido'}
-                    onClick={handleSubmit}
-                >
-                    <SaveIcon />
-                </TooltipIconButton>
-                {/*}
-                <button
-                    type='submit'
-                    className={styles.submitButton}
-                    style={{
-                        background: content.id ? '#e67e22' : '#2ecc71'
-                    }}>
-                    {content.id ? 'Actualizar Unidad' : 'Agregar Unidad'}
-                </button>
-                */}
-                <TooltipIconButton
-                    title='Cancelar'
+            <div className={styles.buttons}>
+                <Button
                     onClick={cancelEdit}
+                    variant='outlined'
+                    startIcon={<CloseIcon/>}
                 >
-                    <CloseIcon />
-                </TooltipIconButton>
-
-                {
-                    content.id ? (
-                        <TooltipIconButton
-                            title='Eliminar'
-                            onClick={handleRemove}
-                        >
-                            <DeleteIcon />
-                        </TooltipIconButton>
-                    ) : null
-                }
+                    {touched ? 'Cancelar' : 'Cerrar'}
+                </Button>
+                {touched
+                    ? (<Button
+                        onClick={handleSubmit}
+                        startIcon={<SaveIcon/>}
+                        variant='contained'
+                        color='primary'
+                        size='small'>Guardar</Button>)
+                    : null}
             </div>
-
         </form>
     )
 }

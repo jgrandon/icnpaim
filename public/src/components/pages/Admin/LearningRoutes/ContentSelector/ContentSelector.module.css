@@ -1,0 +1,48 @@
+.wrapper {
+    min-width: 400px;
+    max-width: 600;
+    width: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow: auto;
+    min-height: 200px;
+    max-height: 400px;
+    height: stretch;
+    background-color: #f8f9fa;
+}
+
+.selectableRow {
+    cursor: pointer;
+    border: 4px solid white;
+    /*
+    height: 20px;
+    width: stretch;
+    border: 1px solid;
+    padding: 5px 10px;
+*/
+} 
+
+.selected {
+    box-sizing: content-box;
+    background-color: #b9b9b9;
+    border: 4px solid #b9b9b9;
+    border-radius: 15px;
+    color: gray !important;
+}
+
+.selectableRow:hover {
+    background-color: lightyellow;
+}
+
+.contentSelectorButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

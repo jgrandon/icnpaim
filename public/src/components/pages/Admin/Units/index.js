@@ -1,23 +1,41 @@
 import React, { useState, useEffect } from 'react'
-import ContentsAdmin from '../Contents'
-import { v4 as uuidv4 } from 'uuid'
+import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
-import Unitform from './unitForm'
-import Modal from '@material-ui/core/Modal'
+import Button from '@material-ui/core/Button'
+import AddIcon from '@material-ui/icons/Add'
+import Modal from '../../../organisms/Modal'
+import { v4 as uuidv4 } from 'uuid'
 import VerticalTabs from '../../../organisms/VerticalTabs'
-
-/*
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
-import AppBar from '@material-ui/core/AppBar'
-*/
-
+import Unitform from './unitForm'
+import ContentsAdmin from '../ContentsAdmin'
+import LearningRoutesAdmin from '../LearningRoutes'
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
 
-export default function UnitsAdmin() {
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#ec622b',
+            contrastText: '#ffffff', 
+        },
+        secondary: {
+            main: '#07111d',
+            contrastText: '#fff',
+        }
+    },
+})
+
+export default function UnitsAdmin () {
+    return (
+        <ThemeProvider theme={theme}>
+            <Admin />
+        </ThemeProvider>
+    )
+}
+
+function Admin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [ units, setUnits ] = useState([])
     const [ selectedUnitId, setSelectedUnitId ] = useState(null)
@@ -49,33 +67,33 @@ export default function UnitsAdmin() {
         if (action == 'added') {
             console.log('added')
             setUnits([ ...units, updatedUnit ])
+            setModalOpen(false)
         } if (action == 'updated') {
             console.log('updated')
             setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
         } if (action == 'removed') {
             console.log('removed')
             setUnits(units.filter((u) => u.id !== updatedUnit.id))
+        } if (action == 'canceled') {
+            setModalOpen(false)
         }
     }
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
+        <div className={styles.admin}>
             <div className={styles.header}>
                 <h2>Unidades</h2>
-                <button
+
+                <Button
+                    variant='contained'
+                    color='primary'
+                    size='small'
+                    startIcon={<AddIcon />}
                     onClick={() => setModalOpen(true)}
-                    style={{
-                        padding: '8px 16px',
-                        background: '#2ecc71',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
+                    style={{ height: '30px' }}
                 >
                     Agregar Unidad
-                </button>
+                </Button>
             </div>
 
 
@@ -99,7 +117,7 @@ export default function UnitsAdmin() {
                                 {unit.name}
                             </AccordionSummary>
                             <AccordionDetails>
-                                <VerticalTabs color={unit.color}>
+                                <VerticalTabs orientation='horizontal'>
                                     <div data-title='Datos'
                                         className={styles.tabWrapper}
                                     >
@@ -111,12 +129,12 @@ export default function UnitsAdmin() {
                                     <div data-title='Contenidos'
                                         className={styles.tabWrapper}
                                     >
-                                        <ContentsAdmin unitId={selectedUnitId}/>
+                                        <ContentsAdmin unitId={unit.id}/>
                                     </div>
                                     <div data-title='Rutas Aprendizaje'
                                         className={styles.tabWrapper}
                                     >
-                                        Rutas
+                                        <LearningRoutesAdmin unit={unit} />
                                     </div>
                                 </VerticalTabs>
                             </AccordionDetails>
@@ -125,23 +143,17 @@ export default function UnitsAdmin() {
                 }
             </div>
             )}
+
             <Modal
                 open={isModalOpen}
-                className={styles.modal}
                 onClose={() => setModalOpen(false)}
-                aria-labelledby='simple-modal-title'
-                aria-describedby='simple-modal-description'
+                title='Nueva Unidad'
             >
-                <div className={styles.modalContent}>
-                    <div className={styles.modalTitle}>
-                        <div>Nueva Unidad</div>
-                        <button onClose={() => setModalOpen(false)}> X </button>
-                    </div>
-                    <Unitform
-                        unit={{}}
-                        updateCallback={handleUnitsUpdate}
-                    />
-                </div>
+                <Unitform
+                    unit={{}}
+                    updateCallback={handleUnitsUpdate}
+                    cancel
+                />
             </Modal>
         </div>
     )

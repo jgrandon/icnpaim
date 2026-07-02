@@ -4,7 +4,6 @@
     align-items: flex-start;
     gap: 10px;
     padding: 15px;
-    background: #f5f5f5;
     border-radius: 6px;
 }
 
@@ -27,6 +26,9 @@
     padding: 6px;
     height: 20px;
     width: 200px;
+    border: 0px;
+    background: #dddddd;
+    border-radius: 4px;
 }
 
 .submitButton {
@@ -49,4 +51,11 @@
     padding: 0;
     height: 36px;
     width: 216px;
+}
+
+.buttons {
+    width: stretch;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
 }

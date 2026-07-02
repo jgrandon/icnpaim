@@ -1,0 +1,82 @@
+.header {
+    display: flex;
+    justify-content: flex-end;;
+    padding: 20px 0px;
+}
+
+.addButton {
+    background-color: #ec622b;
+    margin: 20px 0px;
+}
+
+.listContainer {
+    background-color: #f8f9fa;
+    width: stretch;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 25px;
+    overflow: auto;
+    max-height: 200px;
+}
+
+.contentWrapper {
+    position: relative;
+    border: 5px solid white;
+    .deleteButton, .editButton {
+        display: none;
+        position: absolute;
+        right: 0px;
+        background: #ec622b;
+        color: white;
+        border-radius: 0px;
+    }
+    .deleteButton { bottom: 0px; }
+    .editButton { top: 0px; }
+}
+
+
+.contentWrapper:hover {
+    border: 5px solid #ec622b;
+    .deleteButton, .editButton {
+        display: unset;
+    }
+    .deleteButton:hover,
+    .editButton:hover {
+        background: #ec622b;
+        color: white;
+    }
+}
+
+.modal {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* align-content: center; */
+    justify-content: center;
+}
+
+.modalContent {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.modalTitle {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    min-width: 300px;
+    width: stretch;
+    max-width: 700px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+

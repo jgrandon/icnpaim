@@ -12,6 +12,7 @@ import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
 import * as unitsHandler from './handlers/v2/units'
 import * as contentsHandler from './handlers/v2/contents'
+import * as LRHandler from './handlers/v2/learningRoutes'
 
 const router = express.Router();
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
@@ -591,4 +592,43 @@ router.delete('/v2/units/:unitId/contents', async (req, res) => {
 })
 
 
+
+//
+router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
+    const { unitId } = req.params
+    const data = req.body
+    await LRHandler.updateSchema(unitId, data)
+    //TODO: find learningRouteData registers
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
+    })
+})
+
+router.get('/v2/units/:unitId/lr', async (req, res) => {
+    const { unitId } = req.params
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
+    })
+})
+
+router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
+    const { unitId, ldId } = req.params
+    const data = req.body
+    const update = await LRHandler.updateLRContents(ldId, data)
+
+    console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
+    //TODO: find learningRouteData registers
+    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+
+    return res.status(200).json({
+        ok: true,
+        learningRoutes
+    })
+})
 export default router

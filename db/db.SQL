@@ -2,6 +2,11 @@
 DROP DATABASE icnpaim;
 CREATE DATABASE icnpaim;
 
+DROP TABLE LearningRouteData;
+DROP TABLE LearningRouteSchema;
+DROP TABLE Progress;
+DROP TABLE Content;
+
 CREATE TABLE Subject (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
@@ -62,11 +67,26 @@ CREATE TABLE Grade (
 CREATE TABLE LearningRouteSchema (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     level INT NOT NULL,
-    min_grade float NOT NULL,
-    max_grade float NOT NULL,
+    min_grade FLOAT NOT NULL,
+    max_grade FLOAT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT FALSE, 
     unit_id INT,
     CONSTRAINT FK_UnitLearningRouteSchema
         FOREIGN KEY (unit_id) REFERENCES Unit(id)
+    CONSTRAINT unique_lr_unit_level UNIQUE (unit_id, level)
+);
+
+CREATE TABLE LearningRouteSchema (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    level INT NOT NULL,
+    min_grade FLOAT NOT NULL,
+    max_grade FLOAT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT FALSE, 
+    unit_id INT,
+    CONSTRAINT FK_UnitLearningRouteSchema
+        FOREIGN KEY (unit_id) REFERENCES Unit(id),
+    CONSTRAINT UQ_UnitId_Level 
+        UNIQUE (unit_id, level)
 );
 
 CREATE TABLE LearningRouteData (
@@ -74,8 +94,11 @@ CREATE TABLE LearningRouteData (
     position INT NOT NULL,
     learning_route_id INT,
     content_id INT,
+    enabled BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT FK_LRDataLearningRSchema
         FOREIGN KEY (learning_route_id) REFERENCES LearningRouteSchema(id),
     CONSTRAINT FK_LRDataContent
-        FOREIGN KEY (content_id) REFERENCES Content(id)
+        FOREIGN KEY (content_id) REFERENCES Content(id),
+    CONSTRAINT UQ_LearningRouteId_ContentId
+        UNIQUE (learning_route_id, content_id)
 );

@@ -40,11 +40,26 @@ const useStyles = makeStyles((theme) => ({
         display: 'grid',
         gridTemplateColumns: '1fr 3fr'
     },
+    rootHorizontal: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+        height: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        '& .MuiTabs-flexContainer': {
+            display: 'flex',
+            justifyContent: 'space-evenly'
+        }
+    },
     leftAlignedTab: {
         '& .MuiTab-wrapper': {
-            alignItems: 'flex-start',
-            textAlign: 'left',
+            alignItems: 'center',
+            textAlign: 'center',
         },
+    },
+    centeredTabPanel: {
+        display: 'flex',
+        justifyContent: 'center'
     }
 }))
 
@@ -55,35 +70,44 @@ export default function VerticalTabs(props) {
     const handleChange = (event, newValue) => {
         setValue(newValue)
     }
-    const dividerColor = props.color ?? 'gray'
     return (
-        <div className={classes.root}>
+        <div className={props.orientation == 'horizontal' 
+            ? classes.rootHorizontal 
+            : classes.root
+        }>
             <Tabs
-                orientation='vertical'
+                orientation={props.orientation ?? 'vertical'}
                 variant='scrollable'
                 value={value}
                 onChange={handleChange}
                 aria-label='Vertical tabs example'
-                style={{
-                    borderRight: `1px solid ${dividerColor}`,
-                }}
             >
                 {
                     React.Children.map(props.children, (child, index) => (
                         <Tab 
                             label={child.props['data-title']} {...a11yProps(index)}
-                            className={classes.leftAlignedTab}
+                            className={ props.orientation == 'vertical' 
+                                ? classes.leftAlignedTab
+                                : classes.centeredTab }
+                            onClick={child.props['onClick']}
                         />
                     ))
                 }
             </Tabs>
-            {
-                React.Children.map(props.children, (child, index) => (
-                    <TabPanel value={value} index={index}>
-                        {child}
-                    </TabPanel>
-                ))
-            }
+
+            <div>
+                {
+                    React.Children.map(props.children, (child, index) => (
+                        <TabPanel 
+                            value={value}
+                            index={index}
+                            className={classes.centeredTabPanel}
+                        >
+                            {child}
+                        </TabPanel>
+                    ))
+                }
+            </div>
 
         </div>
     )
