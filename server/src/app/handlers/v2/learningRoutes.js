@@ -89,6 +89,8 @@ export async function getLearningRoutes(unitId) {
 export async function getAllUnitsLearningRoutes(subjectId) {
     // TODO: add join unit
     // TODO: add restriction by unit.subject_id
+    console.log('getAllUnitsLearningRoutes => subjectId', subjectId)
+
     const res = await client.query(
         `SELECT
             lrs.id, lrs.level, lrs.min_grade,
@@ -105,13 +107,17 @@ export async function getAllUnitsLearningRoutes(subjectId) {
         ORDER BY lrs.unit_id, lrs.level, lrd.position;`,
         [ subjectId ]
     )
-    let learningRoutes = {}
-    res.rows.map (r => learningRoutes[r.id]
-        ? learningRoutes[r.unit_id].push( parseUnitsData(r) )
-        : learningRoutes[r.unit_id] = [ parseUnitsData(r) ]
+    let unitsLR = {}
+    console.log('getAllUnitsLearningRoutes => rows', res.rows.length)
+    res.rows.map (r => unitsLR[r.id]
+        ? unitsLR[r.unit_id].push( r )
+        : unitsLR[r.unit_id] = [ r ]
     )
-    const data = parseUnitsData(res.rows)
-    return data
+
+    Object.keys(unitsLR).forEach(unitId => {
+        unitsLR[unitId] = parseUnitsData(unitsLR[unitId])
+    })
+    return unitsLR
 }
 
 function parseUnitsData (data) {
@@ -159,6 +165,7 @@ function parseUnitsData (data) {
             })
         }
     })
+    return learningRoutes
 }
 
 export async function updateLRContents(lrId, contents) {
