@@ -181,11 +181,15 @@ class DashboardView extends React.Component {
       if (nodeEnv=='development') {
         console.log('DashboardView => componentDidMount => DEVELOPMENT')
   
+        const fakeCourse = { id : 1, title: 'Fake Course 101'}
+
         this.setState({
           user:{bbCourseId:'213123'},
-          courses: [],
+          courses: [fakeCourse],
           loading: false
         });
+        
+        this.selectCourse(fakeCourse);
       } else {
         await this.loadUserData();
         await this.loadCourses();
@@ -258,7 +262,8 @@ class DashboardView extends React.Component {
     
     try {
       // Cargar unidades
-      const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
+      // const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
+      const unitsResponse = await fetch(`/api/v2/dashboard?courseId=${course.id}`);
       console.log('unitsResponse => ', unitsResponse )
       const responseBody = await unitsResponse.json();
       console.log('responseBody => ', responseBody )
