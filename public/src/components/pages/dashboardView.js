@@ -454,7 +454,7 @@ class DashboardView extends React.Component {
   notifyContentProgress = (e,unit, card) => {
     console.log('notifyContentProgress', card)
     /*
-    if ( card.tipoActividad=='control' ) {
+    if ( card.type=='control' ) {
       console.log('es control', e)
       e.preventDefault()
       this.setState({
@@ -463,8 +463,8 @@ class DashboardView extends React.Component {
       })
     } else {
       */
-      const isScorm = card.tipoActividad.toLowerCase() == 'scorm'
-      const isControl = card.tipoActividad.toLowerCase() == 'control'
+      const isScorm = card.type.toLowerCase() == 'scorm'
+      const isControl = card.type.toLowerCase() == 'control'
       if (!isControl && !isScorm) {
         this.handleCardComplete(unit.id, card.id)
       }
@@ -743,10 +743,10 @@ class DashboardView extends React.Component {
                         <div>
                           <Typography variant="h4"
                           style={{fontSize: '1.25rem'}}
-                          >{unit.title?.rendered || unit.title}</Typography>
+                          >{unit.name}</Typography>
                           <Typography variant="h6"
                           style={{fontSize: '0.85rem'}}
-                          >{unit.content?.rendered || unit.content}</Typography>
+                          >{unit.description}</Typography>
                         </div>
                         <div>
                           {unit.studentLearningRoute?.length} actividades
@@ -902,7 +902,7 @@ class DashboardView extends React.Component {
                   <div style={{ fontSize: '0.75rem'}}>
                     <p style={{display: 'flex', alignItems: 'center'}}>Para acceder a este Control dirigete a Blackboard:</p>
                     <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.selectedCourse?.title}</p>
-                    <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.modalData.unit?.title?.rendered}</p>
+                    <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.modalData.unit?.name}</p>
                     <p style={{display: 'flex', alignItems: 'center'}}><RightArrow/> {this.state.modalData.card?.title}</p>
                   </div>
                   <Link
