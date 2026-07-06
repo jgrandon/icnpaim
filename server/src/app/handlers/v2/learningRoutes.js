@@ -82,7 +82,7 @@ export async function getLearningRoutes(unitId) {
         ORDER BY lrs.level, lrd.position;`,
         [ unitId ]
     )
-    const data = parseUnitsData(res.rows)
+    const data = parseLearningRoutes(res.rows)
     return data
 }
 
@@ -109,18 +109,22 @@ export async function getAllUnitsLearningRoutes(subjectId) {
     )
     let unitsLR = {}
     console.log('getAllUnitsLearningRoutes => rows', res.rows.length)
-    res.rows.map (r => unitsLR[r.id]
+    res.rows.map (r => unitsLR[r.unit_id]
         ? unitsLR[r.unit_id].push( r )
         : unitsLR[r.unit_id] = [ r ]
     )
+    console.log('getAllUnitsLearningRoutes => rows', unitsLR)
 
     Object.keys(unitsLR).forEach(unitId => {
-        unitsLR[unitId] = parseUnitsData(unitsLR[unitId])
+        const parsedData = parseLearningRoutes(unitsLR[unitId]).map(
+            lr => ({ ...lr, cards: lr.contents })
+        )
+        unitsLR[unitId] = parsedData
     })
     return unitsLR
 }
 
-function parseUnitsData (data) {
+function parseLearningRoutes (data) {
     let learningRoutes = []
     data.map(currentLR => {
         const { id, level, min_grade,

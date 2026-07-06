@@ -662,11 +662,11 @@ router.get('/v2/dashboard', async (req, res) => {
         - obtiene bb column id en base a bb course id y bb content id
         - obtiene grade en base a bb column id */
         
-    const allLR = await LRHandler.getAllUnitsLearningRoutes(courseId)   
+    let allLR = await LRHandler.getAllUnitsLearningRoutes(courseId)
 
     const __DEFAULT_STUDENT_LR_INDEX = 1
     const fullUnits = units.map(u => {
-      const currentLR = allLR[u.id]
+        const currentLR = allLR[u.id].map(lr => lr.contents)
       
       // TODO:: find grade to decide student lr index
       const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
@@ -688,7 +688,7 @@ router.get('/v2/dashboard', async (req, res) => {
     // return units, contents, allGrades
 
     return res.status(200).json({
-        ok: true,
+        success: true,
         units: fullUnits
     })
 })
