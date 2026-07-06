@@ -13,6 +13,7 @@ import { getContentsByIds } from './handlers/content';
 import * as unitsHandler from './handlers/v2/units'
 import * as contentsHandler from './handlers/v2/contents'
 import * as LRHandler from './handlers/v2/learningRoutes'
+import * as dashboardHandler from './handlers/v2/dashboard'
 
 const router = express.Router();
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
@@ -631,4 +632,65 @@ router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
         learningRoutes
     })
 })
+
+router.get('/v2/dashboard', async (req, res) => {
+    //obtiene curso desde lti session
+    // TODO: update to bb course_id after bb conection
+    const courseId = '1'
+
+    //obtiene units y todas sus cards (?)
+    //obtiene progress en base a courseId
+    //iterate units and cards to set progress
+    const units = await dashboardHandler.getUnitsWithCards(courseId)
+    console.log('/v2/dashboard => units => ', units)
+
+    //obtiene todos los contentId de las cards
+    const cardsContentIds = units.map(
+        u => u.cards.filter(
+            c => !!c.contentId
+        ).map(c => c.contentId)
+    ).reduce((acc = [], a) => [ ...acc, ...a ])
+
+    //mezcla todos los contentId de cards y de units en una sola variable
+    const contentIds = [
+        ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
+        ...cardsContentIds // cards contents
+    ]
+
+    // obtiene contents desde bb
+    /* obtiene notas:
+        - obtiene bb column id en base a bb course id y bb content id
+        - obtiene grade en base a bb column id */
+        
+    const allLR = await LRHandler.getAllUnitsLearningRoutes(courseId)   
+
+    const __DEFAULT_STUDENT_LR_INDEX = 1
+    const fullUnits = units.map(u => {
+      const currentLR = allLR[u.id]
+      
+      // TODO:: find grade to decide student lr index
+      const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+      
+      return {
+        ...u,
+        learningRoutes: currentLR,
+            studentLearningRoute: currentLR[learningRouteIndex - 1],
+            studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
+      }
+    })
+
+    /* itera unidades:
+        - set units grade
+        - set grade to all cards
+        - get unit learningRoutes
+        - assign a studentLearningRoute based on grade */
+    // notify new progress
+    // return units, contents, allGrades
+
+    return res.status(200).json({
+        ok: true,
+        units: fullUnits
+    })
+})
+
 export default router
