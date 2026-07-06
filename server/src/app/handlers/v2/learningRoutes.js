@@ -82,9 +82,51 @@ export async function getLearningRoutes(unitId) {
         ORDER BY lrs.level, lrd.position;`,
         [ unitId ]
     )
-    let learningRoutes = []
+    const data = parseLearningRoutes(res.rows)
+    return data
+}
 
-    res.rows.map(currentLR => {
+export async function getAllUnitsLearningRoutes(subjectId) {
+    // TODO: add join unit
+    // TODO: add restriction by unit.subject_id
+    console.log('getAllUnitsLearningRoutes => subjectId', subjectId)
+
+    const res = await client.query(
+        `SELECT
+            lrs.id, lrs.level, lrs.min_grade,
+            lrs.max_grade, lrs.unit_id, lrd.position,
+            lrd.content_id, c.title, c.type, c.url
+        FROM LearningRouteSchema AS lrs
+        FULL OUTER JOIN (
+            SELECT * FROM LearningRouteData WHERE enabled = TRUE
+        ) AS lrd ON lrs.id = lrd.learning_route_id
+        FULL OUTER JOIN Content as c ON lrd.content_id = c.id
+        JOIN Unit AS u ON lrs.unit_id = u.id
+        WHERE lrs.enabled = TRUE
+        AND u.subject_id = $1
+        ORDER BY lrs.unit_id, lrs.level, lrd.position;`,
+        [ subjectId ]
+    )
+    let unitsLR = {}
+    console.log('getAllUnitsLearningRoutes => rows', res.rows.length)
+    res.rows.map (r => unitsLR[r.unit_id]
+        ? unitsLR[r.unit_id].push( r )
+        : unitsLR[r.unit_id] = [ r ]
+    )
+    console.log('getAllUnitsLearningRoutes => rows', unitsLR)
+
+    Object.keys(unitsLR).forEach(unitId => {
+        const parsedData = parseLearningRoutes(unitsLR[unitId]).map(
+            lr => ({ ...lr, cards: lr.contents })
+        )
+        unitsLR[unitId] = parsedData
+    })
+    return unitsLR
+}
+
+function parseLearningRoutes (data) {
+    let learningRoutes = []
+    data.map(currentLR => {
         const { id, level, min_grade,
             max_grade, unit_id,
             position, content_id,

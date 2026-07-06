@@ -29,7 +29,13 @@ const learningRouteServices = {
                 throw new Error(`Failed to update content: ${response.status}`)
             }
             const { learningRoutes } = await response.json()
-            return learningRoutes
+
+            if ( (!learningRoutes || learningRoutes.length == 0)){
+                //TODO: feature/loggin
+                console.log('getLearningRoutes: empty leargning route, unitId = ', unitId) 
+                return []
+            }
+            return learningRoutes ?? []
         } catch (error) {
             console.error('Error updating content:', error)
             throw error
@@ -49,7 +55,8 @@ const learningRouteServices = {
             if (!response.ok) {
                 throw new Error(`Failed to update LR schema: ${response.status}`)
             }
-            const { learningRoutes } = await response.json()
+            const learningRoutes = await response.json()
+            if (!learningRoutes) return []
             return learningRoutes
         } catch (error) {
             console.error('Error updating LR schema:', error)

@@ -39,7 +39,7 @@ export function CardHeader(props) {
             }}
         >
             <Icon 
-                search={card.tipoActividad}
+                search={card.type}
                 color={'white'}
             />
             <Typography
@@ -50,7 +50,7 @@ export function CardHeader(props) {
                     color: 'white'
                 }}
             >
-                {card.tipoActividad || 'actividad'}
+                {card.type || 'actividad'}
             </Typography>
         </div>
 

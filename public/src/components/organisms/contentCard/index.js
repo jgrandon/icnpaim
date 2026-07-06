@@ -20,7 +20,7 @@ const getCurrentCard = (unit) => {
 			currentFounded = true
 		}
 	}
-	return unit.studentLearningRoute[currentIndex+1]
+	return unit.studentLearningRoute[currentIndex /*+1 */ ]
 }
 
 const ContentCard = forwardRef(function (props, ref) {
@@ -30,9 +30,9 @@ const ContentCard = forwardRef(function (props, ref) {
 		unit
 	} = props
 	const isMobile = window.matchMedia('(max-width: 800)').matches;//useResponsive()
-	const { index, completed } = card
-	const nextCard = unit.studentLearningRoute[index + 1]
-	const prevCard = unit.studentLearningRoute[index - 1]
+	const { order, completed } = card
+	const nextCard = unit.studentLearningRoute[order + 1]
+	const prevCard = unit.studentLearningRoute[order - 1]
 	const isCurrentCard = getCurrentCard(unit)?.id == card.id
 	const { freeProgress: isFreeProgressEnabled } = unit
 	const isLocked = !isFreeProgressEnabled && !completed && !isCurrentCard
@@ -40,7 +40,10 @@ const ContentCard = forwardRef(function (props, ref) {
 	const cardColor = completed
 		? _OK_GREEN 
 		: ( isFreeProgressEnabled || isCurrentCard ? color : _INACTIVE_GRAY )
-
+	const protocolRegex = /^https?:\/\//i
+	const url = protocolRegex.test(card.url) 
+		? card.url
+		: 'http://' + card.url 
 	return (
 		<div
 			ref={ref}
@@ -57,26 +60,26 @@ const ContentCard = forwardRef(function (props, ref) {
 		>
 			{/* ghost div only for correct display */}
 			<div style={{
-				gridColumn: isMobile ? 3 : index%2==0 ? 3 : 1
+				gridColumn: isMobile ? 3 : order%2==0 ? 3 : 1
 			}}/>
 
 			<ProgressIndicator
 				isActive={completed}
-				index={index}
+				index={order}
 				next={nextCard}
 				prev={prevCard}
 				color={color}
 			/>
 
 			<Link
-				to={{ pathname: card.url }}
+				to={{ pathname: url }}
 				onClick={onClick}
 				target="_blank"
 				style={{
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: isMobile ? 2 : (index%2==0 ? 1 : 3),
+					gridColumn: isMobile ? 2 : (order%2==0 ? 1 : 3),
 					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
 					gridRowStart: 1,
