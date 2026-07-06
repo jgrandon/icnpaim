@@ -24,24 +24,33 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
         ORDER BY u.position, c.id; `,
         [ studentId, courseId ]
     )
+    
+    console.log('getUnitsWithCards => rows', res.rows.length)
+
     let units = []
 
     for (let i=0; i < res.rows.length; i++) {
+        
         const row = res.rows[i]
+        console.log('getUnitsWithCards => for ', {i, row})
         const { id, name, color, position, bbId,
-            contentId, title, type, url, completed } = row
+            contentid, title, type, url, completed } = row
 
-        const content = { id: contentId,
+        const content = { id: contentid,
             title, type, url, completed }
         const unit = { id, name, color, position, bbId }
 
         const inArray = units.find(u => row.id==u.id )
         if (!inArray) {
+            console.log('getUnitsWithCards => new ')
+
             units.push({ ...unit,
                 cards: content.id ? [ content ] : [] })
             continue
         }
-        units.map(u => unit.id==u.id
+        console.log('getUnitsWithCards => inArray ')
+
+        units = units.map(u => unit.id==u.id
             ? { ...u, cards: [ ...u.cards, content ]} // add content
             : u ) // bypass
     }
