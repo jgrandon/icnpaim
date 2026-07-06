@@ -40,7 +40,10 @@ const ContentCard = forwardRef(function (props, ref) {
 	const cardColor = completed
 		? _OK_GREEN 
 		: ( isFreeProgressEnabled || isCurrentCard ? color : _INACTIVE_GRAY )
-
+	const protocolRegex = /^https?:\/\//i
+	const url = protocolRegex.test(card.url) 
+		? card.url
+		: 'http://' + card.url 
 	return (
 		<div
 			ref={ref}
@@ -69,7 +72,7 @@ const ContentCard = forwardRef(function (props, ref) {
 			/>
 
 			<Link
-				to={{ pathname: card.url }}
+				to={{ pathname: url }}
 				onClick={onClick}
 				target="_blank"
 				style={{
