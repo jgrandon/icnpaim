@@ -339,7 +339,7 @@ class DashboardView extends React.Component {
 
   handleCardComplete = async (unitId, cardId) => {
     try {
-      const response = await fetch('/api/progress', {
+      const response = await fetch('/api/v2/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
