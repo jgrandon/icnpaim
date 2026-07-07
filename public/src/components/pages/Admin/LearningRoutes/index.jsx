@@ -166,6 +166,7 @@ export default function LearningRoutesAdmin (props) {
                     learningRoutes.map(lr => (
                         <div key={uuidv4()}
                             data-title={`Nivel ${lr.level}`}
+                            style={{ width: 'stretch', padding: '10px'}}
                             onClick={() => {
                                 console.log('cambiando LR id', lr)
                                 setSelectedLR(lr)}
