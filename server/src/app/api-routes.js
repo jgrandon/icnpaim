@@ -637,11 +637,11 @@ router.get('/v2/dashboard', async (req, res) => {
     //obtiene curso desde lti session
     // TODO: update to bb course_id after bb conection
     const courseId = '1'
-
+    const studentId = '1'
     //obtiene units y todas sus cards (?)
     //obtiene progress en base a courseId
     //iterate units and cards to set progress
-    const units = await dashboardHandler.getUnitsWithCards(courseId)
+    const units = await dashboardHandler.getUnitsWithCards(courseId,studentId)
     console.log('/v2/dashboard => units => ', units)
 
     //obtiene todos los contentId de las cards
@@ -667,16 +667,18 @@ router.get('/v2/dashboard', async (req, res) => {
     const __DEFAULT_STUDENT_LR_INDEX = 1
     const fullUnits = units.map(u => {
         const currentLR = allLR[u.id].map(lr => lr.contents)
-      
-      // TODO:: find grade to decide student lr index
-      const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
-      
-      return {
-        ...u,
-        learningRoutes: currentLR,
-            studentLearningRoute: currentLR[learningRouteIndex - 1],
+        // TODO:: find grade to decide student lr index
+        const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+        const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
+            const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
+            return { ...content, completed }
+        })
+        return {
+            ...u,
+            learningRoutes: currentLR,
+            studentLearningRoute,
             studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
-      }
+        }
     })
 
     /* itera unidades:
@@ -692,5 +694,21 @@ router.get('/v2/dashboard', async (req, res) => {
         units: fullUnits
     })
 })
+
+
+router.post('/v2/progress' , async (req, res) => {
+    //const { unitId, ldId } = req.params
+    const contentId = req.body.completedCardId
+    const studentId = 1
+    const update = await LRHandler.updateContentProgress({
+        studentId,
+        contentId,
+    })
+    return res.status(200).json({
+        ok: true,
+        update
+    })
+})
+
 
 export default router

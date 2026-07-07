@@ -116,7 +116,7 @@ class UnitProgressView extends React.Component {
       }
 
       // Cargar progreso
-      const progressResponse = await fetch(`/api/progress?courseId=${courseId}&unitId=${unitId}`);
+      const progressResponse = await fetch(`/api/v2/progress?courseId=${courseId}&unitId=${unitId}`);
       if (progressResponse.ok) {
         const progress = await progressResponse.json();
         this.setState({ progress: progress[0] || null });
@@ -134,7 +134,7 @@ class UnitProgressView extends React.Component {
 
   handleCardComplete = async (cardId) => {
     try {
-      const response = await fetch('/api/progress', {
+      const response = await fetch('/api/v2/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
