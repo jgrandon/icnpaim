@@ -52,7 +52,7 @@ export default function LearningRoutesAdmin (props) {
         closeModal()
     }
 
-    const handleAddOrRemove = (updatedLevel, selectedContents) => {
+    const handleAddOrRemoveContent = (updatedLevel, selectedContents) => {
         setLearningRoutes(prev => {
             const updatedLR = prev.find(lr => lr.level == updatedLevel)
             const otherLR = prev.filter(lr => lr.level != updatedLevel)
@@ -77,7 +77,6 @@ export default function LearningRoutesAdmin (props) {
                 ...otherLR,
                 { ...updatedLR, contents: updatedContents }
             ].sort((a, b) => (a.level - b.level))
-            console.log('handleAddOrRemove => setLearningRoutes', allLR)
             const newLR = { ...updatedLR, contents: updatedContents }
             saveContentChanges({
                 unitId: props.unit.id,
@@ -209,7 +208,7 @@ export default function LearningRoutesAdmin (props) {
                         ? (
                             <ContentSelector
                                 learningRoute={selectedLR}
-                                onAccept={handleAddOrRemove}
+                                onAccept={handleAddOrRemoveContent}
                                 onCancel={closeModal}
                             />
                         ) 
