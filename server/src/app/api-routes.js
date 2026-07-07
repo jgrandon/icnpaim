@@ -693,4 +693,20 @@ router.get('/v2/dashboard', async (req, res) => {
     })
 })
 
+
+router.post('/v2/progress' , async (req, res) => {
+    //const { unitId, ldId } = req.params
+    const contentId = req.body.completedCardId
+    const studentId = 1
+    const update = await LRHandler.updateContentProgress({
+        studentId,
+        contentId,
+    })
+    return res.status(200).json({
+        ok: true,
+        update
+    })
+})
+
+
 export default router
