@@ -23,6 +23,7 @@ CREATE TABLE Unit (
     description varchar(255),
     color varchar(255),
     position INT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     bb_id varchar(255) NOT NULL,
     subject_id INT NOT NULL,
     evaluation_id INT, -- bb content_id

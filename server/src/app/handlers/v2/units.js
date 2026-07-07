@@ -22,7 +22,7 @@ async function ensureConnection() {
 
 export async function getAllUnits() {
     await ensureConnection()
-    const res = await client.query('SELECT * FROM unit ORDER BY position ASC')
+    const res = await client.query('SELECT * FROM unit WHERE enabled = TRUE ORDER BY position ASC')
     return res.rows
 }
 
@@ -35,23 +35,35 @@ export async function getUnitById(id) {
     return res.rows[0] || null
 }
 
-export async function createUnit({ name, color, position }) {
+export async function createUnit({ name, color, position, subjectId }) {
     await ensureConnection()
     const bbId = '123' //mock blackBoard content Id
 
     const res = await client.query(
-        'INSERT INTO unit (name, color, position, bb_id) VALUES ($1, $2, $3, $4) RETURNING *',
-        [ name, color || null, position, bbId ]
+        `INSERT INTO unit (name, color, position, bb_id, subject_id) 
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *`,
+        [ name, color || null, position, bbId, subjectId ]
     )
     const newUnit = res.rows[0]
-    /*
-    const defaultGradesBreakPoint = [ 4,5.5 ]
-    createLearningRoutes(
-        newUnit,
-        defaultGradesBreakPoint
-    )
-    */
+    if (newUnit) {
+        createDefaultLR(newUnit.id)
+    }
     return newUnit
+}
+
+export async function createDefaultLR(unitId) {
+    const res = await client.query(
+        `INSERT INTO learningrouteschema 
+            (level, min_grade, max_grade, enabled, unit_id)
+        VALUES 
+            (1, 1.0, 4.0, TRUE, $1),
+            (2, 4.0, 5.5, TRUE, $1),
+            (3, 5.5, 7.0, TRUE, $1)
+        RETURNING *`,
+        [ unitId ]
+    )
+    return res.rows
 }
 
 export async function updateUnit({ id, name, color, position }) {
@@ -68,7 +80,7 @@ export async function deleteUnit(id) {
     await contentsHandler.deleteByUnit(id)
 
     const res = await client.query(
-        'DELETE FROM unit WHERE id = $1 RETURNING *', 
+        'UPDATE unit SET enabled=FALSE WHERE id = $1 RETURNING *', 
         [ id ]
     )
     return res.rows[0] || null

@@ -101,7 +101,9 @@ export async function getAllUnitsLearningRoutes(subjectId) {
             SELECT * FROM LearningRouteData WHERE enabled = TRUE
         ) AS lrd ON lrs.id = lrd.learning_route_id
         FULL OUTER JOIN Content as c ON lrd.content_id = c.id
-        JOIN Unit AS u ON lrs.unit_id = u.id
+        JOIN (
+            SELECT * FROM Unit WHERE enabled = TRUE
+        ) AS u ON lrs.unit_id = u.id
         WHERE lrs.enabled = TRUE
         AND u.subject_id = $1
         ORDER BY lrs.unit_id, lrs.level, lrd.position;`,
