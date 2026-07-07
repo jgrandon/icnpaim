@@ -40,16 +40,19 @@ CREATE TABLE Student (
     name varchar(255),
     bb_id INT
 );
+INSERT INTO student (name, bb_id) VALUES ('John Doe', '123');
 
 CREATE TABLE Progress (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    completed varchar(255),
+    completed BOOLEAN DEFAULT FALSE,
     content_id INT,
     student_id INT,
     CONSTRAINT FK_ContentProgress
         FOREIGN KEY (content_id) REFERENCES Content(id),
     CONSTRAINT FK_StudentProgress
-        FOREIGN KEY (student_id) REFERENCES Student(id)
+        FOREIGN KEY (student_id) REFERENCES Student(id),
+	CONSTRAINT UQ_content_student
+        UNIQUE (content_id, student_id)
 );
 
 CREATE TABLE Grade (
