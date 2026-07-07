@@ -200,6 +200,27 @@ export async function updateLRContents(lrId, contents) {
     return updated
 }
 
+export async function updateContentProgress ({
+    studentId,
+    contentId
+}) {
+    console.log('updateContentProgress DATA => ',{
+        studentId,
+        contentId
+    })
+    const res = await client.query(
+        `INSERT INTO progress (content_id, student_id, completed) 
+            VALUES ( $1, $2, TRUE ) 
+            ON CONFLICT (content_id, student_id)
+            DO UPDATE SET
+                completed = TRUE
+            RETURNING *`,
+        [ contentId, studentId ]
+    )
+    console.log('upadteContentProgress response => rows', res.rows.length)
+    return res.rows
+}
+
 /*
 export async function createLearningRoute ({ level, minGrade, maxGrade, unitId }) {
     const res = await client.query(
