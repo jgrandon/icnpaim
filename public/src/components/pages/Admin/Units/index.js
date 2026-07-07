@@ -64,19 +64,22 @@ function Admin() {
 
     const handleUnitsUpdate = (action, updatedUnit) => {
         console.log('handleUnitsUpdate', {action,updatedUnit})
+        let newState = []
         if (action == 'added') {
             console.log('added')
-            setUnits([ ...units, updatedUnit ])
+            newState = [ ...units, updatedUnit ]
             setModalOpen(false)
         } if (action == 'updated') {
             console.log('updated')
-            setUnits(units.map((u) => (u.id === selectedUnitId ? updatedUnit : u)))
+            newState = units.map((u) => (u.id === selectedUnitId ? updatedUnit : u))
         } if (action == 'removed') {
             console.log('removed')
-            setUnits(units.filter((u) => u.id !== updatedUnit.id))
+            newState = units.filter((u) => u.id !== updatedUnit.id)
         } if (action == 'canceled') {
             setModalOpen(false)
+            return
         }
+        setUnits( newState.sort((a,b) => a.position - b.position) )
     }
 
     return (
