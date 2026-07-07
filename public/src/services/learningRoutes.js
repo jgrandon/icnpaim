@@ -55,7 +55,7 @@ const learningRouteServices = {
             if (!response.ok) {
                 throw new Error(`Failed to update LR schema: ${response.status}`)
             }
-            const learningRoutes = await response.json()
+            const {learningRoutes} = await response.json()
             if (!learningRoutes) return []
             return learningRoutes
         } catch (error) {
