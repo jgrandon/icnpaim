@@ -17,6 +17,7 @@ import * as styles from './learningRoutes.module.css'
 
 const __DEFAULT_MIN_GRADE = 1
 const __DEFAULT_MAX_GRADE = 7
+const ___MAX_NODES = 7
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,10 +33,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
         alignItems: 'center',
         marginTop: '20px',
-    },
-    saveButton: {
-        color: 'white',
-        backgroundColor: 'green'
     },
     /*
     icon: {
@@ -58,8 +55,8 @@ const __DEFAULT_ROUTES = [
 export default function MultiNodeSlider(props) {
     const classes = useStyles()
     
-    const  [ nodes, setNodes ] = useState([ 2.5, 5.0 ])
-    const  [ routes, setRoutes ] = useState(__DEFAULT_ROUTES)
+    const  [ nodes, setNodes ] = useState(props.breakPoints ?? [ 2.5, 5.0 ])
+    const  [ routes, setRoutes ] = useState(props.learningRoutes ?? __DEFAULT_ROUTES)
 
     const handleSliderChange = (event, newValue) => {
         setNodes(newValue)
@@ -67,7 +64,7 @@ export default function MultiNodeSlider(props) {
     }
 
     const addNode = () => {
-        if (nodes.length >= 6) {
+        if (nodes.length >= ___MAX_NODES - 1) {
             alert('No puedes agregar mas rutas de aprendizaje')
             return
         }
@@ -115,6 +112,17 @@ export default function MultiNodeSlider(props) {
             newRoutes.push({level, minGrade, maxGrade})
         }
         setRoutes(newRoutes)
+    }
+
+    const getTableData = () => {
+        const data = []
+        for(let i=0; i < ___MAX_NODES; i++) {
+            const currentRow = routes[i]
+            if (!currentRow) {
+                data.push({ level: i+1, minGrade: '-', maxGrade: '-'})
+            } else data.push(currentRow)
+        }
+        return data
     }
 
     return (
@@ -173,7 +181,7 @@ export default function MultiNodeSlider(props) {
                 </thead>
                 <tbody>
                     {
-                        routes.map(r => (
+                        getTableData().map(r => (
                             <tr key={uuidv4()} >
                                 <td>{`Nivel ${r.level}`}</td>
                                 <td>{r.minGrade}</td>
@@ -187,20 +195,22 @@ export default function MultiNodeSlider(props) {
             
             <div className={classes.controls}>
                 <Button
-                    className={classes.saveButton}
                     onClick={() => props.onAccept(routes)}
                     variant='contained'
+                    color='primary'
                     startIcon={<SaveIcon/>}
                 >
                     Guardar
                 </Button>
             </div>
 
-
+            {/*}
             <div className={classes.nodeList}>
                 <strong>Current Output Array:</strong> 
                 <code>{JSON.stringify(nodes.map(n => parseFloat(n.toFixed(2))))}</code>
             </div>
+            */}
+
         </div>
     )
 }
