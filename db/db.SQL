@@ -6,20 +6,25 @@ DROP TABLE LearningRouteData;
 DROP TABLE LearningRouteSchema;
 DROP TABLE Progress;
 DROP TABLE Content;
+DROP TABLE Grade;
+DROP TABLE Student;
+DROP TABLE Unit;
+DROP TABLE Subject;
 
 CREATE TABLE Subject (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
-    bb_id INT
+    bb_id varchar(255) NOT NULL
 );
 
 CREATE TABLE Unit (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
+    description varchar(255),
     color varchar(255),
     position INT NOT NULL,
-    bb_id INT NOT NULL,
-    subject_id INT,
+    bb_id varchar(255) NOT NULL,
+    subject_id INT NOT NULL,
     evaluation_id INT, -- bb content_id
     CONSTRAINT FK_SubjectUnit
         FOREIGN KEY (subject_id) REFERENCES Subject(id)
@@ -28,6 +33,7 @@ CREATE TABLE Unit (
 CREATE TABLE Content (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	title varchar(255) NOT NULL,
+    description varchar(255),
     type varchar(255),
     url varchar(255) NOT NULL,
     unit_id INT,
@@ -40,7 +46,6 @@ CREATE TABLE Student (
     name varchar(255),
     bb_id INT
 );
-INSERT INTO student (name, bb_id) VALUES ('John Doe', '123');
 
 CREATE TABLE Progress (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -75,21 +80,8 @@ CREATE TABLE LearningRouteSchema (
     enabled BOOLEAN NOT NULL DEFAULT FALSE, 
     unit_id INT,
     CONSTRAINT FK_UnitLearningRouteSchema
-        FOREIGN KEY (unit_id) REFERENCES Unit(id)
-    CONSTRAINT unique_lr_unit_level UNIQUE (unit_id, level)
-);
-
-CREATE TABLE LearningRouteSchema (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    level INT NOT NULL,
-    min_grade FLOAT NOT NULL,
-    max_grade FLOAT NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT FALSE, 
-    unit_id INT,
-    CONSTRAINT FK_UnitLearningRouteSchema
         FOREIGN KEY (unit_id) REFERENCES Unit(id),
-    CONSTRAINT UQ_UnitId_Level 
-        UNIQUE (unit_id, level)
+    CONSTRAINT UQ_UnitId_Level UNIQUE (unit_id, level)
 );
 
 CREATE TABLE LearningRouteData (
