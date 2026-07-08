@@ -22,11 +22,6 @@ const ___MAX_NODES = 7
 const useStyles = makeStyles((theme) => ({
     root: {
         width: 400,
-        margin: '30px auto',
-        padding: '20px',
-        boxShadow: theme.shadows[2],
-        borderRadius: '8px',
-        backgroundColor: '#fff',
     },
     controls: {
         display: 'flex',
@@ -125,18 +120,22 @@ export default function MultiNodeSlider(props) {
         return data
     }
 
+    const disabledRouteStyles = {
+        background: '#d5d5d5',
+        fontWeight: '300',
+        color: '#b7b7b7'
+    }
+
     return (
         <div className={classes.root}>
-            <Typography id='multi-node-slider-label' gutterBottom={false}>
-                <strong>Rangos de notas</strong>
-            </Typography>
         
-            <Grid
-                container
-                justifyContent='center'
-                alignItems='center'
-            >
-                <Grid item xs={9} gap={20}> 
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: '20px',
+                padding: '20px 0px'
+            }}>
+                <div style={{ width: 'stretch'}}> 
                     <Slider
                         value={nodes}
                         onChange={handleSliderChange}
@@ -146,8 +145,8 @@ export default function MultiNodeSlider(props) {
                         max={7.0}
                         valueLabelDisplay='auto' // Shows value bubble on hover/drag
                     />
-                </Grid>
-                <Grid item xs={3}>
+                </div>
+                <div>
                     <ButtonGroup variant='contained' color='primary' aria-label='contained secondary button group'>
                         <Button aria-label='add' onClick={addNode}>
                             <AddIcon />
@@ -168,8 +167,8 @@ export default function MultiNodeSlider(props) {
                         </IconButton>
                     </Tooltip>
                     */}
-                </Grid>
-            </Grid>
+                </div>
+            </div>
 
             <table className={styles.table}>
                 <thead>
@@ -182,7 +181,13 @@ export default function MultiNodeSlider(props) {
                 <tbody>
                     {
                         getTableData().map(r => (
-                            <tr key={uuidv4()} >
+                            <tr 
+                                key={uuidv4()} 
+                                style={ r.minGrade == '-'
+                                    ? disabledRouteStyles
+                                    : {}
+                                }
+                            >
                                 <td>{`Nivel ${r.level}`}</td>
                                 <td>{r.minGrade}</td>
                                 <td>{r.maxGrade}</td>
