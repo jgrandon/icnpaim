@@ -21,6 +21,7 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
         ) AS p
             ON p.content_id = c.id
         WHERE u.subject_id = $2
+            AND u.enabled = TRUE
         ORDER BY u.position, c.id; `,
         [ studentId, courseId ]
     )

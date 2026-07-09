@@ -139,6 +139,17 @@ export default function LearningRoutesAdmin (props) {
         }
     }
 
+    const getLRBreakPoints = () => {
+        const bp = []
+        learningRoutes.forEach((lr, index) => {
+            const isLast = index == (learningRoutes.length-1)
+            if (!isLast) {
+                bp.push(lr.maxGrade)
+            }
+        })
+        return bp
+    }
+
     return (
         <div>
             <Grid container
@@ -212,7 +223,10 @@ export default function LearningRoutesAdmin (props) {
                                 onCancel={closeModal}
                             />
                         ) 
-                        : (<MultiNodeSlider onAccept={handleSchemaUpdate}/>)
+                        : (<MultiNodeSlider
+                            breakPoints={getLRBreakPoints()}
+                            learningRoutes={learningRoutes}
+                            onAccept={handleSchemaUpdate}/>)
                 }
             </Modal>
         </div>

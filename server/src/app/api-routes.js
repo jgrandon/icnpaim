@@ -531,8 +531,9 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
 router.post('/v2/units', async (req, res) => {
     const data = req.body
     let unit
+    const subjectId = '1'
     if (!data.id) {
-        unit = await unitsHandler.createUnit(data)
+        unit = await unitsHandler.createUnit({...data, subjectId})
     } else {
         unit = await unitsHandler.updateUnit(data)
     }

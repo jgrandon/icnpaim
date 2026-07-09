@@ -753,7 +753,10 @@ class DashboardView extends React.Component {
                         </div>
                       </div>
                       {!unit.studentGrade
-                        ? <Typography variant="h6" style={{ color: 'black' }}>
+                        ? <Typography variant="h6" style={{
+                          color: 'black',
+                          margin: '20px 0px 0px 0px'
+                          }}>
                             Aun no tienes nota de evaluación para esta unidad
                           </Typography>
                         : null}

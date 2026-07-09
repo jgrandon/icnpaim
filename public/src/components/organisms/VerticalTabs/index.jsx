@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
 import Tabs from '@material-ui/core/Tabs'
@@ -65,7 +65,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VerticalTabs(props) {
     const classes = useStyles()
+    const [ children, setChildren ] = React.useState([])
     const [ value, setValue ] = React.useState(0)
+
+    useEffect(() => {
+        if (props.children.length == 0) return
+        if (props.children.length <= value) {
+            setValue(props.children.length - 1) // set last 
+        }
+        setChildren(props.children)
+    }, [ props.children ])
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
@@ -83,7 +92,7 @@ export default function VerticalTabs(props) {
                 aria-label='Vertical tabs example'
             >
                 {
-                    React.Children.map(props.children, (child, index) => (
+                    React.Children.map(children, (child, index) => (
                         <Tab 
                             label={child.props['data-title']} {...a11yProps(index)}
                             className={ props.orientation == 'vertical' 
@@ -97,7 +106,7 @@ export default function VerticalTabs(props) {
 
             <div>
                 {
-                    React.Children.map(props.children, (child, index) => (
+                    React.Children.map(children, (child, index) => (
                         <TabPanel 
                             value={value}
                             index={index}
