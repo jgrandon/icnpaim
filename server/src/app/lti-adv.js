@@ -59,9 +59,13 @@ export const verifyToken = async (id_token) => {
     '/jwks.json';
 
   try {
+    console.log('-- verifyToken => try => ')
     const response = await axios.get(url);
+    console.log('>>> verifyToken => try => response.data', response.data)
     const key = response.data.keys.find(k => k.kid === jwtPayload.header.kid);
+    console.log('>>> verifyToken => key => ', key)
     jwt.verify(id_token, jwk2pem(key));
+    console.log('>>> verifyToken => try => ')
     jwtPayload.verified = true;
     console.log('Auth5 - JWT verified ' + jwtPayload.verified);
   } catch (err) {

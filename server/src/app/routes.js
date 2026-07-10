@@ -253,6 +253,8 @@ module.exports = function (app) {
     const jwtPayload = await verifyToken(req.body.id_token);
 
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
+    console.log('POST /lti13 => messageType', messageType)
+
     if (messageType === "LtiSubmissionNotice") {
       return handleSubmissionNotice(req, res, jwtPayload);
     } else if (messageType === 'LtiEulaRequest') {
@@ -263,9 +265,13 @@ module.exports = function (app) {
     } else if (messageType === 'LtiReportReviewRequest') {
       res.send(jwtPayload);
     } else {
+        console.log('POST /lti13 => else')
+
       await db.insertNewAuthToken(state, jwtPayload, 'jwt');
       //await insertNewAuthToken(state, appInfo.appId, 'client_id');
       const app = db.getAppById(jwtPayload.body.aud);
+      console.log('POST /lti13 => else => app', app)
+
       // Now we have the JWT but next we need to get an OAuth2 bearer token for REST calls.
       // Before we can do that we need to get an authorization code for the current user.
       // Save off the JWT to our database so we can get it back after we get the auth code.
@@ -280,6 +286,8 @@ module.exports = function (app) {
       authcodeUrl.searchParams.append('one_time_session_token', oneTimeSessionToken);
       authcodeUrl.searchParams.append('state', state);
       console.log('Adv6 - Redirect to Learn to get 3LO code');
+      console.log('POST /lti13 => else => authcodeUrl', authcodeUrl)
+
       res.redirect(authcodeUrl);
     }
   });
