@@ -32,7 +32,7 @@ export const applicationInfo = (client_id) => {
 export const verifyToken = async (id_token) => {
   console.log('Auth4 - Verify the JWT');
   let parts = id_token.split('.');
-
+  consle.log('verifyToken => parts', parts)
   // Parse and store payload data from launch
   let jwtPayload = new JWTPayload();
   jwtPayload.header = JSON.parse(Buffer.from(parts[0], 'base64').toString());
@@ -62,7 +62,9 @@ export const verifyToken = async (id_token) => {
     console.log('-- verifyToken => try => ')
     const response = await axios.get(url);
     console.log('>>> verifyToken => try => response.data', response.data)
-    const key = response.data.keys.find(k => k.kid === jwtPayload.header.kid);
+    console.log('>>> verifyToken => try => jwtPayload.header.kid', jwtPayload.header.kid)
+    console.log('>>> verifyToken => try => jwtPayload.header', jwtPayload.header)
+    const key = response.data.keys.find(k => k.kid == jwtPayload.header.kid);
     console.log('>>> verifyToken => key => ', key)
     jwt.verify(id_token, jwk2pem(key));
     console.log('>>> verifyToken => try => ')
