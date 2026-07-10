@@ -32,7 +32,7 @@ export const applicationInfo = (client_id) => {
 export const verifyToken = async (id_token) => {
   console.log('Auth4 - Verify the JWT');
   let parts = id_token.split('.');
-  consle.log('verifyToken => parts', parts)
+  console.log('verifyToken => parts', parts)
   // Parse and store payload data from launch
   let jwtPayload = new JWTPayload();
   jwtPayload.header = JSON.parse(Buffer.from(parts[0], 'base64').toString());
