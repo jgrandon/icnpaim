@@ -13,11 +13,11 @@ VALUES (
 'Un recorrido por la estructura macroscópica del sistema nervioso, vinculando la anatomía con las funciones conductuales.'
 ), (
 'Unidad 3: Sistemas Sensoriales, Motores y Neuroendocrinología',
-'purple', 2, 2, 1, 2,
+'purple', 3, 3, 1, 3,
 'Estudio de cómo el organismo recibe información del entorno, ejecuta respuestas y se regula internamente a través de las hormonas.'
 ), (
 'Unidad 4: Bases Biológicas de los Procesos Psicológicos Complejos',
-'orange', 2, 2, 1, 2,
+'orange', 4, 4, 1, 4,
 'Examen de cómo las redes neuronales y los sistemas biológicos subyacen a las funciones cognitivas y afectivas superiores.'
 );
 
