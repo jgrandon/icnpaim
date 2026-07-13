@@ -329,7 +329,7 @@ router.get('/units', requireLTISession, async (req, res) => {
         u => u.cards.filter(
           c => !!c.contentId
         ).map(c => c.contentId)
-      ).reduce((acc = [], a) => [...acc, ...a])
+      ).reduce((acc = [], a) => [ ...acc, ...a ], [])
 
 
 
@@ -650,7 +650,7 @@ router.get('/v2/dashboard', async (req, res) => {
         u => u.cards.filter(
             c => !!c.contentId
         ).map(c => c.contentId)
-    ).reduce((acc = [], a) => [ ...acc, ...a ])
+    ).reduce((acc = [], a) => [ ...acc, ...a ], [])
 
     //mezcla todos los contentId de cards y de units en una sola variable
     const contentIds = [
