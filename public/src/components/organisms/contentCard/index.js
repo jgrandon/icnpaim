@@ -45,11 +45,6 @@ const ContentCard = forwardRef(function (props, ref) {
 		? card.url
 		: 'http://' + card.url
 
-	console.log('ContentCard => isCurrentCard', isCurrentCard)
-	console.log('ContentCard => isFreeProgressEnabled', isFreeProgressEnabled)
-	console.log('ContentCard => cardColor', cardColor)
-	console.log('ContentCard => isLocked', isLocked)
-	
 	return (
 		<div
 			ref={ref}
