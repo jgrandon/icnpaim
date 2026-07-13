@@ -3,19 +3,19 @@ import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 import { ProgressIndicator } from './progressIndicator'
 import { CardContent } from './content'
-import { getDefaultColor } from './colors'
 import { CardHeader } from './header'
 import { _OK_GREEN, _INACTIVE_GRAY } from './colors'
 import { forwardRef } from 'react';
-import { useResponsive } from '../../../hooks/useResponsive'
 
 const getCurrentCard = (unit) => {
 	const iCards = unit.studentLearningRoute.length
 	let currentFounded = false
 	let currentIndex = 0
+
+	// iterates until it finds the last completed card
 	for (let i = 0; i < iCards; i++) {
 		if (unit.studentLearningRoute[i].completed && !currentFounded) {
-			currentIndex = i
+			currentIndex = i +1
 		} else {
 			currentFounded = true
 		}
@@ -43,7 +43,8 @@ const ContentCard = forwardRef(function (props, ref) {
 	const protocolRegex = /^https?:\/\//i
 	const url = protocolRegex.test(card.url) 
 		? card.url
-		: 'http://' + card.url 
+		: 'http://' + card.url
+
 	return (
 		<div
 			ref={ref}

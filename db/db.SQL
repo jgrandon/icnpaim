@@ -23,7 +23,9 @@ CREATE TABLE Unit (
     description varchar(255),
     color varchar(255),
     position INT NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    free_progress BOOLEAN NOT NULL DEFAULT false,
+    published BOOLEAN NOT NULL DEFAULT false,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,y
     bb_id varchar(255) NOT NULL,
     subject_id INT NOT NULL,
     evaluation_id INT, -- bb content_id
