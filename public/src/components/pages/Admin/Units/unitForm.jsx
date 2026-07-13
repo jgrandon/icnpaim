@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import API from '../../../../services/units'
-import * as styles from '../form.module.css'
 import SaveIcon from '@material-ui/icons/Save'
 import CloseIcon from '@material-ui/icons/Close'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Button from '@material-ui/core/Button'
+import Switch from '@material-ui/core/Switch'
+import Tooltip from '@material-ui/core/Tooltip'
+import API from '../../../../services/units'
+import * as styles from '../form.module.css'
+
 
 export default function UnitForm ({
     unit,
@@ -12,27 +15,44 @@ export default function UnitForm ({
     updateCallback = () => {}
 }) {
     const [ modified, setModified ] = useState(false)
-    const [ formData, setFormData ] = useState({ id: '', name: unit, color: '#000000', position: '' })
+    const [ formData, setFormData ] = useState({
+        id: '',
+        name: '',
+        description: '',
+        color: '#000000',
+        position: '',
+        published: false,
+        freeProgress: false
+    })
 
     useEffect(()=> {
         resetFormData()
     }, [])
 
     const resetFormData = () => {
+        console.log('resetFormData', unit)
         setFormData({
             id: unit.id ?? '',
             name: unit.name ?? '',
+            description: unit.description ?? '',
             color: unit.color ?? '#000000',
-            position: unit.position ?? ''
+            position: unit.position ?? '',
+            published: unit.published ?? false,
+            freeProgress: unit.free_progress ?? false
         })
     }
 
     const handleInputChange = (e) => {
         setModified(true)
-        const { name, value } = e.target
+        const { name, value, checked } = e.target
+        console.log('handleInputChange => e.target', e.target)
+        let finalValue = value
+        if (name === 'position') finalValue = parseInt(value, 10)
+        if ([ 'published', 'freeProgress' ].includes(name)) finalValue = checked
+
         setFormData((prev) => ({
             ...prev,
-            [name]: name === 'position' ? parseInt(value, 10) || '' : value,
+            [name]: finalValue,
         }))
     }
     
@@ -116,6 +136,20 @@ export default function UnitForm ({
                 </div>
 
                 <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Descripción</label>
+                    <textarea
+                        type='text'
+                        name='description'
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder='Descripción unidad'
+                        className={styles.textArea}
+                    />
+                </div>
+
+                <div className={styles.inputWrapper}>
                     <label className={styles.label} > Color </label>
                     <input
                         type='color'
@@ -139,6 +173,48 @@ export default function UnitForm ({
                         required
                         className={styles.input}
                     />
+                </div>
+
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Publicado</label>
+                    <Tooltip
+                        title={'Controla si el contenido se muestra a los alumnos'}
+                        placement='bottom'
+                        arrow
+                    >
+                        <Switch
+                            name='published'
+                            checked={formData.published}
+                            onChange={handleInputChange}
+                            color='primary'
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                        />
+                    </Tooltip>
+                </div>
+
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Progreso Libre</label>
+                    <Tooltip
+                        title={`Controla como el estudiante puede avanzar 
+                            por los contenidos. Si se activa el estudiante puede 
+                            acceder a los contenidos sin la necesidad de haber 
+                            completado el contenido previo`}
+                        placement='bottom'
+                        arrow
+                    >
+                        <Switch
+                            name='freeProgress'
+                            checked={formData.freeProgress}
+                            onChange={handleInputChange}
+                            color='primary'
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                        />
+                    </Tooltip>
+
                 </div>
 
             </div>
