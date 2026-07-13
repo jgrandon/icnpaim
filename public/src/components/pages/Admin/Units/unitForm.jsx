@@ -30,7 +30,6 @@ export default function UnitForm ({
     }, [])
 
     const resetFormData = () => {
-        console.log('resetFormData', unit)
         setFormData({
             id: unit.id ?? '',
             name: unit.name ?? '',
@@ -45,7 +44,6 @@ export default function UnitForm ({
     const handleInputChange = (e) => {
         setModified(true)
         const { name, value, checked } = e.target
-        console.log('handleInputChange => e.target', e.target)
         let finalValue = value
         if (name === 'position') finalValue = parseInt(value, 10)
         if ([ 'published', 'freeProgress' ].includes(name)) finalValue = checked
@@ -96,7 +94,6 @@ export default function UnitForm ({
         if (!window.confirm('Estas seguro de eliminar esta Unidad? Se borrarán tambien todos sus Contenidos')) return
         try {
             await API.delete(unit.id)
-            console.log('handleDelete', unit)
             updateCallback('removed', unit)
         } catch (err) {
             console.error('Delete failed', err)
