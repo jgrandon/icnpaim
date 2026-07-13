@@ -29,6 +29,18 @@
     border: 0px;
     background: #dddddd;
     border-radius: 4px;
+    font-family: system-ui;
+}
+
+.textArea {
+    padding: 6px;
+    height: 100px;
+    resize: vertical;
+    width: 200px;
+    border: 0px;
+    background: #dddddd;
+    border-radius: 4px;
+    font-family: system-ui;
 }
 
 .submitButton {
