@@ -36,11 +36,12 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
         const row = res.rows[i]
         console.log('getUnitsWithCards => for ', {i, row})
         const { id, name, color, position, bbId,
-            contentid, title, type, url, completed } = row
+            contentid, title, type, url, completed,
+            description, free_progress: freeProgress } = row
 
         const content = { id: contentid,
             title, type, url, completed }
-        const unit = { id, name, color, position, bbId }
+        const unit = { id, name, description, color, position, freeProgress, bbId }
 
         const inArray = units.find(u => row.id==u.id )
         if (!inArray) {
