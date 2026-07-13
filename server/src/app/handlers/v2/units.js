@@ -36,8 +36,8 @@ export async function getUnitById(id) {
 export async function createUnit({ name, color, position,description, published, freeProgress, subjectId }) {
     const bbId = '123' //mock blackBoard content Id
     const res = await client.query(
-        `INSERT INTO unit (name, color, position, bb_id, subject_id) 
-        VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO unit (name, color, position, bb_id, subject_id, description, published, free_progress) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *`,
         [ name, color || null, position, bbId,
             subjectId, description, published, freeProgress ]
