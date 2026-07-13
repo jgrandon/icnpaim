@@ -347,18 +347,18 @@ module.exports = function (app) {
       } else {
         res.send(`Unrecognized proctoring message type: ${messageType}`);
       }
-    } else if (jwtPayload.target_link_uri.endsWith('lti')) {
-      res.redirect(`/lti_adv_view?nonce=${state}`);
-    } else if (jwtPayload.target_link_uri.endsWith('lti13')) {
-      res.redirect(`/lti_adv_view?nonce=${state}`);
+//    } else if (jwtPayload.target_link_uri.endsWith('lti')) {
+//      res.redirect(`/lti_adv_view?nonce=${state}`);
+//    } else if (jwtPayload.target_link_uri.endsWith('lti13')) {
+//      res.redirect(`/lti_adv_view?nonce=${state}`);
     } else if (jwtPayload.target_link_uri.endsWith('msteams')) {
       res.redirect(`/ms_teams_view?nonce=${state}`);
     } else {
       // Default: upsert en WordPress y redirigir al dashboard
-      const { wpStudentId, wpCourseId } = await upsertWpEntities(jwtPayload, state);
+      //const { wpStudentId, wpCourseId } = await upsertWpEntities(jwtPayload, state);
       res.cookie('ltiState', state, { sameSite: 'none', secure: true, httpOnly: true });
-      await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
-      await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
+      //await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
+      //await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
       await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
       res.redirect(`/dashboard?nonce=${state}`);
