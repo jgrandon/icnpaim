@@ -62,7 +62,11 @@ const requireLTISession = async (req, res, next) => {
         req.ltiSession = {
             ...req.ltiSession,
             subject,
-            student
+            student,
+            isStudent: jwt['https://purl.imsglobal.org/spec/lti/claim/roles']
+                .includes('http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'),
+            isAdmin: jwt['https://purl.imsglobal.org/spec/lti/claim/roles']
+                .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
         }
 
         next()
@@ -551,110 +555,176 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     */
 
 // Units
-router.post('/v2/units', async (req, res) => {
-    const data = req.body
-    let unit
-    const subjectId = '1'
-    if (!data.id) {
-        unit = await unitsHandler.createUnit({...data, subjectId})
-    } else {
-        unit = await unitsHandler.updateUnit(data)
+router.post('/v2/units', requireLTISession,  async (req, res) => {
+    try {
+        const subjectId = req.ltiSession.subject.id
+        const data = req.body
+        let unit
+        //const subjectId = '1'
+        if (!data.id) {
+            unit = await unitsHandler.createUnit({...data, subjectId})
+        } else {
+            unit = await unitsHandler.updateUnit(data)
+        }
+        return res.status(200).json({
+            ok: true,
+            unit
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
+})
+router.get('/v2/units', requireLTISession, async (req, res) => {
+    try {
+        const subjectId = req.ltiSession.subject.id
+        // const data = req.body
+        const units = await unitsHandler.getAllUnits(subjectId)
+        return res.status(200).json({
+            ok: true,
+            units
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
     }
-    return res.status(200).json({
-        ok: true,
-        unit
-    })
 })
-router.get('/v2/units', async (req, res) => {
-    const data = req.body
-    const units = await unitsHandler.getAllUnits(data)
-    return res.status(200).json({
-        ok: true,
-        units
-    })
-})
-router.delete('/v2/units', async (req, res) => {
-    const id = req.body.id
-    await unitsHandler.deleteUnit(id)
-    return res.status(200).json({
-        ok: true
-    })
+
+router.delete('/v2/units', requireLTISession,  async (req, res) => {
+    try {
+        const id = req.body.id
+        await unitsHandler.deleteUnit(id)
+        return res.status(200).json({
+            ok: true
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
 })
 
 
 // Contents
-router.get('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    const contents = await contentsHandler.getAllContents(unitId)
-    return res.status(200).json({
-        ok: true,
-        unitId,
-        contents
-    })
-})
-
-router.post('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    const data = req.body
-    let content
-    if (!data.id) {
-        content = await contentsHandler.createContent(data)
-    } else {
-        content = await contentsHandler.updateContent(data)
+router.get('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const contents = await contentsHandler.getAllContents(unitId)
+        return res.status(200).json({
+            ok: true,
+            unitId,
+            contents
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
     }
-    return res.status(200).json({
-        ok: true,
-        content
-    })
 })
 
-router.delete('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    await contentsHandler.deleteContent(unitId)
-    return res.status(200).json({
-        ok: true
-    })
+router.post('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const data = req.body
+        let content
+        if (!data.id) {
+            content = await contentsHandler.createContent(data)
+        } else {
+            content = await contentsHandler.updateContent(data)
+        }
+        return res.status(200).json({
+            ok: true,
+            content
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+
+})
+
+router.delete('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        await contentsHandler.deleteContent(unitId)
+        return res.status(200).json({
+            ok: true
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
 
 
 //
-router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
-    const { unitId } = req.params
-    const data = req.body
-    await LRHandler.updateSchema(unitId, data)
-    //TODO: find learningRouteData registers
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
+router.post('/v2/units/:unitId/lr/schema', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const data = req.body
+        await LRHandler.updateSchema(unitId, data)
+        //TODO: find learningRouteData registers
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
-router.get('/v2/units/:unitId/lr', async (req, res) => {
-    const { unitId } = req.params
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
+router.get('/v2/units/:unitId/lr', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
-router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
-    const { unitId, ldId } = req.params
-    const data = req.body
-    const update = await LRHandler.updateLRContents(ldId, data)
-
-    console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
-    //TODO: find learningRouteData registers
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
+router.post('/v2/units/:unitId/lr/:ldId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId, ldId } = req.params
+        const data = req.body
+        const update = await LRHandler.updateLRContents(ldId, data)
+    
+        console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
+        //TODO: find learningRouteData registers
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
 router.get('/v2/dashboard', requireLTISession, async (req, res) => {
@@ -740,18 +810,25 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
 })
 
 
-router.post('/v2/progress' , async (req, res) => {
-    //const { unitId, ldId } = req.params
-    const contentId = req.body.completedCardId
-    const studentId = 1
-    const update = await LRHandler.updateContentProgress({
-        studentId,
-        contentId,
-    })
-    return res.status(200).json({
-        ok: true,
-        update
-    })
+router.post('/v2/progress' , requireLTISession, async (req, res) => {
+    try {
+        //const { unitId, ldId } = req.params
+        const contentId = req.body.completedCardId
+        const studentId = 1
+        const update = await LRHandler.updateContentProgress({
+            studentId,
+            contentId,
+        })
+        return res.status(200).json({
+            ok: true,
+            update
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
 
