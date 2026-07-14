@@ -25,7 +25,7 @@ CREATE TABLE Unit (
     position INT NOT NULL,
     free_progress BOOLEAN NOT NULL DEFAULT false,
     published BOOLEAN NOT NULL DEFAULT false,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,y
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     bb_id varchar(255) NOT NULL,
     subject_id INT NOT NULL,
     evaluation_id INT, -- bb content_id
