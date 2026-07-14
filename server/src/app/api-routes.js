@@ -52,6 +52,9 @@ const requireLTISession = async (req, res, next) => {
         
         // get subject and student data from db
         const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
+        console.error('requireLTISession => bbCourseId => ', bbCourseId)
+        console.error('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
+
         const student = await studentHandler.getOrCreate({
             name: jwt.name,
             bbId: bbStudentExternalId})
