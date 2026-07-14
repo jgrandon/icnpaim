@@ -132,7 +132,9 @@ export default function UnitForm ({
                     />
                 </div>
 
-                <div className={styles.inputWrapper}>
+                <div
+                    className={styles.inputWrapper}
+                    style={{alignItems: 'baseline'}}>
                     <label
                         className={styles.label}
                     >Descripción</label>
