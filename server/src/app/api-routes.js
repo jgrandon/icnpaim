@@ -54,10 +54,11 @@ const requireLTISession = async (req, res, next) => {
         const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
         console.error('requireLTISession => bbCourseId => ', bbCourseId)
         console.error('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
-
+        
+        const bbStudentId = await students.getStudentId(bbStudentExternalId)
         const student = await studentHandler.getOrCreate({
             name: jwt.name,
-            bbId: bbStudentExternalId})
+            bbId: bbStudentId})
         const subject = await subjectHandler.getOrCreate({
             name: jwt['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
