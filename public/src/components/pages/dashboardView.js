@@ -185,11 +185,11 @@ class DashboardView extends React.Component {
 
         this.setState({
           user:{bbCourseId:'213123'},
-          courses: [fakeCourse],
-          loading: false
+          //courses: [fakeCourse],
+          //loading: false
         });
-        
-        this.selectCourse(fakeCourse);
+
+        this.loadDashboard();
       } else {
         await this.loadUserData();
         await this.loadCourses();
@@ -257,73 +257,56 @@ class DashboardView extends React.Component {
       .replace('course_id=','')
   }
 
-  selectCourse = async (course) => {
-    this.setState({ selectedCourse: course, units: [], grades: {}, progress: [] });
-    
-    try {
-      // Cargar unidades
-      // const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
-      const unitsResponse = await fetch(`/api/v2/dashboard?courseId=${course.id}`);
-      console.log('unitsResponse => ', unitsResponse )
-      const responseBody = await unitsResponse.json();
-      console.log('responseBody => ', responseBody )
-      if (responseBody.success) {
-        const { units /*: allUnits*/ } = responseBody
-        console.log('responseBody success => ',responseBody )
+    loadDashboard = async (course) => {
+      //this.setState({ selectedCourse: course, units: [], grades: {}, progress: [] });
+        try {
+            // Cargar unidades
+            // const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
+            const unitsResponse = await fetch(`/api/v2/dashboard`);
+            console.log('unitsResponse => ', unitsResponse )
+            const responseBody = await unitsResponse.json();
+            console.log('responseBody => ', responseBody )
+            if (!responseBody.success) { return }
 
-        const cards = (
-          units.length > 0
-          ? units.map(u => u.studentLearningRoute)
-          : [[]]
-        ).reduce((acc= [], current)=> [...acc, ...current])
+            const { units, subject, student } = responseBody
+            console.log('responseBody success => ',responseBody )
 
-        const cardsLength = cards.length
-        console.log('before setting reffs')
+            const cards = (
+                units.length > 0
+                ? units.map(u => u.studentLearningRoute)
+                : [[]]
+            ).reduce((acc= [], current)=> [...acc, ...current])
 
-        //if (this.cardsRef.current?.length !== cardsLength) {
-          console.log('setting reffs')
-          if (!this.cardsRef.current) { 
-            this.cardsRef.current = [...units.map(u => [])]
-          }
+            const cardsLength = cards.length
+            console.log('before setting reffs')
 
-          //organizar las referencias por unidad para que al asignarlas no se pisen los ids
-          this.cardsRef.current = units.map((u, uIndex) =>
+            console.log('setting reffs')
+            if (!this.cardsRef.current) { 
+                this.cardsRef.current = [...units.map(u => [])]
+            }
+
+            //organizar las referencias por unidad para que al asignarlas no se pisen los ids
+            this.cardsRef.current = units.map((u, uIndex) =>
             Array(u.studentLearningRoute.length)
-              .fill()
-              .map((_, i) => 
+                .fill()
+                .map((_, i) => 
                 this.cardsRef.current[uIndex][i] || React.createRef()
-              )
-          )
+                )
+            )
 
-          /*
-          this.cardsRef.current = Array(cardsLength)
-            .fill()
-            .map((_, i) => this.cardsRef.current[i] || React.createRef());
-          */
-          console.log('cardsRef', this.cardsRef)
-        //}
-
-
-
-        this.setState({
-          units
-        });
-
-
-      }
-/*
-      // Cargar progreso
-      const progressResponse = await fetch(`/api/progress?courseId=${course.id}`);
-      if (progressResponse.ok) {
-        const progress = await progressResponse.json();
-        this.setState({ progress });
-      }
-    */
-
-    } catch (error) {
-      console.error('Error loading course data:', error);
-    }
-  };
+            console.log('cardsRef', this.cardsRef)
+            this.setState({
+                units,
+                selectedCourse: subject,
+                courses: [subject],
+                bbCourseId: subject.bbId,
+                user: student,
+                loading: false
+            });
+        } catch (error) {
+            console.error('Error loading course data:', error);
+        }
+    };
 
   handleModalComplete() {
     this.handleCardComplete(this.state.modalData.unit.id, this.state.modalData.card.id)
@@ -533,7 +516,7 @@ class DashboardView extends React.Component {
                     ¡Bienvenido, {user?.name || 'Estudiante'}!
                   </Typography>
                   <Typography variant="subtitle1" style={{ opacity: 0.9 }}>
-                    {selectedCourse ? selectedCourse.title : 'Plataforma de Aprendizaje ICNPAIM'}
+                    {selectedCourse ? selectedCourse.name : 'Plataforma de Aprendizaje ICNPAIM'}
                   </Typography>
                 </Box>
               </Box>
