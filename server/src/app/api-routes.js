@@ -579,12 +579,13 @@ router.post('/v2/units', requireLTISession,  async (req, res) => {
 })
 router.get('/v2/units', requireLTISession, async (req, res) => {
     try {
-        const subjectId = req.ltiSession.subject.id
+        const { subject } = req.ltiSession
         // const data = req.body
-        const units = await unitsHandler.getAllUnits(subjectId)
+        const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
             ok: true,
-            units
+            units,
+            subject
         })
     } catch (error) {
         return res.status(200).json({
