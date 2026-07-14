@@ -657,66 +657,86 @@ router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
     })
 })
 
-router.get('/v2/dashboard', async (req, res) => {
-    //obtiene curso desde lti session
-    // TODO: update to bb course_id after bb conection
-    const courseId = '1'
-    const studentId = '1'
-    //obtiene units y todas sus cards (?)
-    //obtiene progress en base a courseId
-    //iterate units and cards to set progress
-    const units = await dashboardHandler.getUnitsWithCards(courseId,studentId)
-    console.log('/v2/dashboard => units => ', units)
-
-    //obtiene todos los contentId de las cards
-    const cardsContentIds = units.map(
-        u => u.cards.filter(
-            c => !!c.contentId
-        ).map(c => c.contentId)
-    ).reduce((acc = [], a) => [ ...acc, ...a ], [])
-
-    //mezcla todos los contentId de cards y de units en una sola variable
-    const contentIds = [
-        ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
-        ...cardsContentIds // cards contents
-    ]
-
-    // obtiene contents desde bb
-    /* obtiene notas:
-        - obtiene bb column id en base a bb course id y bb content id
-        - obtiene grade en base a bb column id */
+router.get('/v2/dashboard', requireLTISession, async (req, res) => {
+    try {
+        const {
+            bbCourseId,
+            bbStudentExternalId,
+            subject,
+            student
+        } = req.ltiSession
+        console.log('/v2/dashboard => LTI session => ', {bbCourseId, bbStudentExternalId})
+    
+        console.log('/v2/dashboard => LTI subjectId => ', subject.id)
         
-    let allLR = await LRHandler.getAllUnitsLearningRoutes(courseId)
-
-    const __DEFAULT_STUDENT_LR_INDEX = 1
-    const fullUnits = units.map(u => {
-        const currentLR = allLR[u.id].map(lr => lr.contents)
-        // TODO:: find grade to decide student lr index
-        const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
-        const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
-            const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
-            return { ...content, completed }
+        //obtiene curso desde lti session
+        // TODO: update to bb course_id after bb conection
+        //const courseId = '1'
+        //const studentId = '1'
+        //obtiene units y todas sus cards (?)
+        //obtiene progress en base a courseId
+        //iterate units and cards to set progress
+        const units = await dashboardHandler.getUnitsWithCards(subject.id, student.id)
+        console.log('/v2/dashboard => units => ', units)
+    
+        //obtiene todos los contentId de las cards
+        const cardsContentIds = units.map(
+            u => u.cards.filter(
+                c => !!c.contentId
+            ).map(c => c.contentId)
+        ).reduce((acc = [], a) => [ ...acc, ...a ], [])
+    
+        //mezcla todos los contentId de cards y de units en una sola variable
+        const contentIds = [
+            ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
+            ...cardsContentIds // cards contents
+        ]
+    
+        // obtiene contents desde bb
+        /* obtiene notas:
+            - obtiene bb column id en base a bb course id y bb content id
+            - obtiene grade en base a bb column id */
+            
+        let allLR = await LRHandler.getAllUnitsLearningRoutes(subject.id)
+    
+        const __DEFAULT_STUDENT_LR_INDEX = 1
+        const fullUnits = units.map(u => {
+            const currentLR = allLR[u.id].map(lr => lr.contents)
+            // TODO:: find grade to decide student lr index
+            const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+            const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
+                const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
+                return { ...content, completed }
+            })
+            return {
+                ...u,
+                learningRoutes: currentLR,
+                studentLearningRoute,
+                studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
+            }
         })
-        return {
-            ...u,
-            learningRoutes: currentLR,
-            studentLearningRoute,
-            studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
-        }
-    })
-
-    /* itera unidades:
-        - set units grade
-        - set grade to all cards
-        - get unit learningRoutes
-        - assign a studentLearningRoute based on grade */
-    // notify new progress
-    // return units, contents, allGrades
-
-    return res.status(200).json({
-        success: true,
-        units: fullUnits
-    })
+    
+        /* itera unidades:
+            - set units grade
+            - set grade to all cards
+            - get unit learningRoutes
+            - assign a studentLearningRoute based on grade */
+        // notify new progress
+        // return units, contents, allGrades
+    
+        return res.status(200).json({
+            success: true,
+            units: fullUnits,
+            subject,
+            student
+        })
+      
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
 })
 
 
