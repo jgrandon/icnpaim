@@ -23,33 +23,53 @@ const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
-  try {
-    const sessionId = req.cookies?.ltiState || req.session?.ltiState;
-    console.log('requireLTISession => sessionId', sessionId)
-    console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
-    console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
-    if (!sessionId) {
-      return res.status(401).json({ error: 'No LTI session found' });
-    }
+    try {
+        if (process.env.NODE_ENV == 'development') {
+            req.ltiSession = mockLti
+        } else {
+            const sessionId = req.cookies?.ltiState || req.session?.ltiState;
+            console.log('requireLTISession => sessionId', sessionId)
+            console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
+            console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
+            if (!sessionId) {
+                return res.status(401).json({ error: 'No LTI session found' });
+            }
+        
+            const auth = await getAuthFromState(sessionId);
+            if (!auth?.jwt) {
+                return res.status(401).json({ error: 'Invalid LTI session' });
+            }
+        
+            req.ltiSession = {
+                jwt: auth.jwt,
+                sessionId: sessionId,
+                //wpStudentId: auth.wpStudentId,
+                //wpCourseId: auth.wpCourseId,
+                bbStudentExternalId: auth.bbStudentExternalId,
+                bbCourseId: auth.bbCourseId
+            }
+        }
+        
+        // get subject and student data from db
+        const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
+        const student = await studentHandler.getOrCreate({
+            name: jwt.name,
+            bbId: bbStudentExternalId})
+        const subject = await subjectHandler.getOrCreate({
+            name: jwt['https://purl.imsglobal.org/spec/lti/claim/context'].title,
+            bbId: bbCourseId
+        })
+        req.ltiSession = {
+            ...req.ltiSession,
+            subject,
+            student
+        }
 
-    const auth = await getAuthFromState(sessionId);
-    if (!auth?.jwt) {
-      return res.status(401).json({ error: 'Invalid LTI session' });
+        next()
+    } catch (error) {
+        console.error('Session validation error:', error);
+        res.status(401).json({ error: 'Session validation failed' });
     }
-
-    req.ltiSession = {
-      jwt: auth.jwt,
-      sessionId: sessionId,
-      wpStudentId: auth.wpStudentId,
-      wpCourseId: auth.wpCourseId,
-      bbStudentExternalId: auth.bbStudentExternalId,
-      bbCourseId: auth.bbCourseId
-    };
-    next();
-  } catch (error) {
-    console.error('Session validation error:', error);
-    res.status(401).json({ error: 'Session validation failed' });
-  }
 };
 
 // GET /api/me - datos del usuario en sesión
@@ -64,8 +84,8 @@ router.get('/me', requireLTISession, (req, res) => {
       family_name: jwt.body.family_name,
       roles: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles'] || [],
       context: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'] || {},
-      wpStudentId: req.ltiSession.wpStudentId,
-      wpCourseId: req.ltiSession.wpCourseId,
+      //wpStudentId: req.ltiSession.wpStudentId,
+      //wpCourseId: req.ltiSession.wpCourseId,
       bbCourseId: req.ltiSession.bbCourseId
     };
 
