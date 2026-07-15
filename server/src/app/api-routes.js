@@ -54,6 +54,7 @@ const requireLTISession = async (req, res, next) => {
         const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
         console.error('requireLTISession => bbCourseId => ', bbCourseId)
         console.error('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
+        console.error('requireLTISession => jwt => ', jwt)
         
         const bbStudentId = await students.getStudentId(bbStudentExternalId)
         const student = await studentHandler.getOrCreate({
