@@ -27,24 +27,22 @@ const requireLTISession = async (req, res, next) => {
         if (process.env.NODE_ENV == 'development') {
             req.ltiSession = mockLti
         } else {
-            const sessionId = req.cookies?.ltiState || req.session?.ltiState;
+            const sessionId = req.cookies?.ltiState || req.session?.ltiState
             console.log('requireLTISession => sessionId', sessionId)
             console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
             console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
             if (!sessionId) {
-                return res.status(401).json({ error: 'No LTI session found' });
+                return res.status(401).json({ error: 'No LTI session found' })
             }
         
-            const auth = await getAuthFromState(sessionId);
+            const auth = await getAuthFromState(sessionId)
             if (!auth?.jwt) {
-                return res.status(401).json({ error: 'Invalid LTI session' });
+                return res.status(401).json({ error: 'Invalid LTI session' })
             }
         
             req.ltiSession = {
                 jwt: auth.jwt,
                 sessionId: sessionId,
-                //wpStudentId: auth.wpStudentId,
-                //wpCourseId: auth.wpCourseId,
                 bbStudentExternalId: auth.bbStudentExternalId,
                 bbCourseId: auth.bbCourseId
             }
@@ -58,28 +56,28 @@ const requireLTISession = async (req, res, next) => {
         
         const bbStudentId = await students.getStudentId(bbStudentExternalId)
         const student = await studentHandler.getOrCreate({
-            name: jwt.name,
+            name: jwt.body.name,
             bbId: bbStudentId})
         const subject = await subjectHandler.getOrCreate({
-            name: jwt['https://purl.imsglobal.org/spec/lti/claim/context'].title,
+            name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
         })
         req.ltiSession = {
             ...req.ltiSession,
             subject,
             student,
-            isStudent: jwt['https://purl.imsglobal.org/spec/lti/claim/roles']
+            isStudent: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
                 .includes('http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'),
-            isAdmin: jwt['https://purl.imsglobal.org/spec/lti/claim/roles']
+            isAdmin: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
                 .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
         }
 
         next()
     } catch (error) {
-        console.error('Session validation error:', error);
-        res.status(401).json({ error: 'Session validation failed' });
+        console.error('Session validation error:', error)
+        res.status(401).json({ error: 'Session validation failed' })
     }
-};
+}
 
 // GET /api/me - datos del usuario en sesión
 router.get('/me', requireLTISession, (req, res) => {
