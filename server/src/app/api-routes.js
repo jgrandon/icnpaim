@@ -16,7 +16,7 @@ import * as LRHandler from './handlers/v2/learningRoutes'
 import * as dashboardHandler from './handlers/v2/dashboard'
 import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
-import { mockLti } from './mockLti'
+import mockLti from './mockLti.json'
 
 const router = express.Router()
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
