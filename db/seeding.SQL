@@ -1,24 +1,24 @@
-insert into subject (name, bb_id) values ('NeuroBiologia', 11);
+insert into subject (name, bb_id) values ('NeuroBiologia', '_89726_1');
 
 INSERT INTO student (name, bb_id) VALUES ('John Doe', '123');
 
-INSERT INTO Unit (name, color, position, bb_id, subject_id, evaluation_id, description)
+INSERT INTO Unit (name, description, color, position, bb_id, subject_id, evaluation_id, published)
 VALUES (
 'Unidad 1: Introducción a la Psicobiología y Celulas del Sistema Nervioso',
-'#33CCFF', 1, 1, 1, 1,
-'Esta unidad sienta las bases conceptuales y examina los componentes fundamentales que permiten la comunicación en el cerebro.'
+'Esta unidad sienta las bases conceptuales y examina los componentes fundamentales que permiten la comunicación en el cerebro.',
+'#33CCFF', 1, 1, 1, 1, TRUE
 ), (
 'Unidad 2: Anatomía Funcional del Sistema Nervioso',
-'blue', 2, 2, 1, 2,
-'Un recorrido por la estructura macroscópica del sistema nervioso, vinculando la anatomía con las funciones conductuales.'
+'Un recorrido por la estructura macroscópica del sistema nervioso, vinculando la anatomía con las funciones conductuales.',
+'blue', 2, 2, 1, 2, TRUE
 ), (
 'Unidad 3: Sistemas Sensoriales, Motores y Neuroendocrinología',
-'purple', 3, 3, 1, 3,
-'Estudio de cómo el organismo recibe información del entorno, ejecuta respuestas y se regula internamente a través de las hormonas.'
+'Estudio de cómo el organismo recibe información del entorno, ejecuta respuestas y se regula internamente a través de las hormonas.',
+'purple', 3, 3, 1, 3, TRUE
 ), (
 'Unidad 4: Bases Biológicas de los Procesos Psicológicos Complejos',
-'orange', 4, 4, 1, 4,
-'Examen de cómo las redes neuronales y los sistemas biológicos subyacen a las funciones cognitivas y afectivas superiores.'
+'Examen de cómo las redes neuronales y los sistemas biológicos subyacen a las funciones cognitivas y afectivas superiores.',
+'orange', 4, 4, 1, 4, TRUE
 );
 
 INSERT INTO Content (title, description, type, url, unit_id)
@@ -49,3 +49,10 @@ VALUES
 (1, 1.0, 4.0, true, 2),(2, 4.0, 5.5, true, 2),(3, 5.5, 7.0, true, 2),
 (1, 1.0, 4.0, true, 3),(2, 4.0, 5.5, true, 3),(3, 5.5, 7.0, true, 3),
 (1, 1.0, 4.0, true, 4),(2, 4.0, 5.5, true, 4),(3, 5.5, 7.0, true, 4);
+
+INSERT INTO LearningRouteData (learning_route_id, content_id, position, enabled)
+VALUES 
+(1, 1, 0, true),(1, 2, 1, true),(1, 3, 2, true),(1, 4, 3, true),(1, 5, 4, true),
+(4, 6, 0, true),(4, 7, 1, true),(4, 8, 2, true),(4, 9, 3, true),(4, 10, 4, true),
+(7, 11, 0, true),(7, 12, 1, true),(7, 13, 2, true),(7, 14, 3, true),(7, 15, 4, true),
+(10, 16, 0, true),(10, 17, 1, true),(10, 18, 2, true),(10, 19, 3, true),(10, 20, 4, true);
