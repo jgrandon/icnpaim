@@ -70,23 +70,24 @@ const requireLTISession = async (req, res, next) => {
 
         // validate profiles
         if (isStudent && isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
-        if (isAdmin && !isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+        else if (isAdmin && !isStudent && !isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+        else {
+            if (!isAdminUrl) {
+                student = await studentHandler.getOrCreate({
+                    name: jwt.body.name,
+                    bbId: bbStudentId})
+            }
 
-        if (!isAdminUrl) {
-            student = await studentHandler.getOrCreate({
-                name: jwt.body.name,
-                bbId: bbStudentId})
+            req.ltiSession = {
+                ...req.ltiSession,
+                subject,
+                student,
+                isStudent,
+                isAdmin
+            }
+            console.log('=> next')
+            next()
         }
-
-        req.ltiSession = {
-            ...req.ltiSession,
-            subject,
-            student,
-            isStudent,
-            isAdmin
-        }
-
-        next()
     } catch (error) {
         console.error('Session validation error:', error)
         res.status(401).json({ error: 'Session validation failed' })
