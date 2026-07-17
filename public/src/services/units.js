@@ -22,8 +22,8 @@ const unitServices = {
             if (!response.ok) {
                 throw new Error(`Failed to get all units: ${response.status}`)
             }
-            const { units } = await response.json()
-            return units
+            const data = await response.json()
+            return data
         } catch (error) {
             console.error('Error getting all units:', error)
             throw error

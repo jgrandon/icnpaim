@@ -14,40 +14,85 @@ import * as unitsHandler from './handlers/v2/units'
 import * as contentsHandler from './handlers/v2/contents'
 import * as LRHandler from './handlers/v2/learningRoutes'
 import * as dashboardHandler from './handlers/v2/dashboard'
+import * as subjectHandler from './handlers/v2/subject'
+import * as studentHandler from './handlers/v2/student'
+// import mockLti from './mockLti.json'
 
-const router = express.Router();
+const router = express.Router()
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
-  try {
-    const sessionId = req.cookies?.ltiState || req.session?.ltiState;
-    console.log('requireLTISession => sessionId', sessionId)
-    console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
-    console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
-    if (!sessionId) {
-      return res.status(401).json({ error: 'No LTI session found' });
-    }
+    try {
+        
+        if (process.env.NODE_ENV == 'development') {
+            const mockLti = require('../../mockLti.json')
+            req.ltiSession = mockLti
+        } else {
+            const sessionId = req.cookies?.ltiState || req.session?.ltiState
+            console.log('requireLTISession => sessionId', sessionId)
+            console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
+            console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
+            if (!sessionId) {
+                return res.status(401).json({ error: 'No LTI session found' })
+            }
+        
+            const auth = await getAuthFromState(sessionId)
+            if (!auth?.jwt) {
+                return res.status(401).json({ error: 'Invalid LTI session' })
+            }
+        
+            req.ltiSession = {
+                jwt: auth.jwt,
+                sessionId: sessionId,
+                bbStudentExternalId: auth.bbStudentExternalId,
+                bbCourseId: auth.bbCourseId
+            }
+        }
+        
+        // get subject and student data from db
+        const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
+        console.log('requireLTISession => bbCourseId => ', bbCourseId)
+        console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
+        console.log('requireLTISession => jwt => ', jwt)
+        
+        const bbStudentId = await students.getStudentId(bbStudentExternalId)
+        const subject = await subjectHandler.getOrCreate({
+            name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
+            bbId: bbCourseId
+        })
+        const isAdminUrl = req.originalUrl.includes('v2/units')
+        const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+        const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+        let student = null
 
-    const auth = await getAuthFromState(sessionId);
-    if (!auth?.jwt) {
-      return res.status(401).json({ error: 'Invalid LTI session' });
-    }
+        // validate profiles
+        if (isStudent && isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+        else if (isAdmin && !isStudent && !isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+        else {
+            if (!isAdminUrl) {
+                student = await studentHandler.getOrCreate({
+                    name: jwt.body.name,
+                    bbId: bbStudentId})
+            }
 
-    req.ltiSession = {
-      jwt: auth.jwt,
-      sessionId: sessionId,
-      wpStudentId: auth.wpStudentId,
-      wpCourseId: auth.wpCourseId,
-      bbStudentExternalId: auth.bbStudentExternalId,
-      bbCourseId: auth.bbCourseId
-    };
-    next();
-  } catch (error) {
-    console.error('Session validation error:', error);
-    res.status(401).json({ error: 'Session validation failed' });
-  }
-};
+            req.ltiSession = {
+                ...req.ltiSession,
+                subject,
+                student,
+                isStudent,
+                isAdmin
+            }
+            console.log('=> next')
+            next()
+        }
+    } catch (error) {
+        console.error('Session validation error:', error)
+        res.status(401).json({ error: 'Session validation failed' })
+    }
+}
 
 // GET /api/me - datos del usuario en sesión
 router.get('/me', requireLTISession, (req, res) => {
@@ -61,8 +106,8 @@ router.get('/me', requireLTISession, (req, res) => {
       family_name: jwt.body.family_name,
       roles: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles'] || [],
       context: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'] || {},
-      wpStudentId: req.ltiSession.wpStudentId,
-      wpCourseId: req.ltiSession.wpCourseId,
+      //wpStudentId: req.ltiSession.wpStudentId,
+      //wpCourseId: req.ltiSession.wpCourseId,
       bbCourseId: req.ltiSession.bbCourseId
     };
 
@@ -528,187 +573,281 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
     */
 
 // Units
-router.post('/v2/units', async (req, res) => {
-    const data = req.body
-    let unit
-    const subjectId = '1'
-    if (!data.id) {
-        unit = await unitsHandler.createUnit({...data, subjectId})
-    } else {
-        unit = await unitsHandler.updateUnit(data)
+router.post('/v2/units', requireLTISession,  async (req, res) => {
+    try {
+        const subjectId = req.ltiSession.subject.id
+        const data = req.body
+        let unit
+        //const subjectId = '1'
+        if (!data.id) {
+            unit = await unitsHandler.createUnit({...data, subjectId})
+        } else {
+            unit = await unitsHandler.updateUnit(data)
+        }
+        return res.status(200).json({
+            ok: true,
+            unit
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
+})
+router.get('/v2/units', requireLTISession, async (req, res) => {
+    try {
+        const { subject } = req.ltiSession
+        // const data = req.body
+        const units = await unitsHandler.getAllUnits(subject.id)
+        return res.status(200).json({
+            ok: true,
+            units,
+            subject
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
     }
-    return res.status(200).json({
-        ok: true,
-        unit
-    })
 })
-router.get('/v2/units', async (req, res) => {
-    const data = req.body
-    const units = await unitsHandler.getAllUnits(data)
-    return res.status(200).json({
-        ok: true,
-        units
-    })
-})
-router.delete('/v2/units', async (req, res) => {
-    const id = req.body.id
-    await unitsHandler.deleteUnit(id)
-    return res.status(200).json({
-        ok: true
-    })
+
+router.delete('/v2/units', requireLTISession,  async (req, res) => {
+    try {
+        const id = req.body.id
+        await unitsHandler.deleteUnit(id)
+        return res.status(200).json({
+            ok: true
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
 })
 
 
 // Contents
-router.get('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    const contents = await contentsHandler.getAllContents(unitId)
-    return res.status(200).json({
-        ok: true,
-        unitId,
-        contents
-    })
-})
-
-router.post('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    const data = req.body
-    let content
-    if (!data.id) {
-        content = await contentsHandler.createContent(data)
-    } else {
-        content = await contentsHandler.updateContent(data)
+router.get('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const contents = await contentsHandler.getAllContents(unitId)
+        return res.status(200).json({
+            ok: true,
+            unitId,
+            contents
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
     }
-    return res.status(200).json({
-        ok: true,
-        content
-    })
 })
 
-router.delete('/v2/units/:unitId/contents', async (req, res) => {
-    const { unitId } = req.params
-    await contentsHandler.deleteContent(unitId)
-    return res.status(200).json({
-        ok: true
-    })
+router.post('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const data = req.body
+        let content
+        if (!data.id) {
+            content = await contentsHandler.createContent(data)
+        } else {
+            content = await contentsHandler.updateContent(data)
+        }
+        return res.status(200).json({
+            ok: true,
+            content
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+
+})
+
+router.delete('/v2/units/:unitId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        await contentsHandler.deleteContent(unitId)
+        return res.status(200).json({
+            ok: true
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
 
 
 //
-router.post('/v2/units/:unitId/lr/schema', async (req, res) => {
-    const { unitId } = req.params
-    const data = req.body
-    await LRHandler.updateSchema(unitId, data)
-    //TODO: find learningRouteData registers
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
-})
-
-router.get('/v2/units/:unitId/lr', async (req, res) => {
-    const { unitId } = req.params
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
-})
-
-router.post('/v2/units/:unitId/lr/:ldId/contents', async (req, res) => {
-    const { unitId, ldId } = req.params
-    const data = req.body
-    const update = await LRHandler.updateLRContents(ldId, data)
-
-    console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
-    //TODO: find learningRouteData registers
-    const learningRoutes = await LRHandler.getLearningRoutes(unitId)
-
-    return res.status(200).json({
-        ok: true,
-        learningRoutes
-    })
-})
-
-router.get('/v2/dashboard', async (req, res) => {
-    //obtiene curso desde lti session
-    // TODO: update to bb course_id after bb conection
-    const courseId = '1'
-    const studentId = '1'
-    //obtiene units y todas sus cards (?)
-    //obtiene progress en base a courseId
-    //iterate units and cards to set progress
-    const units = await dashboardHandler.getUnitsWithCards(courseId,studentId)
-    console.log('/v2/dashboard => units => ', units)
-
-    //obtiene todos los contentId de las cards
-    const cardsContentIds = units.map(
-        u => u.cards.filter(
-            c => !!c.contentId
-        ).map(c => c.contentId)
-    ).reduce((acc = [], a) => [ ...acc, ...a ], [])
-
-    //mezcla todos los contentId de cards y de units en una sola variable
-    const contentIds = [
-        ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
-        ...cardsContentIds // cards contents
-    ]
-
-    // obtiene contents desde bb
-    /* obtiene notas:
-        - obtiene bb column id en base a bb course id y bb content id
-        - obtiene grade en base a bb column id */
-        
-    let allLR = await LRHandler.getAllUnitsLearningRoutes(courseId)
-
-    const __DEFAULT_STUDENT_LR_INDEX = 1
-    const fullUnits = units.map(u => {
-        const currentLR = allLR[u.id].map(lr => lr.contents)
-        // TODO:: find grade to decide student lr index
-        const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
-        const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
-            const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
-            return { ...content, completed }
+router.post('/v2/units/:unitId/lr/schema', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const data = req.body
+        await LRHandler.updateSchema(unitId, data)
+        //TODO: find learningRouteData registers
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
         })
-        return {
-            ...u,
-            learningRoutes: currentLR,
-            studentLearningRoute,
-            studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
-        }
-    })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
 
-    /* itera unidades:
-        - set units grade
-        - set grade to all cards
-        - get unit learningRoutes
-        - assign a studentLearningRoute based on grade */
-    // notify new progress
-    // return units, contents, allGrades
+router.get('/v2/units/:unitId/lr', requireLTISession, async (req, res) => {
+    try {
+        const { unitId } = req.params
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
 
-    return res.status(200).json({
-        success: true,
-        units: fullUnits
-    })
+router.post('/v2/units/:unitId/lr/:ldId/contents', requireLTISession, async (req, res) => {
+    try {
+        const { unitId, ldId } = req.params
+        const data = req.body
+        const update = await LRHandler.updateLRContents(ldId, data)
+    
+        console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
+        //TODO: find learningRouteData registers
+        const learningRoutes = await LRHandler.getLearningRoutes(unitId)
+    
+        return res.status(200).json({
+            ok: true,
+            learningRoutes
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
+
+router.get('/v2/dashboard', requireLTISession, async (req, res) => {
+    try {
+        const {
+            bbCourseId,
+            bbStudentExternalId,
+            subject,
+            student
+        } = req.ltiSession
+        console.log('/v2/dashboard => LTI session => ', {bbCourseId, bbStudentExternalId})
+    
+        console.log('/v2/dashboard => LTI subjectId => ', subject.id)
+        
+        //obtiene curso desde lti session
+        // TODO: update to bb course_id after bb conection
+        //const courseId = '1'
+        //const studentId = '1'
+        //obtiene units y todas sus cards (?)
+        //obtiene progress en base a courseId
+        //iterate units and cards to set progress
+        const units = await dashboardHandler.getUnitsWithCards(subject.id, student.id)
+        console.log('/v2/dashboard => units => ', units)
+    
+        //obtiene todos los contentId de las cards
+        const cardsContentIds = units.map(
+            u => u.cards.filter(
+                c => !!c.contentId
+            ).map(c => c.contentId)
+        ).reduce((acc = [], a) => [ ...acc, ...a ], [])
+    
+        //mezcla todos los contentId de cards y de units en una sola variable
+        const contentIds = [
+            ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
+            ...cardsContentIds // cards contents
+        ]
+    
+        // obtiene contents desde bb
+        /* obtiene notas:
+            - obtiene bb column id en base a bb course id y bb content id
+            - obtiene grade en base a bb column id */
+            
+        let allLR = await LRHandler.getAllUnitsLearningRoutes(subject.id)
+    
+        const __DEFAULT_STUDENT_LR_INDEX = 1
+        const fullUnits = units.map(u => {
+            const currentLR = allLR[u.id].map(lr => lr.contents)
+            // TODO:: find grade to decide student lr index
+            const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+            const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
+                const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
+                return { ...content, completed }
+            })
+            return {
+                ...u,
+                learningRoutes: currentLR,
+                studentLearningRoute,
+                studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
+            }
+        })
+    
+        /* itera unidades:
+            - set units grade
+            - set grade to all cards
+            - get unit learningRoutes
+            - assign a studentLearningRoute based on grade */
+        // notify new progress
+        // return units, contents, allGrades
+    
+        return res.status(200).json({
+            success: true,
+            units: fullUnits,
+            subject,
+            student
+        })
+      
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    } 
 })
 
 
-router.post('/v2/progress' , async (req, res) => {
-    //const { unitId, ldId } = req.params
-    const contentId = req.body.completedCardId
-    const studentId = 1
-    const update = await LRHandler.updateContentProgress({
-        studentId,
-        contentId,
-    })
-    return res.status(200).json({
-        ok: true,
-        update
-    })
+router.post('/v2/progress' , requireLTISession, async (req, res) => {
+    try {
+        //const { unitId, ldId } = req.params
+        const contentId = req.body.completedCardId
+        const studentId = 1
+        const update = await LRHandler.updateContentProgress({
+            studentId,
+            contentId,
+        })
+        return res.status(200).json({
+            ok: true,
+            update
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
 })
 
 

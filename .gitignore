@@ -16,6 +16,8 @@ bower_components
 /server/src/database/blackboard_token.json
 /server/src/database/blackboard.json
 
+/server/mockLti.json
+
 # Created by https://www.gitignore.io/api/node,eclipse
 
 ### Node ###

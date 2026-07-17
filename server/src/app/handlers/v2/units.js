@@ -1,27 +1,14 @@
 import client from '../../db/postgres'
 import * as contentsHandler from './contents'
-// import * as learningRoutesHandler from './learningRoutes'
-/**
- * CRUD handlers for the Unit table in PostgreSQL.
- * 
- * Table schema:
- *   id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY
- *   name     varchar(255) NOT NULL
- *   color    varchar(255)
- *   position INT NOT NULL
- */
 
-let connected = false
-
-async function ensureConnection() {
-    if (!connected) {
-        await client.connect()
-        connected = true
-    }
-}
-
-export async function getAllUnits() {
-    const res = await client.query('SELECT * FROM unit WHERE enabled = TRUE ORDER BY position ASC')
+export async function getAllUnits(subjectId) {
+    const res = await client.query(
+        `SELECT * FROM unit 
+        WHERE enabled = TRUE 
+            AND subject_id = $1
+        ORDER BY position ASC`,
+        [ subjectId ]
+    )
     return res.rows
 }
 
@@ -79,7 +66,6 @@ export async function updateUnit({ id, name, color, position, description, publi
 }
 
 export async function deleteUnit(id) {
-    await ensureConnection()
     await contentsHandler.deleteByUnit(id)
 
     const res = await client.query(

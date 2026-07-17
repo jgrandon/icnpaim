@@ -47,7 +47,7 @@ CREATE TABLE Content (
 CREATE TABLE Student (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255),
-    bb_id INT
+    bb_id varchar(255) NOT NULL
 );
 
 CREATE TABLE Progress (
@@ -66,7 +66,7 @@ CREATE TABLE Progress (
 CREATE TABLE Grade (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     grade float,
-    bb_id INT,
+    bb_id varchar(255) NOT NULL,
     subject_id INT,
     student_id INT,
     CONSTRAINT FK_SubjectGrad
