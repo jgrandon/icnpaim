@@ -361,7 +361,20 @@ module.exports = function (app) {
       //await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
       await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
-      res.redirect(`/dashboard?nonce=${state}`);
+
+      const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+          .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+      const isAdmin = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+          .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+
+      if (isStudent) {
+        res.redirect(`/dashboard?nonce=${state}`)
+      } else if (isAdmin) {
+        res.redirect(`/dashboard?nonce=${state}`)
+      } else {
+        res.redirect(`/not-allowed`)
+      }
+
     }
   });
 
