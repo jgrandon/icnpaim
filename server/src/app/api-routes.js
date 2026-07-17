@@ -52,26 +52,38 @@ const requireLTISession = async (req, res, next) => {
         
         // get subject and student data from db
         const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
-        console.error('requireLTISession => bbCourseId => ', bbCourseId)
-        console.error('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
-        console.error('requireLTISession => jwt => ', jwt)
+        console.log('requireLTISession => bbCourseId => ', bbCourseId)
+        console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
+        console.log('requireLTISession => jwt => ', jwt)
         
         const bbStudentId = await students.getStudentId(bbStudentExternalId)
-        const student = await studentHandler.getOrCreate({
-            name: jwt.body.name,
-            bbId: bbStudentId})
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
         })
+        const isAdminUrl = req.originalUrl.includes('v2/units')
+        const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+        const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+        let student = null
+
+        // validate profiles
+        if (isStudent && isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+        if (isAdmin && !isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
+
+        if (!isAdminUrl) {
+            student = await studentHandler.getOrCreate({
+                name: jwt.body.name,
+                bbId: bbStudentId})
+        }
+
         req.ltiSession = {
             ...req.ltiSession,
             subject,
             student,
-            isStudent: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-                .includes('http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'),
-            isAdmin: jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-                .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+            isStudent,
+            isAdmin
         }
 
         next()
