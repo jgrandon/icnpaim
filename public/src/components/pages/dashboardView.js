@@ -32,7 +32,6 @@ import ProgressDashboard from './Dashboards/progress'
 import { useResponsive } from '../../hooks/useResponsive'
 import { Link } from 'react-router-dom'
 
-
 const nodeEnv = process.env.NODE_ENV
 
 
@@ -266,6 +265,11 @@ class DashboardView extends React.Component {
             console.log('unitsResponse => ', unitsResponse )
             const responseBody = await unitsResponse.json();
             console.log('responseBody => ', responseBody )
+            if (responseBody.error == 'Unauthorized') {
+                window.location.href = '/not-allowed'
+                return
+            }
+
             if (!responseBody.success) { return }
 
             const { units, subject, student } = responseBody
