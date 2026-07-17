@@ -19,6 +19,7 @@ const unitServices = {
     getAll: async () => {
         try {
             const response = await fetch('/api/v2/units')
+            if (response.status == 401) window.location.href = '/not-allowed'
             if (!response.ok) {
                 throw new Error(`Failed to get all units: ${response.status}`)
             }
