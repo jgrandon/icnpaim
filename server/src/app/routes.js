@@ -370,7 +370,7 @@ module.exports = function (app) {
       if (isStudent) {
         res.redirect(`/dashboard?nonce=${state}`)
       } else if (isAdmin) {
-        res.redirect(`/dashboard?nonce=${state}`)
+        res.redirect(`/units-admin?nonce=${state}`)
       } else {
         res.redirect(`/not-allowed`)
       }
