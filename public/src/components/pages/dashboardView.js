@@ -137,7 +137,7 @@ const RightArrow = () => {
 }
 
 const withResponsive = (WrappedComponent) => {
-    const handleBeforeUnload = () => {
+    const deleteSession = () => {
         const params = new URLSearchParams(window.location.search)
         const nonce =  params.get('nonce')
 
@@ -152,24 +152,26 @@ const withResponsive = (WrappedComponent) => {
         })
     }
 
-  return function (props) {
-    const [width, setWidth] = useState(0)
-    const windowWidth = useResponsive();
+    return function (props) {
+        const [width, setWidth] = useState(0)
+        const windowWidth = useResponsive()
 
-    useEffect(()=> {
-      setWidth(windowWidth.current)
+        useEffect(()=> {
+        setWidth(windowWidth.current)
+        },[windowWidth.current])
+        
+        useEffect(() => {
+            window.addEventListener('beforeunload', deleteSession)
+            return () => {
+                window.removeEventListener('beforeunload', deleteSession)
+            }
+        }, [])
 
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload)
-      };
-    },[windowWidth.current])
-
-    return <WrappedComponent
-      {...props}
-      windowWidth={width}
-    />;
-  };
+        return <WrappedComponent
+        {...props}
+        windowWidth={width}
+        />
+    }
 }
 
 class DashboardView extends React.Component {
