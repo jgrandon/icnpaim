@@ -775,13 +775,7 @@ module.exports = function (app) {
   app.get('*', async (req, res) => {
     console.log('catchall - (' + req.url + ')');
 
-    const state = req.cookies['state'];
-    if (state !== req.query.state) {
-      console.log('The state field is missing or doesn\'t match.');
-      res.redirect(`/not-allowed`)
-    }
-    const auth = await db.getAuthFromState(state);
-    const jwtPayload = auth.jwt;
+    const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
 
     const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
         .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
@@ -789,7 +783,7 @@ module.exports = function (app) {
         .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
 
     if (!isStudent && !isAdmin) {
-        console.log('Not Student not Admin');
+        console.log('Not Student nor Admin');
         res.redirect(`/not-allowed`)
     }
     
