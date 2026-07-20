@@ -194,3 +194,14 @@ export const deleteExpiredSessions = () => {
     });
   }
 };
+
+export const deleteSession = (state) => {
+    try {
+        console.log('deleteSession => state', state)
+        const index = auth.getIndex('.auth-data', state)
+        auth.delete(`.auth-data[${index}]`)
+        return true
+    } catch (e) {
+        return e
+    }
+}

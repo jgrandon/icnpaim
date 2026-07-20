@@ -39,12 +39,35 @@ const theme = createTheme({
 })
 
 export default function UnitsAdmin () {
+    const deleteSession = () => {
+        const params = new URLSearchParams(window.location.search)
+        const nonce =  params.get('nonce')
+    
+        fetch('/end-session', {
+            method: 'POST',
+            body: JSON.stringify({
+                nonce,
+                timestamp: Date.now()
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,
+        })
+    }
+
+    useEffect(() => {
+        window.addEventListener('beforeunload', deleteSession)
+        return () => {
+            window.removeEventListener('beforeunload', deleteSession)
+        }
+    }, [])
+    
     return (
         <ThemeProvider theme={theme}>
             <Admin />
         </ThemeProvider>
     )
 }
+
 
 function Admin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
