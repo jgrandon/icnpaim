@@ -766,27 +766,35 @@ module.exports = function (app) {
     }
   });
 
+    app.get('/applications', async (req, res) => {
+        if (!req.query.appadmin) {
+            res.redirect(`/not-allowed`)
+        } else {
+            res.sendFile(path.resolve('./public', 'index.html'));
+        }
+    });
 
     app.get('/not-allowed', async (req, res) => {
         res.sendFile(path.resolve('./public', 'index.html'));
     });
-  //=======================================================
-  // Catch all
-  app.get('*', async (req, res) => {
-    console.log('catchall - (' + req.url + ')');
-
-    const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
-
-    const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-        .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
-    const isAdmin = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-        .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
-
-    if (!isStudent && !isAdmin) {
-        console.log('Not Student nor Admin');
-        res.redirect(`/not-allowed`)
-    }
     
-    res.sendFile(path.resolve('./public', 'index.html'));
-  });
+    //=======================================================
+    // Catch all
+    app.get('*', async (req, res) => {
+        console.log('catchall - (' + req.url + ')');
+
+        const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
+
+        const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+        const isAdmin = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+
+        if (!isStudent && !isAdmin) {
+            console.log('Not Student nor Admin');
+            res.redirect(`/not-allowed`)
+        } else {
+            res.sendFile(path.resolve('./public', 'index.html'));
+        }
+    });
 };
