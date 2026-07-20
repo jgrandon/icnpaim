@@ -768,8 +768,27 @@ module.exports = function (app) {
 
   //=======================================================
   // Catch all
-  app.get('*', (req, res) => {
+  app.get('*', async (req, res) => {
     console.log('catchall - (' + req.url + ')');
+
+    const state = req.cookies['state'];
+    if (state !== req.query.state) {
+      console.log('The state field is missing or doesn\'t match.');
+      res.redirect(`/not-allowed`)
+    }
+    const auth = await db.getAuthFromState(state);
+    const jwtPayload = auth.jwt;
+
+    const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+        .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+    const isAdmin = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+        .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+
+    if (!isStudent && !isAdmin) {
+        console.log('Not Student not Admin');
+        res.redirect(`/not-allowed`)
+    }
+    
     res.sendFile(path.resolve('./public', 'index.html'));
   });
 };
