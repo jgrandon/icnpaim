@@ -766,6 +766,10 @@ module.exports = function (app) {
     }
   });
 
+
+    app.get('/not-allowed', async (req, res) => {
+        res.sendFile(path.resolve('./public', 'index.html'));
+    });
   //=======================================================
   // Catch all
   app.get('*', async (req, res) => {
