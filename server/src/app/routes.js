@@ -777,7 +777,21 @@ module.exports = function (app) {
     app.get('/not-allowed', async (req, res) => {
         res.sendFile(path.resolve('./public', 'index.html'));
     });
-    
+
+    app.post('/end-session', async (req, res) => {
+        //const jwtPayload = await db.getAuthFromState(req.body.nonce).jwt;
+        const session  = req.body?.nonce
+        console.log('/end-session => session', session)
+        console.log('/end-session => req.body', req.body)
+
+        const deletion = await db.deleteSession(session)
+        console.log('/end-session => deletion', deletion)
+        res.status(200).json({
+            error: deletion==true ? '' : deletion.message,
+            ok: deletion==true
+        });
+    });    
+
     //=======================================================
     // Catch all
     app.get('*', async (req, res) => {
@@ -785,12 +799,15 @@ module.exports = function (app) {
 
         const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
 
-        const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+        const isStudent = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
-        const isAdmin = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+        const isAdmin = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
 
-        if (!isStudent && !isAdmin) {
+        if (process.env.NODE_ENV != 'development'
+            && !isStudent
+            && !isAdmin
+        ) {
             console.log('Not Student nor Admin');
             res.redirect(`/not-allowed`)
         } else {

@@ -137,12 +137,32 @@ const RightArrow = () => {
 }
 
 const withResponsive = (WrappedComponent) => {
+    const handleBeforeUnload = () => {
+        const params = new URLSearchParams(window.location.search)
+        const nonce =  params.get('nonce')
+
+        fetch('/end-session', {
+            method: 'POST',
+            body: JSON.stringify({
+                nonce,
+                timestamp: Date.now()
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,
+        })
+    }
+
   return function (props) {
     const [width, setWidth] = useState(0)
     const windowWidth = useResponsive();
 
     useEffect(()=> {
       setWidth(windowWidth.current)
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload)
+      };
     },[windowWidth.current])
 
     return <WrappedComponent
@@ -265,9 +285,8 @@ class DashboardView extends React.Component {
             console.log('unitsResponse => ', unitsResponse )
             const responseBody = await unitsResponse.json();
             console.log('responseBody => ', responseBody )
-            if (responseBody.error == 'Unauthorized') {
+            if (responseBody.error) {
                 window.location.href = '/not-allowed'
-                return
             }
 
             if (!responseBody.success) { return }
