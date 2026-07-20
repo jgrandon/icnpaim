@@ -80,6 +80,7 @@ const requireLTISession = async (req, res, next) => {
 
             req.ltiSession = {
                 ...req.ltiSession,
+                bbStudentId,
                 subject,
                 student,
                 isStudent,
@@ -750,11 +751,12 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
     try {
         const {
             bbCourseId,
-            bbStudentExternalId,
+            //bbStudentExternalId,
             subject,
-            student
+            student,
+            bbStudentId
         } = req.ltiSession
-        console.log('/v2/dashboard => LTI session => ', {bbCourseId, bbStudentExternalId})
+        console.log('/v2/dashboard => LTI session => ', {bbCourseId, bbStudentId})
     
         console.log('/v2/dashboard => LTI subjectId => ', subject.id)
         
@@ -781,6 +783,31 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ...cardsContentIds // cards contents
         ]
     
+
+        // get content grades
+        let allGrades = []
+        const iContents = contentIds.length
+        for (let i = 0; i<iContents; i++) {
+            const currentContentId = contentIds[i]
+            const columnId = await columns.getColumnIdByContent(bbCourseId, currentContentId)
+
+            console.log('current Content', currentContentId)
+            //get column
+            console.log('AFteR GETTING COLUMN id', columnId)
+
+
+            //get grade
+            let grade = null
+            if (!!columnId) {
+                grade = await grades.getGrade(bbCourseId, columnId, bbStudentId)
+            }
+            allGrades.push({
+                contentId: currentContentId,
+                columnId,
+                grade
+            })
+        }
+
         // obtiene contents desde bb
         /* obtiene notas:
             - obtiene bb column id en base a bb course id y bb content id
