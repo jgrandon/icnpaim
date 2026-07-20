@@ -46,6 +46,21 @@ export default function UnitsAdmin () {
     )
 }
 
+const deleteSession = () => {
+    const params = new URLSearchParams(window.location.search)
+    const nonce =  params.get('nonce')
+
+    fetch('/end-session', {
+        method: 'POST',
+        body: JSON.stringify({
+            nonce,
+            timestamp: Date.now()
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+    })
+}
+
 function Admin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [ units, setUnits ] = useState([])
@@ -55,6 +70,11 @@ function Admin() {
 
     useEffect(() => {
         loadUnits()
+
+        window.addEventListener('beforeunload', deleteSession)
+        return () => {
+            window.removeEventListener('beforeunload', deleteSession)
+        }
     }, [])
 
     const loadUnits = async () => {
