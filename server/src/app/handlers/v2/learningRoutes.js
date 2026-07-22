@@ -89,7 +89,7 @@ export async function getLearningRoutes(unitId) {
 export async function getAllUnitsLearningRoutes(subjectId) {
     // TODO: add join unit
     // TODO: add restriction by unit.subject_id
-    console.log('getAllUnitsLearningRoutes => subjectId', subjectId)
+    //console.log('getAllUnitsLearningRoutes => subjectId', subjectId)
 
     const res = await client.query(
         `SELECT
@@ -110,12 +110,12 @@ export async function getAllUnitsLearningRoutes(subjectId) {
         [ subjectId ]
     )
     let unitsLR = {}
-    console.log('getAllUnitsLearningRoutes => rows', res.rows.length)
+    //console.log('getAllUnitsLearningRoutes => rows', res.rows.length)
     res.rows.map (r => unitsLR[r.unit_id]
         ? unitsLR[r.unit_id].push( r )
         : unitsLR[r.unit_id] = [ r ]
     )
-    console.log('getAllUnitsLearningRoutes => rows', unitsLR)
+    //console.log('getAllUnitsLearningRoutes => rows', unitsLR)
 
     Object.keys(unitsLR).forEach(unitId => {
         const parsedData = parseLearningRoutes(unitsLR[unitId]).map(
@@ -149,7 +149,7 @@ function parseLearningRoutes (data) {
             unitId: unit_id
         }
         if ( wasAdded ) {
-            console.log('wasAdded LR => ', lr, content)
+            //console.log('wasAdded LR => ', lr, content)
 
             learningRoutes = learningRoutes.map(addedLR => {
                 if (addedLR.id == lr.id) { //match duplicated lr
@@ -164,7 +164,7 @@ function parseLearningRoutes (data) {
                 else return addedLR //bypass lr
             })
         } else {
-            console.log('new LR => ', lr, content)
+            //console.log('new LR => ', lr, content)
             learningRoutes.push({
                 ...lr,
                 contents: content==null ? [] : [ content ]

@@ -777,12 +777,16 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ).map(c => c.contentId)
         ).reduce((acc = [], a) => [ ...acc, ...a ], [])
     
+        console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
+
         //mezcla todos los contentId de cards y de units en una sola variable
         const contentIds = [
             ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
             ...cardsContentIds // cards contents
         ]
-    
+        
+        console.log('/v2/dashboard => contentIds', contentIds )
+
 
         // get content grades
         let allGrades = []
