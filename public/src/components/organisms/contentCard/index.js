@@ -45,6 +45,11 @@ const ContentCard = forwardRef(function (props, ref) {
 		? card.url
 		: 'http://' + card.url
 
+	const handleClick  = (e) => {
+		if (isLocked) e.preventDefault()
+		else onClick(e)
+	}
+
 	return (
 		<div
 			ref={ref}
@@ -56,7 +61,7 @@ const ContentCard = forwardRef(function (props, ref) {
 				gridTemplateColumns: '6fr 1fr 6fr',
 				gridTemplateRows: '1fr',
 				alignItems: 'center',
-				justifyItems: 'center'
+				justifyItems: 'center',
 			}}
 		>
 			{/* ghost div only for correct display */}
@@ -74,19 +79,20 @@ const ContentCard = forwardRef(function (props, ref) {
 
 			<Link
 				to={{ pathname: url }}
-				onClick={onClick}
+				onClick={(e) => handleClick(e)}
 				target="_blank"
 				style={{
+					cursor: isLocked ? 'not-allowed' : 'pointer',
+					border: `2px solid ${cardColor}`,
+					display: 'grid',
+					gridColumn: isMobile ? 2 : (order%2==0 ? 1 : 3),
+					gridRowStart: 1,
 					height: '12rem',
 					width: '18rem',
 					padding: '1.5rem',
-					gridColumn: isMobile ? 2 : (order%2==0 ? 1 : 3),
-					border: `2px solid ${cardColor}`,
 					borderRadius: '1rem',
-					gridRowStart: 1,
-					display: 'grid',
-					color: 'black',
 					textDecoration: 'none',
+					color: 'black',
 					boxShadow: 'rgba(0, 0, 0, 0.15) 1px 2px 6px 3px',
 					transition: 'box-shadow 2s',
 					'&:hover': {
