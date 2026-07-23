@@ -106,9 +106,9 @@ const ContentCard = forwardRef(function (props, ref) {
 						alignItems: 'flex-end'
 					}}
 				>
-					{isLocked
-						? 'Bloqueado X'
-						: (completed ? 'Revisar >' : 'Comenzar >')}
+					{completed
+						? 'Revisar >'
+						: (isLocked ? 'Bloqueado X' : 'Comenzar >')}
 				</Typography>
 			</Link>
 		</div>
