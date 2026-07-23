@@ -822,14 +822,30 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         const __DEFAULT_STUDENT_LR_INDEX = 1
         const fullUnits = units.map(u => {
             const currentLR = allLR[u.id].map(lr => lr.contents)
+
+            //assign grade to content
+            const cards = u.cards.map(c => {
+                const grade = allGrades.find(g => g.contentId == c.contentId)
+                return {
+                    ...c,
+                    grade,
+                    completed: grade?.grade?.status == 'Graded'
+                }
+            })
+
             // TODO:: find grade to decide student lr index
             const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+
             const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
-                const completed = u.cards.find(c => content.id == c.id)?.completed ?? false
+                const completed = cards.find(c => content.id == c.id)?.completed ?? false
                 return { ...content, completed }
             })
+
+
+
             return {
                 ...u,
+                cards,
                 learningRoutes: currentLR,
                 studentLearningRoute,
                 studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
