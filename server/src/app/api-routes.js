@@ -771,19 +771,21 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         console.log('/v2/dashboard => units => ', units)
     
         //obtiene todos los contentId de las cards
-        const cardsContentIds = units.map(
+        const contentIds = units.map(
             u => u.cards.filter(
                 c => !!c.contentId
             ).map(c => c.contentId)
         ).reduce((acc = [], a) => [ ...acc, ...a ], [])
     
-        console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
+        //console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
 
         //mezcla todos los contentId de cards y de units en una sola variable
+        /*
         const contentIds = [
             ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
             ...cardsContentIds // cards contents
         ]
+        */
         
         console.log('/v2/dashboard => contentIds', contentIds )
 
@@ -820,11 +822,14 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         let allLR = await LRHandler.getAllUnitsLearningRoutes(subject.id)
     
         const __DEFAULT_STUDENT_LR_INDEX = 1
-        const fullUnits = units.map(u => {
-            const currentLR = allLR[u.id].map(lr => lr.contents)
+        let fullUnits = []
+        //units.map(u => {
+        for( let i=0; i < units.length; i++ ) {
+            const currentUnit = units[i]
+            const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
 
             //assign grade to content
-            const cards = u.cards.map(c => {
+            const cards = currentUnit.cards.map(c => {
                 const grade = allGrades.find(g => g.contentId == c.contentId)
                 return {
                     ...c,
@@ -832,25 +837,39 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                     completed: grade?.grade?.status == 'Graded'
                 }
             })
+            
+            let studentLearningIndex = null
+            let studentLearningRoute = []
+            let unitGrade = null
 
-            // TODO:: find grade to decide student lr index
-            const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+            try {
+                    // TODO:: find grade to decide student lr index
+                    unitGrade = await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
+                    const score = unitGrade.score * 10 / 7
+                    studentLearningIndex = currentLR.find(
+                        lr => (lr.minGrade < score && lr.maxGrade >= score)
+                    )?.level
 
-            const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
-                const completed = cards.find(c => content.id == c.id)?.completed ?? false
-                return { ...content, completed }
-            })
+                    studentLearningRoute = currentLR[studentLearningIndex - 1].contents.map( content => {
+                        const completed = cards.find(c => content.id == c.id)?.completed ?? false
+                        return { ...content, completed }
+                    })
+            } catch (e) {
+                console.log('units grade error => ', e)
+                studentLearningIndex = null
+                studentLearningRoute = []
+                unitGrade = null
+            } 
 
-
-
-            return {
-                ...u,
+            fullUnits.push({
+                ...currentUnit,
+                unitGrade,
                 cards,
                 learningRoutes: currentLR,
                 studentLearningRoute,
-                studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
-            }
-        })
+                studentLearningIndex,
+            })
+        }
     
         /* itera unidades:
             - set units grade
