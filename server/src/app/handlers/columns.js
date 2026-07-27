@@ -27,3 +27,29 @@ export async function getColumnIdByContent (courseId, contentId) {
 
     return column?.id
 }
+
+export async function getColumnByName (courseId, columnName) {
+    console.log('getColumnByName => start => courseId', courseId)
+    console.log('getColumnByName => start => columnName', columnName)
+    const cachedColumn = await cache.getColumnByName(courseId, columnName)
+    console.log('getColumnByName => cachedColumn' , cachedColumn)
+
+    if ( !!cachedColumn ) return cachedColumn.id
+    console.log('getColumnByName => not cached')
+
+    const apiClient = BlackBoardApiClient.getClient()
+    //console.log('getColumnsByContent => apiClient', apiClient)
+
+    const request = await apiClient.get(
+        `/v2/courses/${courseId}/gradebook/columns`
+    )
+    const allColumns = request.data.results
+    console.log('getColumnByName => columns length', allColumns.length)
+
+    const column = allColumns.find(c => 
+        c.name.toLowerCase().includes(columnName.toLowerCase()))
+    //if (!column) console.log('column not found: allColumns => ', allColumns)
+    cache.updateColumns(courseId, allColumns)
+
+    return column?.id
+}

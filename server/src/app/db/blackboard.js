@@ -18,7 +18,20 @@ export async function getColumnId(courseId, contentId) {
     } catch (error) {
         return null
     }
-}       
+}
+
+export async function getColumnByName(courseId, columnName) {
+    console.log('getColumnId')
+    try {
+        const cachedColumns = await db.getData(`/course/${courseId}/columns`)
+        const columns = cachedColumns ?? []
+        const searchedColumn = columns.find( c => c.name.toLowerCase().includes(columnName.toLowerCase()) )
+        console.log('bbCache => getColumnByName => searchedColumn => ', searchedColumn)
+        return searchedColumn
+    } catch (error) {
+        return null
+    }
+}
 
 export async function getContent(courseId, contentId) {
     console.log('getContents')
