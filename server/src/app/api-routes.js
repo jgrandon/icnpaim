@@ -880,9 +880,9 @@ router.post('/v2/progress' , requireLTISession, async (req, res) => {
     try {
         //const { unitId, ldId } = req.params
         const contentId = req.body.completedCardId
-        const studentId = 1
+        const { student } = req.ltiSession
         const update = await LRHandler.updateContentProgress({
-            studentId,
+            studentId: student.id,
             contentId,
         })
         return res.status(200).json({
