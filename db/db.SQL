@@ -26,9 +26,9 @@ CREATE TABLE Unit (
     free_progress BOOLEAN NOT NULL DEFAULT false,
     published BOOLEAN NOT NULL DEFAULT false,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    bb_id varchar(255) NOT NULL,
     subject_id INT NOT NULL,
-    evaluation_id INT, -- bb content_id
+    evaluation_name varchar(255) DEFAULT '',
+    evaluation_id varchar(255) DEFAULT NULL, -- bb content_id
     CONSTRAINT FK_SubjectUnit
         FOREIGN KEY (subject_id) REFERENCES Subject(id)
 );
