@@ -39,6 +39,7 @@ CREATE TABLE Content (
     description varchar(255),
     type varchar(255),
     url varchar(255) NOT NULL,
+    bb_content_id varchar(255) default NULL,
     unit_id INT,
     CONSTRAINT FK_UnitContent
         FOREIGN KEY (unit_id) REFERENCES Unit(id)

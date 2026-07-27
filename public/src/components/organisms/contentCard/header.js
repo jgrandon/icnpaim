@@ -50,7 +50,7 @@ export function CardHeader(props) {
                     color: 'white'
                 }}
             >
-                {card.type || 'actividad'}
+                {card.type?.toUpperCase() || 'actividad'}
             </Typography>
         </div>
 

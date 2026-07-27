@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import CloseIcon from '@material-ui/icons/Close'
 import SaveIcon from '@material-ui/icons/Save'
-import Button from '@material-ui/core/Button'
+import {
+    Button,
+    MenuItem,
+    Select
+} from '@material-ui/core'
 import API from '../../../../services/contents'
 import * as styles from '../form.module.css'
 
@@ -63,6 +67,26 @@ export default function ContentsForm ({
 
             <div className={styles.inputWrapper}>
                 <label className={styles.label}> Tipo </label>
+                
+                <Select
+                    name='type'
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    defaultValue='clase'
+                    style={{
+                        padding: '6px',
+                        height: '30px',
+                        width: '200px',
+                        fontfamily: 'system-ui'
+                    }}
+                >
+                    <MenuItem value={'clase'}>Clase</MenuItem>
+                    <MenuItem value={'podcast'}>Podcast</MenuItem>
+                    <MenuItem value={'video'}>Video</MenuItem>
+                    <MenuItem value={'control'}>Control</MenuItem>
+                    <MenuItem value={'scorm'}>Scorm</MenuItem>
+                </Select>
+                {/*}
                 <input
                     type='text'
                     name='type'
@@ -72,6 +96,7 @@ export default function ContentsForm ({
                     placeholder='Tipo'
                     required
                 />
+                */}
             </div>
 
             <div className={styles.inputWrapper}>
