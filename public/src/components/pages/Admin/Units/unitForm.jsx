@@ -20,7 +20,7 @@ export default function UnitForm ({
         name: '',
         description: '',
         color: '#000000',
-        position: '',
+        //position: '',
         published: false,
         freeProgress: false
     })
@@ -35,7 +35,6 @@ export default function UnitForm ({
             name: unit.name ?? '',
             description: unit.description ?? '',
             color: unit.color ?? '#000000',
-            position: unit.position ?? '',
             published: unit.published ?? false,
             freeProgress: unit.free_progress ?? false
         })
@@ -45,7 +44,7 @@ export default function UnitForm ({
         setModified(true)
         const { name, value, checked } = e.target
         let finalValue = value
-        if (name === 'position') finalValue = parseInt(value, 10)
+        //if (name === 'position') finalValue = parseInt(value, 10)
         if ([ 'published', 'freeProgress' ].includes(name)) finalValue = checked
 
         setFormData((prev) => ({
@@ -56,18 +55,18 @@ export default function UnitForm ({
     
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
+        if (!formData.name) return alert('Nombre es obligatorio')
 
         try {
             if (unit.id) {
             // Update Action
-                const updatedUnit = await API.updateUnit({ ...formData })
+                const allUnits = await API.updateUnit({ ...formData })
                 //setSelectedUnitId(null)
-                updateCallback('updated',updatedUnit)
+                updateCallback('updated',allUnits)
             } else {
             // Create Action
-                const newUnit = await API.updateUnit(formData)
-                updateCallback('added', newUnit)
+                const allUnits = await API.updateUnit(formData)
+                updateCallback('added', allUnits)
             }
             //alert('Datos Guardados')
         } catch (err) {
@@ -93,8 +92,8 @@ export default function UnitForm ({
 
         if (!window.confirm('Estas seguro de eliminar esta Unidad? Se borrarán tambien todos sus Contenidos')) return
         try {
-            await API.delete(unit.id)
-            updateCallback('removed', unit)
+            const allUnits = await API.delete(unit)
+            updateCallback('removed', allUnits)
         } catch (err) {
             console.error('Delete failed', err)
         }
@@ -156,21 +155,6 @@ export default function UnitForm ({
                         className={styles.color}
                         value={formData.color}
                         onChange={handleInputChange}
-                    />
-                </div>
-
-                <div className={styles.inputWrapper}>
-                    <label
-                        className={styles.label}
-                    >Posicion</label>
-                    <input
-                        type='number'
-                        name='position'
-                        value={formData.position}
-                        onChange={handleInputChange}
-                        placeholder='0'
-                        required
-                        className={styles.input}
                     />
                 </div>
 
