@@ -50,3 +50,25 @@
     align-items: center;
     border-radius: 10px;
 }
+
+.sortHandle {
+    width: 40px;
+    user-select: none;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.handleIcon {
+    border-radius: 50% !important;
+}
+
+.handleIcon:hover {
+    background-color: #d8d8d8 !important;
+}
+
+.sortElementWrapper {
+    display: flex;
+    flex-direction: row;
+}
