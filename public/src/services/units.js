@@ -47,21 +47,21 @@ const unitServices = {
             throw error
         }
     },
-    updateUnitsPositions: async (units) => {
-        console.log('updateUnitsPositions', units)
+    updateUnitsPositions: async (data) => {
+        console.log('updateUnitsPositions', data)
         try {
             const response = await fetch('/api/v2/units/positions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({units})
+                body: JSON.stringify({units: data})
             })
             if (!response.ok) {
-                throw new Error(`Failed to detele unit: ${response.status}`)
+                throw new Error(`Failed to update positions: ${response.status}`)
             }
             const {units} = await response.json()
             return units
         } catch (error) {
-            console.error('Error deleting unit:', error)
+            console.error('Error updating positions:', error)
             throw error
         }
     }

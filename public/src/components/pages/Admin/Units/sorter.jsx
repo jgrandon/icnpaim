@@ -39,25 +39,25 @@ export default function UnitsSorter (props) {
         }
     }, [])
 
-    const handlePositionChange = async () => {
+    const handlePositionChange = async (data) => {
         setSavingState('touched')
         if (savingTimerRef.current) clearTimeout(savingTimerRef.current)
         savingTimerRef.current = setTimeout(async () => {
             const updateData = [ ...units ]
-            console.log('5 seconds have passed!', updateData)
-            await updatePositions()
+            console.log('5 seconds have passed!', data)
+            await updatePositions([...data])
         }, 5000)
     }
 
-    const updatePositions = async () => {
-        //setSavingState('saving')
-        const allUnits = await API.updateUnitsPositions(units)
+    const updatePositions = async (data) => {
+        setSavingState('saving')
+        console.log('updatePositions', data)
+        const allUnits = await API.updateUnitsPositions(data)
         setUnits(allUnits)
         setSavingState('saved')
     }
 
     const handleAccordionChange = (panel) => (e, isExpanded) => {
-        //e.stopPropagation()
         console.log('handleAccordionChange')
         setSelectedUnitId(isExpanded ? panel : false )
     }
@@ -69,12 +69,11 @@ export default function UnitsSorter (props) {
                 setList={setSorted}
                 onSort={() => {
                     console.log('onSort', sorted)
-                    const data = sorted.map((d,index) =>  ({ ...d, position: index+1 }))
-                    setUnits(data)
-                    handlePositionChange()
+                    const data = sorted.map((d,index) =>  ({ ...d, position: index + 1 }))
+                    handlePositionChange(data)
                 }}
                 onChange={() => console.log('onChange')}
-                onUpdate={() => console.log('onUpdate', )} 
+                onUpdate={() => console.log('onUpdate')} 
                 onStart={() => console.log('onStart')} 
                 onEnd={() => console.log('onEnd')}
                 handle={`.${styles.sortHandle}`}

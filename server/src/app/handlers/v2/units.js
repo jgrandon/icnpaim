@@ -2,6 +2,7 @@ import client from '../../db/postgres'
 import * as contentsHandler from './contents'
 import * as columns from '../columns'
 import unitServices from '../../../../../public/src/services/units'
+import { objectToCamelCase } from '../../lib/objectToCamelCase'
 
 export async function getAllUnits(subjectId) {
     const res = await client.query(
@@ -11,7 +12,8 @@ export async function getAllUnits(subjectId) {
         ORDER BY position ASC`,
         [ subjectId ]
     )
-    return res.rows
+    const units = res.rows ?? []
+    return units.map(u => objectToCamelCase(u))
 }
 
 export async function getUnitById(id) {
@@ -25,11 +27,13 @@ export async function getUnitById(id) {
 async function getNextPosition (subjectId) {
     const res = await client.query(
         `SELECT MAX(position)
-        FROM unit WHERE subject_id = $1`,
+        FROM unit
+        WHERE enabled = TRUE
+            AND subject_id = $1`,
         [ subjectId ]
     )
     const lastPosition = res.rows[0]?.max ?? 0
-    console.log('getNextPosition', res.rows[0])
+    //console.log('getNextPosition', res.rows[0])
     return lastPosition + 1
 }
 
@@ -38,7 +42,7 @@ export async function createUnit({ name, color, description, published, freeProg
     const position = await getNextPosition(subjectId)
     console.log('createUnit => position', position)
     const evaluationName = getEvaluationName(position)
-    const evaluationId = await getEvaluationId(evaluationName)
+    const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
     const res = await client.query(
         `INSERT INTO unit (name, color, position, subject_id, description,
             published, free_progress, evaluation_name, evaluation_id)
@@ -88,7 +92,7 @@ function getEvaluationName (position) {
     return position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
 }
 
-async function getEvaluationId (evaluationName) {
+async function getEvaluationId (evaluationName, bbCourseId) {
     let evaluationId = null
     try {
         evaluationId = await columns.getColumnByName(bbCourseId, evaluationName)
@@ -104,8 +108,7 @@ export async function updatePositions(units, bbCourseId) {
         for (let i = 0; i < units.length; i++) {
             const { id, name, color, position, description, published, freeProgress } = units[i]
             const evaluationName = getEvaluationName(position)
-            const evaluationId = await getEvaluationId(evaluationName)
-            //const evaluationId = evaluationColumn?.id
+            const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
             const res = await client.query(
                 `UPDATE unit SET
                     position = $1,
@@ -123,7 +126,7 @@ export async function updatePositions(units, bbCourseId) {
     }
 }
 
-export async function deleteUnit(unit, subjectId) {
+export async function deleteUnit(unit, subjectId, bbCourseId) {
     const deletedPosition = unit.position
 
     await contentsHandler.deleteByUnit(unit.id)
@@ -146,7 +149,7 @@ export async function deleteUnit(unit, subjectId) {
         const newPosition = deletedPosition + i
         const { id } = higherUnitsRes.rows[i]
         const evaluationName = getEvaluationName(newPosition)
-        const evaluationId = await getEvaluationId(evaluationName)
+        const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
         const updatedUnitRes = await client.query(
             `UPDATE unit SET
                 position = $1,

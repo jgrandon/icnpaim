@@ -618,9 +618,9 @@ router.get('/v2/units', requireLTISession, async (req, res) => {
 
 router.delete('/v2/units', requireLTISession,  async (req, res) => {
     try {
-        const { subject } = req.ltiSession        
+        const { subject, bbCourseId } = req.ltiSession        
         const { unit } = req.body
-        await unitsHandler.deleteUnit(unit, subject.id)
+        await unitsHandler.deleteUnit(unit, subject.id, bbCourseId)
         const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
             ok: true,
@@ -829,7 +829,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         const __DEFAULT_STUDENT_LR_INDEX = 1
         let fullUnits = []
         //units.map(u => {
-        for( let i=0; i < units.length; i++ ) {
+        for( let i=0; i < 1/*units.length*/ ; i++ ) {
             const currentUnit = units[i]
             const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
 
@@ -929,6 +929,7 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession
         const { units: unitsToUpdate } = req.body
+        console.log('/v2/units/positions => units', unitsToUpdate.length)
         const update = await unitsHandler.updatePositions(unitsToUpdate, bbCourseId)
         const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
