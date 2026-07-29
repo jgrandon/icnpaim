@@ -850,7 +850,11 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             try {
                     // TODO:: find grade to decide student lr index
                     unitGrade = await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
-                    const score = unitGrade.score * 10 / 7
+                    const { displayGrade } = unitGrade
+                    console.log('unitGrade =>', unitGrade)
+                    const score = displayGrade.score * 7 / displayGrade.possible
+                    console.log('score =>', score)
+
                     studentLearningIndex = currentLR.find(
                         lr => (lr.minGrade < score && lr.maxGrade >= score)
                     )?.level
@@ -860,7 +864,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                         return { ...content, completed }
                     })
             } catch (e) {
-                console.log('units grade error => ', e)
+                console.log('units grade error =>', e.message)
                 studentLearningIndex = null
                 studentLearningRoute = []
                 unitGrade = null
