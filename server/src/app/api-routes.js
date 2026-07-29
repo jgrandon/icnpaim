@@ -921,5 +921,24 @@ router.post('/v2/progress' , requireLTISession, async (req, res) => {
     }
 })
 
+router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
+    try {
+        const { bbCourseId, subject } = req.ltiSession
+        const { units: unitsToUpdate } = req.body
+        const update = await unitsHandler.updatePositions(unitsToUpdate, bbCourseId)
+        const units = await unitsHandler.getAllUnits(subject.id)
+        return res.status(200).json({
+            ok: true,
+            update,
+            units
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
+
 
 export default router
