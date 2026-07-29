@@ -1,6 +1,7 @@
 import client from '../../db/postgres'
 import * as contentsHandler from './contents'
 import * as columns from '../columns'
+import unitServices from '../../../../../public/src/services/units'
 
 export async function getAllUnits(subjectId) {
     const res = await client.query(
@@ -21,11 +22,23 @@ export async function getUnitById(id) {
     return res.rows[0] || null
 }
 
-export async function createUnit({ name, color, position,description, published, freeProgress, subjectId, bbCourseId }) {
+async function getNextPosition (subjectId) {
+    const res = await client.query(
+        `SELECT MAX(position)
+        FROM unit WHERE subject_id = $1`,
+        [ subjectId ]
+    )
+    const lastPosition = res.rows[0]?.max ?? 0
+    console.log('getNextPosition', res.rows[0])
+    return lastPosition + 1
+}
+
+export async function createUnit({ name, color, description, published, freeProgress, subjectId, bbCourseId }) {
     //const bbId = '123' //mock blackBoard content Id
-    const evaluationName = position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
-    const evaluationColumn = await columns.getColumnByName(bbCourseId, evaluationName)
-    const evaluationId = evaluationColumn?.id
+    const position = await getNextPosition(subjectId)
+    console.log('createUnit => position', position)
+    const evaluationName = getEvaluationName(position)
+    const evaluationId = await getEvaluationId(evaluationName)
     const res = await client.query(
         `INSERT INTO unit (name, color, position, subject_id, description,
             published, free_progress, evaluation_name, evaluation_id)
@@ -57,32 +70,91 @@ export async function createDefaultLR(unitId) {
 }
 
 export async function updateUnit({ id, name, color, position, description, published, freeProgress, bbCourseId }) {
-    const evaluationName = position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
-    const evaluationId = await columns.getColumnByName(bbCourseId, evaluationName)
-    //const evaluationId = evaluationColumn?.id
     const res = await client.query(
         `UPDATE unit SET
             name = $1,
             color = $2,
-            position = $3,
-            description = $4,
-            published = $5,
-            free_progress = $6,
-            evaluation_name = $7,
-            evaluation_id = $8
-        WHERE id = $9 RETURNING *`,
-        [ name, color || null, position, description, published,
-            freeProgress, evaluationName, evaluationId, id ]
+            description = $3,
+            published = $4,
+            free_progress = $5,
+        WHERE id = $6 RETURNING *`,
+        [ name, color || null, description, published,
+            freeProgress, id ]
     )
     return res.rows[0] || null
 }
 
-export async function deleteUnit(id) {
-    await contentsHandler.deleteByUnit(id)
+function getEvaluationName (position) {
+    return position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
+}
 
-    const res = await client.query(
+async function getEvaluationId (evaluationName) {
+    let evaluationId = null
+    try {
+        evaluationId = await columns.getColumnByName(bbCourseId, evaluationName)
+    } catch(e) {
+        console.log('error getting column by name', e.message)
+    }
+    return evaluationId
+}
+
+export async function updatePositions(units, bbCourseId) {
+    try {
+        let results = []
+        for (let i = 0; i < units.length; i++) {
+            const { id, name, color, position, description, published, freeProgress } = units[i]
+            const evaluationName = getEvaluationName(position)
+            const evaluationId = await getEvaluationId(evaluationName)
+            //const evaluationId = evaluationColumn?.id
+            const res = await client.query(
+                `UPDATE unit SET
+                    position = $1,
+                    evaluation_name = $2,
+                    evaluation_id = $3
+                WHERE id = $4 RETURNING *`,
+                [ position, evaluationName, evaluationId, id ]
+            )
+            results.push(res.rows[0] || null)
+        }
+        return results
+    } catch (e) {
+        console.log('Error updating units position', e.message)
+        return []
+    }
+}
+
+export async function deleteUnit(unit, subjectId) {
+    const deletedPosition = unit.position
+
+    await contentsHandler.deleteByUnit(unit.id)
+
+    const deletionRes = await client.query(
         'UPDATE unit SET enabled=FALSE WHERE id = $1 RETURNING *', 
-        [ id ]
+        [ unit.id ]
     )
-    return res.rows[0] || null
+
+    const higherUnitsRes = await client.query(
+        `SELECT *
+        FROM unit
+        WHERE subject_id = $1
+            AND position > $2
+            AND enabled=TRUE`, 
+        [ subjectId, deletedPosition ]
+    )
+
+    for (let i = 0; i < higherUnitsRes.rows.length; i++) {
+        const newPosition = deletedPosition + i
+        const { id } = higherUnitsRes.rows[i]
+        const evaluationName = getEvaluationName(newPosition)
+        const evaluationId = await getEvaluationId(evaluationName)
+        const updatedUnitRes = await client.query(
+            `UPDATE unit SET
+                position = $1,
+                evaluation_name = $2,
+                evaluation_id = $3
+            WHERE id = $4 RETURNING *`,
+            [ newPosition, evaluationName, evaluationId, id ]
+        )
+    }
+    return deletionRes.rows[0] || null
 }

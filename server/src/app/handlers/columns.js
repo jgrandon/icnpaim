@@ -51,5 +51,5 @@ export async function getColumnByName (courseId, columnName) {
     //if (!column) console.log('column not found: allColumns => ', allColumns)
     cache.updateColumns(courseId, allColumns)
 
-    return column?.id
+    return column ? column.id : null
 }

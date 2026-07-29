@@ -579,15 +579,17 @@ router.post('/v2/units', requireLTISession,  async (req, res) => {
       const { bbCourseId } = req.ltiSession
         const subjectId = req.ltiSession.subject.id
         const data = { ...req.body, subjectId, bbCourseId }
-        let unit
+        let updatedUnit
         if (!data.id) {
-            unit = await unitsHandler.createUnit(data)
+            updatedUnit = await unitsHandler.createUnit(data)
         } else {
-            unit = await unitsHandler.updateUnit(data)
+            updatedUnit = await unitsHandler.updateUnit(data)
         }
+        const units = await unitsHandler.getAllUnits(subjectId)
         return res.status(200).json({
             ok: true,
-            unit
+            updatedUnit,
+            units
         })
     } catch (error) {
         return res.status(200).json({
@@ -616,10 +618,13 @@ router.get('/v2/units', requireLTISession, async (req, res) => {
 
 router.delete('/v2/units', requireLTISession,  async (req, res) => {
     try {
-        const id = req.body.id
-        await unitsHandler.deleteUnit(id)
+        const { subject } = req.ltiSession        
+        const { unit } = req.body
+        await unitsHandler.deleteUnit(unit, subject.id)
+        const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
-            ok: true
+            ok: true,
+            units
         })
     } catch (error) {
         return res.status(200).json({
