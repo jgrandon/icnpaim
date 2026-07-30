@@ -161,7 +161,7 @@ export default function UnitForm ({
                         type='text'
                         name='evaluationName'
                         readOnly
-                        className={styles.input}
+                        className={`${styles.input} ${styles.readOnly}`}
                         value={formData.evaluationName}
                         onChange={handleInputChange}
                     />

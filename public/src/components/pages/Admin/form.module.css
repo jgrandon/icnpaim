@@ -72,6 +72,14 @@
     justify-content: space-between;
 }
 
+.readOnly {
+    color: gray;
+}
+
+.readOnly:focus-visible {
+    outline: transparent;
+}
+
 .errorMessage {
     font-family: system-ui;
     color: #ff0000;
