@@ -576,18 +576,20 @@ router.get('/evaluationGrade', requireLTISession, async (req, res) => {
 // Units
 router.post('/v2/units', requireLTISession,  async (req, res) => {
     try {
+      const { bbCourseId } = req.ltiSession
         const subjectId = req.ltiSession.subject.id
-        const data = req.body
-        let unit
-        //const subjectId = '1'
+        const data = { ...req.body, subjectId, bbCourseId }
+        let updatedUnit
         if (!data.id) {
-            unit = await unitsHandler.createUnit({...data, subjectId})
+            updatedUnit = await unitsHandler.createUnit(data)
         } else {
-            unit = await unitsHandler.updateUnit(data)
+            updatedUnit = await unitsHandler.updateUnit(data)
         }
+        const units = await unitsHandler.getAllUnits(subjectId)
         return res.status(200).json({
             ok: true,
-            unit
+            updatedUnit,
+            units
         })
     } catch (error) {
         return res.status(200).json({
@@ -616,10 +618,13 @@ router.get('/v2/units', requireLTISession, async (req, res) => {
 
 router.delete('/v2/units', requireLTISession,  async (req, res) => {
     try {
-        const id = req.body.id
-        await unitsHandler.deleteUnit(id)
+        const { subject, bbCourseId } = req.ltiSession        
+        const { unit } = req.body
+        await unitsHandler.deleteUnit(unit, subject.id, bbCourseId)
+        const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
-            ok: true
+            ok: true,
+            units
         })
     } catch (error) {
         return res.status(200).json({
@@ -771,19 +776,21 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         console.log('/v2/dashboard => units => ', units)
     
         //obtiene todos los contentId de las cards
-        const cardsContentIds = units.map(
+        const contentIds = units.map(
             u => u.cards.filter(
                 c => !!c.contentId
             ).map(c => c.contentId)
         ).reduce((acc = [], a) => [ ...acc, ...a ], [])
     
-        console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
+        //console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
 
         //mezcla todos los contentId de cards y de units en una sola variable
+        /*
         const contentIds = [
             ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
             ...cardsContentIds // cards contents
         ]
+        */
         
         console.log('/v2/dashboard => contentIds', contentIds )
 
@@ -820,11 +827,14 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         let allLR = await LRHandler.getAllUnitsLearningRoutes(subject.id)
     
         const __DEFAULT_STUDENT_LR_INDEX = 1
-        const fullUnits = units.map(u => {
-            const currentLR = allLR[u.id].map(lr => lr.contents)
+        let fullUnits = []
+        //units.map(u => {
+        for( let i=0; i < 1/*units.length*/ ; i++ ) {
+            const currentUnit = units[i]
+            const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
 
             //assign grade to content
-            const cards = u.cards.map(c => {
+            const cards = currentUnit.cards.map(c => {
                 const grade = allGrades.find(g => g.contentId == c.contentId)
                 return {
                     ...c,
@@ -832,25 +842,43 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                     completed: grade?.grade?.status == 'Graded'
                 }
             })
+            
+            let studentLearningIndex = null
+            let studentLearningRoute = []
+            let unitGrade = null
 
-            // TODO:: find grade to decide student lr index
-            const learningRouteIndex = __DEFAULT_STUDENT_LR_INDEX
+            try {
+                    // TODO:: find grade to decide student lr index
+                    unitGrade = await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
+                    const { displayGrade } = unitGrade
+                    console.log('unitGrade =>', unitGrade)
+                    const score = displayGrade.score * 7 / displayGrade.possible
+                    console.log('score =>', score)
 
-            const studentLearningRoute = currentLR[learningRouteIndex - 1].map( content => {
-                const completed = cards.find(c => content.id == c.id)?.completed ?? false
-                return { ...content, completed }
-            })
+                    studentLearningIndex = currentLR.find(
+                        lr => (lr.minGrade < score && lr.maxGrade >= score)
+                    )?.level
 
+                    studentLearningRoute = currentLR[studentLearningIndex - 1].contents.map( content => {
+                        const completed = cards.find(c => content.id == c.id)?.completed ?? false
+                        return { ...content, completed }
+                    })
+            } catch (e) {
+                console.log('units grade error =>', e.message)
+                studentLearningIndex = null
+                studentLearningRoute = []
+                unitGrade = null
+            } 
 
-
-            return {
-                ...u,
+            fullUnits.push({
+                ...currentUnit,
+                unitGrade,
                 cards,
                 learningRoutes: currentLR,
                 studentLearningRoute,
-                studentLearningIndex: __DEFAULT_STUDENT_LR_INDEX,
-            }
-        })
+                studentLearningIndex,
+            })
+        }
     
         /* itera unidades:
             - set units grade
@@ -880,14 +908,34 @@ router.post('/v2/progress' , requireLTISession, async (req, res) => {
     try {
         //const { unitId, ldId } = req.params
         const contentId = req.body.completedCardId
-        const studentId = 1
+        const { student } = req.ltiSession
         const update = await LRHandler.updateContentProgress({
-            studentId,
+            studentId: student.id,
             contentId,
         })
         return res.status(200).json({
             ok: true,
             update
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
+
+router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
+    try {
+        const { bbCourseId, subject } = req.ltiSession
+        const { units: unitsToUpdate } = req.body
+        console.log('/v2/units/positions => units', unitsToUpdate.length)
+        const update = await unitsHandler.updatePositions(unitsToUpdate, bbCourseId)
+        const units = await unitsHandler.getAllUnits(subject.id)
+        return res.status(200).json({
+            ok: true,
+            update,
+            units
         })
     } catch (error) {
         return res.status(200).json({

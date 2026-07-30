@@ -20,7 +20,8 @@ export default function UnitForm ({
         name: '',
         description: '',
         color: '#000000',
-        position: '',
+        evaluationName: '',
+        evaluationId: '',
         published: false,
         freeProgress: false
     })
@@ -35,7 +36,8 @@ export default function UnitForm ({
             name: unit.name ?? '',
             description: unit.description ?? '',
             color: unit.color ?? '#000000',
-            position: unit.position ?? '',
+            evaluationName: unit.evaluationName,
+            evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.free_progress ?? false
         })
@@ -45,7 +47,7 @@ export default function UnitForm ({
         setModified(true)
         const { name, value, checked } = e.target
         let finalValue = value
-        if (name === 'position') finalValue = parseInt(value, 10)
+        //if (name === 'position') finalValue = parseInt(value, 10)
         if ([ 'published', 'freeProgress' ].includes(name)) finalValue = checked
 
         setFormData((prev) => ({
@@ -56,30 +58,24 @@ export default function UnitForm ({
     
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!formData.name || formData.position === '') return alert('Nombre y posición son obligatorios')
+        if (!formData.name) return alert('Nombre es obligatorio')
 
         try {
             if (unit.id) {
             // Update Action
-                const updatedUnit = await API.updateUnit({ ...formData })
+                const allUnits = await API.updateUnit({ ...formData })
                 //setSelectedUnitId(null)
-                updateCallback('updated',updatedUnit)
+                updateCallback('updated',allUnits)
             } else {
             // Create Action
-                const newUnit = await API.updateUnit(formData)
-                updateCallback('added', newUnit)
+                const allUnits = await API.updateUnit(formData)
+                updateCallback('added', allUnits)
             }
             //alert('Datos Guardados')
         } catch (err) {
             console.error('Save failed', err)
         }
     }
-    /*
-    const startEdit = (unit) => {
-        setSelectedUnitId(unit.id)
-        setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
-    }
-        */
     
     const cancelEdit = (e) => {
         e.preventDefault()
@@ -93,8 +89,8 @@ export default function UnitForm ({
 
         if (!window.confirm('Estas seguro de eliminar esta Unidad? Se borrarán tambien todos sus Contenidos')) return
         try {
-            await API.delete(unit.id)
-            updateCallback('removed', unit)
+            const allUnits = await API.delete(unit)
+            updateCallback('removed', allUnits)
         } catch (err) {
             console.error('Delete failed', err)
         }
@@ -160,19 +156,22 @@ export default function UnitForm ({
                 </div>
 
                 <div className={styles.inputWrapper}>
-                    <label
-                        className={styles.label}
-                    >Posicion</label>
+                    <label className={styles.label} >Evaluación</label>
                     <input
-                        type='number'
-                        name='position'
-                        value={formData.position}
+                        type='text'
+                        name='evaluationName'
+                        readOnly
+                        className={`${styles.input} ${styles.readOnly}`}
+                        value={formData.evaluationName}
                         onChange={handleInputChange}
-                        placeholder='0'
-                        required
-                        className={styles.input}
                     />
                 </div>
+
+                { formData.evaluationId
+                    ? null
+                    : <div className={styles.errorMessage}>
+                        No se pudo encontrar esta evaluación en BlackBoard
+                    </div> }
 
                 <div className={styles.inputWrapper}>
                     <label

@@ -15,13 +15,12 @@ import {
 } from '@material-ui/core'
 //import Button from '@material-ui/core/Button'
 import AddIcon from '@material-ui/icons/Add'
+
 import SettingsIcon from '@material-ui/icons/Settings'
+import Unitform from './unitForm'
 import Modal from '../../../organisms/Modal'
 import { v4 as uuidv4 } from 'uuid'
-import VerticalTabs from '../../../organisms/VerticalTabs'
-import Unitform from './unitForm'
-import ContentsAdmin from '../ContentsAdmin'
-import LearningRoutesAdmin from '../LearningRoutes'
+import Sorter from './sorter'
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
 
@@ -98,24 +97,32 @@ function Admin() {
         setSelectedUnitId(isExpanded ? panel : false )
     }
 
-    const handleUnitsUpdate = (action, updatedUnit) => {
-        console.log('handleUnitsUpdate', {action,updatedUnit})
+    const handleUnitsUpdate = (action, updatedUnits) => {
+        console.log('handleUnitsUpdate', {action,updatedUnits})
+        /*
         let newState = []
+        const sort = (u, index) => ({ ...u, position: index })
         if (action == 'added') {
             console.log('added')
-            newState = [ ...units, updatedUnit ]
+            setUnits(prev => [ ...prev, updatedUnit ].map(sort))
             setModalOpen(false)
         } if (action == 'updated') {
             console.log('updated')
-            newState = units.map((u) => (u.id === selectedUnitId ? updatedUnit : u))
+            setUnits(prev => prev.map((u) => (u.id === selectedUnitId ? updatedUnit : u)).map(sort))
         } if (action == 'removed') {
             console.log('removed')
-            newState = units.filter((u) => u.id !== updatedUnit.id)
-        } if (action == 'canceled') {
+            setUnits(prev => prev.filter((u) => u.id !== updatedUnit.id).map(sort))
+        }
+        */
+        if (action == 'canceled') {
             setModalOpen(false)
             return
+        } else if (action == 'added') {
+            setModalOpen(false)
         }
-        setUnits( newState.sort((a,b) => a.position - b.position) )
+        console.log('handleUnitsUpdate => updatedUnits', updatedUnits)
+        setUnits(updatedUnits.map((u, index) =>( { ...u, position: index, order: index })))
+        // setUnits( newState.sort((a,b) => a.position - b.position) )
     }
 
     return (
@@ -167,7 +174,16 @@ function Admin() {
             ) : (<div>
                 {units.length==0
                     ? (<div className={styles.noUnitsLabel}>Este curso no tiene unidades</div>)
-                    : units.map((unit) => (
+                    : <Sorter
+                        units={units}
+                        setUnits={setUnits}
+                        selectedUnitId={selectedUnitId}
+                        setSelectedUnitId={setSelectedUnitId}
+                        handleUnitsUpdate={handleUnitsUpdate}
+                    />
+                }
+                {/*
+                units.map((unit) => (
                         <Accordion
                             key={uuidv4()}
                             expanded={selectedUnitId === unit.id}
@@ -205,8 +221,7 @@ function Admin() {
                                 </VerticalTabs>
                             </AccordionDetails>
                         </Accordion> 
-                    ))
-                }
+                    ))*/}
             </div>
             )}
 

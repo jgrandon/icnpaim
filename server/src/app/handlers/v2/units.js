@@ -1,5 +1,8 @@
 import client from '../../db/postgres'
 import * as contentsHandler from './contents'
+import * as columns from '../columns'
+import unitServices from '../../../../../public/src/services/units'
+import { objectToCamelCase } from '../../lib/objectToCamelCase'
 
 export async function getAllUnits(subjectId) {
     const res = await client.query(
@@ -9,7 +12,8 @@ export async function getAllUnits(subjectId) {
         ORDER BY position ASC`,
         [ subjectId ]
     )
-    return res.rows
+    const units = res.rows ?? []
+    return units.map(u => objectToCamelCase(u))
 }
 
 export async function getUnitById(id) {
@@ -20,14 +24,33 @@ export async function getUnitById(id) {
     return res.rows[0] || null
 }
 
-export async function createUnit({ name, color, position,description, published, freeProgress, subjectId }) {
-    const bbId = '123' //mock blackBoard content Id
+async function getNextPosition (subjectId) {
     const res = await client.query(
-        `INSERT INTO unit (name, color, position, bb_id, subject_id, description, published, free_progress) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `SELECT MAX(position)
+        FROM unit
+        WHERE enabled = TRUE
+            AND subject_id = $1`,
+        [ subjectId ]
+    )
+    const lastPosition = res.rows[0]?.max ?? 0
+    //console.log('getNextPosition', res.rows[0])
+    return lastPosition + 1
+}
+
+export async function createUnit({ name, color, description, published, freeProgress, subjectId, bbCourseId }) {
+    //const bbId = '123' //mock blackBoard content Id
+    const position = await getNextPosition(subjectId)
+    console.log('createUnit => position', position)
+    const evaluationName = getEvaluationName(position)
+    const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
+    const res = await client.query(
+        `INSERT INTO unit (name, color, position, subject_id, description,
+            published, free_progress, evaluation_name, evaluation_id)
+        VALUES ($1, $2, $3, $4, $5,
+            $6, $7, $8, $9)
         RETURNING *`,
-        [ name, color || null, position, bbId,
-            subjectId, description, published, freeProgress ]
+        [ name, color || null, position, subjectId, description,
+            published, freeProgress, evaluationName, evaluationId ]
     )
     const newUnit = res.rows[0]
     if (newUnit) {
@@ -50,27 +73,91 @@ export async function createDefaultLR(unitId) {
     return res.rows
 }
 
-export async function updateUnit({ id, name, color, position, description, published, freeProgress }) {
+export async function updateUnit({ id, name, color, position, description, published, freeProgress, bbCourseId }) {
     const res = await client.query(
         `UPDATE unit SET
             name = $1,
             color = $2,
-            position = $3,
-            description = $4,
-            published = $5,
-            free_progress = $6
-        WHERE id = $7 RETURNING *`,
-        [ name, color || null, position, description, published, freeProgress, id ]
+            description = $3,
+            published = $4,
+            free_progress = $5,
+        WHERE id = $6 RETURNING *`,
+        [ name, color || null, description, published,
+            freeProgress, id ]
     )
     return res.rows[0] || null
 }
 
-export async function deleteUnit(id) {
-    await contentsHandler.deleteByUnit(id)
+function getEvaluationName (position) {
+    return position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
+}
 
-    const res = await client.query(
+async function getEvaluationId (evaluationName, bbCourseId) {
+    let evaluationId = null
+    try {
+        evaluationId = await columns.getColumnByName(bbCourseId, evaluationName)
+    } catch(e) {
+        console.log('error getting column by name', e.message)
+    }
+    return evaluationId
+}
+
+export async function updatePositions(units, bbCourseId) {
+    try {
+        let results = []
+        for (let i = 0; i < units.length; i++) {
+            const { id, name, color, position, description, published, freeProgress } = units[i]
+            const evaluationName = getEvaluationName(position)
+            const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
+            const res = await client.query(
+                `UPDATE unit SET
+                    position = $1,
+                    evaluation_name = $2,
+                    evaluation_id = $3
+                WHERE id = $4 RETURNING *`,
+                [ position, evaluationName, evaluationId, id ]
+            )
+            results.push(res.rows[0] || null)
+        }
+        return results
+    } catch (e) {
+        console.log('Error updating units position', e.message)
+        return []
+    }
+}
+
+export async function deleteUnit(unit, subjectId, bbCourseId) {
+    const deletedPosition = unit.position
+
+    await contentsHandler.deleteByUnit(unit.id)
+
+    const deletionRes = await client.query(
         'UPDATE unit SET enabled=FALSE WHERE id = $1 RETURNING *', 
-        [ id ]
+        [ unit.id ]
     )
-    return res.rows[0] || null
+
+    const higherUnitsRes = await client.query(
+        `SELECT *
+        FROM unit
+        WHERE subject_id = $1
+            AND position > $2
+            AND enabled=TRUE`, 
+        [ subjectId, deletedPosition ]
+    )
+
+    for (let i = 0; i < higherUnitsRes.rows.length; i++) {
+        const newPosition = deletedPosition + i
+        const { id } = higherUnitsRes.rows[i]
+        const evaluationName = getEvaluationName(newPosition)
+        const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
+        const updatedUnitRes = await client.query(
+            `UPDATE unit SET
+                position = $1,
+                evaluation_name = $2,
+                evaluation_id = $3
+            WHERE id = $4 RETURNING *`,
+            [ newPosition, evaluationName, evaluationId, id ]
+        )
+    }
+    return deletionRes.rows[0] || null
 }

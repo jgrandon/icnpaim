@@ -4,7 +4,6 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
     const res = await client.query(
         `SELECT
             u.*,
-            u.bb_id as bbId,
             c.id as contentId,
             c.title,
             c.type,
@@ -33,13 +32,14 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
         
         const row = res.rows[i]
         console.log('getUnitsWithCards => for ', {i, row})
-        const { id, name, color, position, bbId,
+        const { id, name, color, position,
             contentid, bbcontentid, title, type, url, completed,
-            description, free_progress: freeProgress } = row
+            description, free_progress: freeProgress,
+            evaluation_id: evaluationId } = row
 
         const content = { id: contentid,
             title, type, url, completed, contentId: bbcontentid }
-        const unit = { id, name, description, color, position, freeProgress, bbId }
+        const unit = { id, name, description, color, position, freeProgress, evaluationId}
 
         const inArray = units.find(u => row.id==u.id )
         if (!inArray) {
