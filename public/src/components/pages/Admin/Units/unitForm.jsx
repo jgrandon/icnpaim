@@ -20,7 +20,8 @@ export default function UnitForm ({
         name: '',
         description: '',
         color: '#000000',
-        //position: '',
+        evaluationName: '',
+        evaluationId: '',
         published: false,
         freeProgress: false
     })
@@ -35,6 +36,8 @@ export default function UnitForm ({
             name: unit.name ?? '',
             description: unit.description ?? '',
             color: unit.color ?? '#000000',
+            evaluationName: unit.evaluationName,
+            evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.free_progress ?? false
         })
@@ -73,12 +76,6 @@ export default function UnitForm ({
             console.error('Save failed', err)
         }
     }
-    /*
-    const startEdit = (unit) => {
-        setSelectedUnitId(unit.id)
-        setFormData({ name: unit.name, color: unit.color || '#000000', position: unit.position })
-    }
-        */
     
     const cancelEdit = (e) => {
         e.preventDefault()
@@ -157,6 +154,24 @@ export default function UnitForm ({
                         onChange={handleInputChange}
                     />
                 </div>
+
+                <div className={styles.inputWrapper}>
+                    <label className={styles.label} >Evaluación</label>
+                    <input
+                        type='text'
+                        name='evaluationName'
+                        readOnly
+                        className={styles.input}
+                        value={formData.evaluationName}
+                        onChange={handleInputChange}
+                    />
+                </div>
+
+                { formData.evaluationId
+                    ? null
+                    : <div className={styles.errorMessage}>
+                        No se pudo encontrar esta evaluación en BlackBoard
+                    </div> }
 
                 <div className={styles.inputWrapper}>
                     <label
