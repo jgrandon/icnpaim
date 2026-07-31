@@ -829,19 +829,28 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         const __DEFAULT_STUDENT_LR_INDEX = 1
         let fullUnits = []
         //units.map(u => {
-        for( let i=0; i < 1/*units.length*/ ; i++ ) {
+        for( let i=0; i < units.length; i++ ) {
             const currentUnit = units[i]
             const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
 
             //assign grade to content
-            const cards = currentUnit.cards.map(c => {
+            let cards = []
+            for( let x=0; x < currentUnit.cards.length; x++ ) {
+                const c = currentUnit.cards[x]
                 const grade = allGrades.find(g => g.contentId == c.contentId)
-                return {
+                if (grade?.grade?.status == 'Graded') {
+                    // notify progress
+                    await LRHandler.updateContentProgress({
+                        studentId: student.id,
+                        contentId: c.id,
+                    })
+                }
+                cards.push({
                     ...c,
                     grade,
-                    completed: grade?.grade?.status == 'Graded'
-                }
-            })
+                    completed: c.completed || grade?.grade?.status == 'Graded'
+                })
+            }
             
             let studentLearningIndex = null
             let studentLearningRoute = []
