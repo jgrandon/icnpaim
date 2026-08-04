@@ -90,6 +90,17 @@ export async function getGrades(courseId, columnId) {
         const grades = await db.getData(`/grades/${courseId}/${columnId}`)
         return grades ?? []
     } catch (error) {
+
+        console.warn('cache error getGrades =>',error.message)
+        return []
+    }
+}
+
+export async function getSubjectGrades(courseId) {
+    try {
+        const grades = await db.getData(`/grades/${courseId}`)
+        return grades ?? []
+    } catch (error) {
         console.warn(error)
         return []
     }
