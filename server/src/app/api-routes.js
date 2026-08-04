@@ -61,7 +61,7 @@ const requireLTISession = async (req, res, next) => {
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
         })
-        const isAdminUrl = req.originalUrl.includes('v2/units')
+        const isAdminUrl = req.originalUrl.includes('v2/units') || req.originalUrl.includes('v2/results')
         const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
         const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
@@ -954,5 +954,62 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
     }
 })
 
+router.get('/v2/results' , requireLTISession, async (req, res) => {
+    try {
+        const { bbCourseId, subject } = req.ltiSession
+        const students = await studentHandler.getStudentsResults(subject.id)
+        
+        const units = await LRHandler.getContentsByLevel(subject.id)
+        const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
+        
+        //get students by group
+        //get students unit grades
+        
+        
+
+        //mix students progress with group name
+        //mix student with units grades
+
+
+        const report = students.map(student => {
+            const progress = units.map(u => {
+                const noProgress = { value: 0, total: 0 }
+                if (!subjectGrades[u.unit.id]) return noProgress
+                const value = student.units[u.unit.id].progress ?? 0
+                const grade = subjectGrades[u.unit.id].find(g => g.userId == student.bbId)
+                if (!grade) return noProgress
+                const studentGrade = parseFloat(grade?.displayGrade?.text)
+                if (studentGrade==NaN) return noProgress
+                console.log('studentGrade', studentGrade)
+                console.log('u.levels', u.levels)
+                const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
+                return {
+                    value,
+                    total: studentLevel?.total
+                }
+            })
+            
+            return {
+                student,
+                progress
+            }
+        })
+
+        //pick learning routes based on
+
+        return res.status(200).json({
+            ok: true,
+            students,
+            units,
+            subjectGrades,
+            report
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
 
 export default router
