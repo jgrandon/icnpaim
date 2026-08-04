@@ -43,7 +43,7 @@ VALUES ( '1.1. Concepto y método de la psicobiología' , 'Estudio de la relaci�
 ( '4.4. Lenguaje y lateralización cerebral' , 'Estudio de la asimetría cerebral, especialización hemisférica y las áreas corticales implicadas en la producción y comprensión lingüística (Broca y Wernicke).', 'clase' , 'www.youtube.com',  4, null),
 ( '4.5. Introducción a la psicopatología biológica' , 'Aproximación a las alteraciones neuroquímicas y estructurales que subyacen a trastornos como la depresión, la ansiedad y la esquizofrenia.', 'clase' , 'www.youtube.com',  4, null),
 ( 'Control 1' , '', 'control' , 'https://udla-staging.blackboard.com/ultra/courses/_89726_1/assessment/_4639208_1/overview?courseId=_89726_1',  1, '_4639208_1'),
-( 'Scorm 1' , '', 'scorm' , 'https://udla-staging.blackboard.com/ultra/courses/_89726_1/scorm/overview/_4639218_1',  1, '_4639218_1');
+( 'Scorm BIOMOLECULA' , '', 'scorm' , 'https://udla-staging.blackboard.com/ultra/courses/_89726_1/scorm/overview/_4639218_1',  1, '_4639218_1');
 
 INSERT INTO LearningRouteSchema (level, min_grade, max_grade, enabled, unit_id)
 VALUES 
