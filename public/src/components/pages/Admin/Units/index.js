@@ -125,6 +125,10 @@ function Admin() {
         // setUnits( newState.sort((a,b) => a.position - b.position) )
     }
 
+    const askForResults  = async () => {
+        const data = await API.getResults()
+    }
+
     return (
         <div className={styles.admin}>
 
@@ -224,7 +228,7 @@ function Admin() {
                     ))*/}
             </div>
             )}
-
+            <Button onClick={askForResults}>API Resultados</Button>
             <Modal
                 open={isModalOpen}
                 onClose={() => setModalOpen(false)}
