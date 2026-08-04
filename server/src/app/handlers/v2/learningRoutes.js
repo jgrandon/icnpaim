@@ -1,40 +1,10 @@
+import { toLower } from 'lodash'
 import client from '../../db/postgres'
+import { objectToCamelCase } from '../../lib/objectToCamelCase'
 
 const __DEFAULT_MIN_GRADE = 1
 const __DEFAULT_MAX_GRADE = 7
-/*
-export async function createLearningRoutes(unitId, breakPoints) {
-    const newRows = []
-    for (let i = 0; i == breakPoints.length; i++) {
-        const currentBP = breakPoints[i]
-        const prevBP = breakPoints[i-1]
-        const isFirst = i == 0
-        const isLast = i == breakPoints.length
-        let minGrade, maxGrade
 
-        if (isFirst) {
-            minGrade = __DEFAULT_MIN_GRADE
-            maxGrade = currentBP
-        }
-        if (isLast) {
-            minGrade = prevBP
-            maxGrade = __DEFAULT_MAX_GRADE
-        }
-        if (!isFirst && !isLast) { //middle position
-            minGrade = prevBP
-            maxGrade = currentBP
-        }
-        const level = i+1
-
-        const res = await client.query(
-            'INSERT INTO learningrouteschema (level, min_grade, max_grade, unit_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [ level, minGrade, maxGrade, unitId ]
-        )
-        newRows.add(res.rows[0])
-    }
-    return newRows
-}
-*/
 export async function updateSchema (unitId, data) {
     disableHigerLevels(unitId, data.length)
     const schemas = []
@@ -87,10 +57,6 @@ export async function getLearningRoutes(unitId) {
 }
 
 export async function getAllUnitsLearningRoutes(subjectId) {
-    // TODO: add join unit
-    // TODO: add restriction by unit.subject_id
-    //console.log('getAllUnitsLearningRoutes => subjectId', subjectId)
-
     const res = await client.query(
         `SELECT
             lrs.id, lrs.level, lrs.min_grade,
@@ -223,66 +189,51 @@ export async function updateContentProgress ({
     return res.rows
 }
 
-/*
-export async function createLearningRoute ({ level, minGrade, maxGrade, unitId }) {
+export async function getContentsByLevel(subjectId) {
     const res = await client.query(
-        'INSERT INTO learningrouteschema (level, min_grade, max_grade, unit_id) VALUES ($1, $2, $3, $4) RETURNING *',
-        [ level, minGrade, maxGrade, unitId ]
+        `SELECT
+            u.name,
+            u.evaluation_id,
+            rslt.*
+        FROM unit AS U
+        JOIN (
+            SELECT
+                lrs.unit_id as id,
+                lrs.level,
+                lrs.min_grade,
+                lrs.max_grade,
+                COUNT(*) FILTER (WHERE lrd.enabled = TRUE) AS total
+            FROM learningrouteschema AS lrs
+            LEFT JOIN learningroutedata AS lrd ON lrs.id = lrd.learning_route_id
+            WHERE lrs.enabled = TRUE
+            GROUP BY  lrs.level, lrs.unit_id, lrs.min_grade, lrs.max_grade
+            ) AS rslt ON rslt.id = u.id
+            WHERE u.enabled = TRUE
+            AND u.published = TRUE
+            AND u.subject_id = $1
+        ORDER BY u.id, rslt.level`,
+        [subjectId]
     )
-    return res.rows[0]
+    const data = res.rows || []
+    let contents = []
+    //data.forEach((d) => {
+    for(let i=0; i < data.length; i++) {
+        const row = objectToCamelCase(data[i])
+        const {id, name, evaluationId, level, total, maxGrade, minGrade} = row
+        const currentLevel = { level, total, maxGrade, minGrade }
+        const existing = contents.find(c => c.unit.id == id)
+        if (!existing){
+            contents.push({
+                unit: {
+                    id, name, evaluationId
+                },
+                levels: [currentLevel]
+            })
+        } else {
+            console.log('pushing new level => existing', existing)
+            console.log('pushing new level => currentLevel', currentLevel)
+            existing.levels.push(currentLevel)
+        }
+    }
+    return contents
 }
-
-export async function updateLearningRoute ({ level, minGrade, maxGrade, unitId }) {
-    const res = await client.query(
-        `UPDATE learningrouteschema SET (
-            level = $1,
-            min_grade = $2,
-            max_grade = $3
-        ) WHERE unit_id = $4 RETURNING *`,
-        [ level, minGrade, maxGrade, unitId ]
-    )
-    return res.rows[0]
-}
-
-export async function getByUnitId(level, unitId) {
-    const res = await client.query('SELECT * FROM learningrouteschema WHERE unit_id=$1', [ unitId ])
-    return res.rows
-}
-
-*/
-
-/*
-export async function getAllContents(unitId) {
-    const res = await client.query('SELECT * FROM content WHERE unit_id=$1', [ unitId ])
-    return res.rows
-}
-
-export async function updateContent({ id, title, type, url, unitId }) {
-    const res = await client.query(
-        `UPDATE content SET 
-        title = $1,
-        type = $2,
-        url = $3
-        unit_id = $4
-        WHERE id = $5 RETURNING *`,
-        [ title, type || 'Contenido', url, unitId, id ]
-    )
-    return res.rows[0] || null
-}
-
-export async function deleteContent(id) {
-    const res = await client.query(
-        'DELETE FROM content WHERE id = $1 RETURNING *', 
-        [ id ]
-    )
-    return res.rows[0] || null
-}
-
-export async function deleteByUnit(unitId) {
-    const res = await client.query(
-        'DELETE FROM content WHERE unit_id = $1 RETURNING *', 
-        [ unitId ]
-    )
-    return res.rows || null
-}
-*/
