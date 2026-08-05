@@ -973,20 +973,29 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
 
         const report = students.map(student => {
             const progress = units.map(u => {
-                const noProgress = { value: 0, total: 0 }
-                if (!subjectGrades[u.unit.id]) return noProgress
-                const value = student.units[u.unit.id].progress ?? 0
+                const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
+                if (!subjectGrades[u.unit.id]) {
+                    return noProgress
+                }
                 const grade = subjectGrades[u.unit.id].find(g => g.userId == student.bbId)
-                if (!grade) return noProgress
+                if (!grade) {
+                    return noProgress
+                }
                 const studentGrade = parseFloat(grade?.displayGrade?.text)
-                if (studentGrade==NaN) return noProgress
+                if (studentGrade==NaN) {
+                    return noProgress
+                }
+
+                
+                console.log('unit with grade => ', u)
+
                 console.log('studentGrade', studentGrade)
                 console.log('u.levels', u.levels)
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
-                return {
-                    value,
-                    total: studentLevel?.total
-                }
+                const value = parseFloat( student.units[u.unit.id].progress ?? 0 )
+                const total = parseFloat(studentLevel?.total)
+                const percentage = +(value * 100 / total).toFixed(1)
+                return { unitId: u.unit.id, value, total, percentage }
             })
             
             return {
@@ -995,14 +1004,13 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             }
         })
 
-        //pick learning routes based on
 
         return res.status(200).json({
             ok: true,
-            students,
+            students: report,
             units,
             subjectGrades,
-            report
+            //report
         })
     } catch (error) {
         return res.status(200).json({
