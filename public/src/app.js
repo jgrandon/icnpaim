@@ -6,6 +6,7 @@ import parameters from './util/parameters'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import UnitsAdmin from './components/pages/Admin/Units'
 import NotAllowed from './components/pages/NotAllowed'
+import Results from './components/pages/Results'
 
 const queryParams = queryString.parse(location.search)
 let params = parameters.getInstance()
@@ -20,6 +21,7 @@ ReactDOM.render(
         <Switch>
             <Route path='/units-admin' component={UnitsAdmin}/>
             <Route path='/not-allowed' component={NotAllowed} />
+            <Route path='/results' component={Results} />
             <Route path='/' component={Dashboard} />
         </Switch>
     </BrowserRouter>,
