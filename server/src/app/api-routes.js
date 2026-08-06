@@ -992,7 +992,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 console.log('studentGrade', studentGrade)
                 console.log('u.levels', u.levels)
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
-                const value = parseFloat( student.units[u.unit.id].progress ?? 0 )
+                const value = parseFloat( student.units[u.unit.id]?.progress ?? 0 )
                 const total = parseFloat(studentLevel?.total)
                 const percentage = +(value * 100 / total).toFixed(1)
                 return { unitId: u.unit.id, value, total, percentage }
