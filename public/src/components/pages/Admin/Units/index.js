@@ -24,6 +24,7 @@ import { v4 as uuidv4 } from 'uuid'
 import Sorter from './sorter'
 import API from '../../../../services/units'
 import * as styles from './units.module.css'
+import Loading from '../../../molecules/loading'
 
 const theme = createTheme({
     palette: {
@@ -158,23 +159,22 @@ function Admin() {
                     </Box>
                 </CardContent>
             </Card>
-            <div className={styles.title}>
-                <Button
-                    variant='contained'
-                    color='primary'
-                    size='small'
-                    startIcon={<AddIcon />}
-                    onClick={() => setModalOpen(true)}
-                    style={{ height: '30px' }}
-                >
-                    Agregar Unidad
-                </Button>
-            </div>
-
 
             {loading ? (
-                <p>Loading units...</p>
-            ) : (<div>
+                <Loading text='Cargando Unidades...' />
+            ) : ( <div>
+                <div className={styles.title}>
+                    <Button
+                        variant='contained'
+                        color='primary'
+                        size='small'
+                        startIcon={<AddIcon />}
+                        onClick={() => setModalOpen(true)}
+                        style={{ height: '30px' }}
+                    >
+                        Agregar Unidad
+                    </Button>
+                </div>
                 {units.length==0
                     ? (<div className={styles.noUnitsLabel}>Este curso no tiene unidades</div>)
                     : <Sorter
@@ -185,49 +185,8 @@ function Admin() {
                         handleUnitsUpdate={handleUnitsUpdate}
                     />
                 }
-                {/*
-                units.map((unit) => (
-                        <Accordion
-                            key={uuidv4()}
-                            expanded={selectedUnitId === unit.id}
-                            onChange={handleAccordionChange(unit.id)}
-                        >
-                            <AccordionSummary className={styles.accordion}>
-                                <div 
-                                    className={styles.colorIndicator}
-                                    style={{
-                                        backgroundColor: unit.color
-                                    }}
-                                ></div>
-                                {unit.name}
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <VerticalTabs orientation='horizontal'>
-                                    <div data-title='Datos'
-                                        className={styles.tabWrapper}
-                                    >
-                                        <Unitform
-                                            unit={unit}
-                                            updateCallback={handleUnitsUpdate}
-                                        />
-                                    </div>
-                                    <div data-title='Contenidos'
-                                        className={styles.tabWrapper}
-                                    >
-                                        <ContentsAdmin unitId={unit.id}/>
-                                    </div>
-                                    <div data-title='Rutas Aprendizaje'
-                                        className={styles.tabWrapper}
-                                    >
-                                        <LearningRoutesAdmin unit={unit} />
-                                    </div>
-                                </VerticalTabs>
-                            </AccordionDetails>
-                        </Accordion> 
-                    ))*/}
-            </div>
-            )}
-            <Button onClick={() => setProgressReportOpen(true)}>Reporte Progreso</Button>
+                <Button onClick={() => setProgressReportOpen(true)}>Reporte Progreso</Button>
+            </div> )}
             <Modal
                 open={isModalOpen}
                 onClose={() => setModalOpen(false)}

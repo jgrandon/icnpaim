@@ -30,11 +30,9 @@ export default function ProgressReport() {
         setLoading(true)
         try {
             const data = await API.getResults()
-            console.log('loadData => data', data)
             setReport(data)
             setFilteredStudents(data.students)
         } catch (err) {
-            console.error('Fail to load results', err)
         } finally {
             setLoading(false)
         }
@@ -50,7 +48,6 @@ export default function ProgressReport() {
         } else {
             students = report.students.filter(s => s.group?.id == value) ?? []
         }
-        console.log('handleFilterChange => students', students)
         setFilteredStudents(students)
         setSelectedGroup(value)
 
