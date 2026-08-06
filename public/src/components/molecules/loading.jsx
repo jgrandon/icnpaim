@@ -4,9 +4,10 @@ import {
   Typography
 } from '@material-ui/core';
 export default function Loading (props) {
-    return <div styles={{
+    return <div style={{
       display: 'flex',
       justifyContent: 'center',
+      width: 'stretch',
       alignItems: 'center',
       minHeight: 400
     }}>
