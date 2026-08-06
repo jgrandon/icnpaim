@@ -109,3 +109,17 @@ export async function getSubjectGrades(courseId) {
 export function saveGrades(courseId, columnId, grades) {
     db.push(`/grades/${courseId}/${columnId}`, grades)
 }
+
+export async function getGroups(courseId) {
+    try {
+        const groups = await db.getData(`/courses/${courseId}/groups`)
+        return groups
+    } catch (error) {
+        console.warn(error)
+        return null
+    }
+}
+
+export function saveGroups(courseId, groups) {
+    db.push(`/courses/${courseId}/groups`, groups)
+}

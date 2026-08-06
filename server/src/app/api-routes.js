@@ -961,7 +961,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         
         const units = await LRHandler.getContentsByLevel(subject.id)
         const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
-        
+        const groups = await contentsHandler.getBBGroups(bbCourseId)
         //get students by group
         //get students unit grades
         
@@ -970,8 +970,8 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         //mix students progress with group name
         //mix student with units grades
 
-
         const report = students.map(student => {
+            const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
                 if (!subjectGrades[u.unit.id]) {
@@ -1000,17 +1000,18 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             
             return {
                 student,
-                progress
+                progress,
+                group
             }
         })
-
 
         return res.status(200).json({
             ok: true,
             students: report,
             units,
             subjectGrades,
-            //report
+            groups,
+            report
         })
     } catch (error) {
         return res.status(200).json({

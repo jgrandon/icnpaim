@@ -1,4 +1,6 @@
 import client from '../../db/postgres'
+import BlackBoardApiClient from '../../clients/blackboard'
+import * as cache from '../../db/blackboard'
 
 export async function getAllContents(unitId) {
     const res = await client.query('SELECT * FROM content WHERE unit_id=$1', [ unitId ])
@@ -86,3 +88,34 @@ function getCourseIdFromURL (url) {
     const match = url.match(/courses\/(.*?)(?=\/assessment)/)
     return match ? match[1] : null
 }
+
+export async function getBBGroups (
+    bbCourseId
+) {
+    const cachedGroups = await cache.getGroups(bbCourseId)
+    if (!!cachedGroups) return cachedGroups
+
+    const apiClient = BlackBoardApiClient.getClient()
+    const request = await apiClient.get(
+        `/v2/courses/${bbCourseId}/groups`
+    )
+    const { results } = request.data
+    const groups = []
+    for(let i=0; i < results.length; i++) {
+
+        const { id, name } = results[i]
+        console.log(`getBBGroups =>  group ${id}`, group)
+        const studentsRequest = await apiClient.get(
+            `/v2/courses/${bbCourseId}/groups/${id}/users`
+        )
+        const students = studentsRequest.data.results
+        console.log(`getBBGgroups => group ${id} => students`, students)
+        groups.push({ id, name, students })
+    }
+
+    cache.saveGroups(bbCourseId, groups)
+    return groups
+
+    //{{BLACKBOARD_API_URL}}/v2/courses/{{BLACKBOARD_COURSE_ID}}/groups/_622428_1/users
+}
+
