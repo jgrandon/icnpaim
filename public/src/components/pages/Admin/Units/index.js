@@ -19,6 +19,7 @@ import AddIcon from '@material-ui/icons/Add'
 import SettingsIcon from '@material-ui/icons/Settings'
 import Unitform from './unitForm'
 import Modal from '../../../organisms/Modal'
+import ProgressReport from '../ProgressReport'
 import { v4 as uuidv4 } from 'uuid'
 import Sorter from './sorter'
 import API from '../../../../services/units'
@@ -70,10 +71,12 @@ export default function UnitsAdmin () {
 
 function Admin() {
     const [ isModalOpen, setModalOpen ] = useState(false)
+    const [ isProgressReportOpen, setProgressReportOpen ] = useState(false)
     const [ units, setUnits ] = useState([])
     const [ subject, setSubject ] = useState([])
     const [ selectedUnitId, setSelectedUnitId ] = useState(null)
     const [ loading, setLoading ] = useState(false)
+
 
     useEffect(() => {
         loadUnits()
@@ -123,10 +126,6 @@ function Admin() {
         console.log('handleUnitsUpdate => updatedUnits', updatedUnits)
         setUnits(updatedUnits.map((u, index) =>( { ...u, position: index, order: index })))
         // setUnits( newState.sort((a,b) => a.position - b.position) )
-    }
-
-    const askForResults  = async () => {
-        const data = await API.getResults()
     }
 
     return (
@@ -228,7 +227,7 @@ function Admin() {
                     ))*/}
             </div>
             )}
-            <Button onClick={askForResults}>API Resultados</Button>
+            <Button onClick={() => setProgressReportOpen(true)}>Reporte Progreso</Button>
             <Modal
                 open={isModalOpen}
                 onClose={() => setModalOpen(false)}
@@ -239,6 +238,13 @@ function Admin() {
                     updateCallback={handleUnitsUpdate}
                     cancel
                 />
+            </Modal>
+            <Modal
+                open={isProgressReportOpen}
+                onClose={() => setProgressReportOpen(false)}
+                title={`${subject.name} > Progreso Estudiantes`} 
+            >
+                <ProgressReport />
             </Modal>
         </div>
     )
