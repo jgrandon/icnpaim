@@ -16,6 +16,7 @@ export async function getOrCreate (data) {
     if (!student) {
         student = await createStudent(data)
     }
+    await registerStudentInSubject(student, data.subject)
     return student
 }
 
@@ -31,6 +32,19 @@ export async function createStudent ({
     )
     const student = res.rows[0]
     return { ...student, bbId }
+}
+
+export async function registerStudentInSubject (student, subject) {
+    const res = await client.query(
+        `INSERT INTO subject_student (student_id, subject_id)
+            VALUES ( $1, $2 )
+            ON CONFLICT (student_id, subject_id)
+            DO UPDATE SET
+                last_access = CURRENT_DATE
+            RETURNING *`,
+        [ student.id, subject.id ]
+    )
+    return res.rows[0]
 }
 
 export async function getStudentsResults (subjectId) {

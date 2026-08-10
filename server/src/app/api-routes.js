@@ -75,7 +75,9 @@ const requireLTISession = async (req, res, next) => {
             if (!isAdminUrl) {
                 student = await studentHandler.getOrCreate({
                     name: jwt.body.name,
-                    bbId: bbStudentId})
+                    bbId: bbStudentId,
+                    subject
+                })
             }
 
             req.ltiSession = {
