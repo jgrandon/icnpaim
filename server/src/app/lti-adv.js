@@ -47,6 +47,7 @@ export const verifyToken = async (id_token) => {
   } else {
     clientId = jwtPayload.body.aud;
   }
+  console.log('-- verifyToken => clientId =>', clientId)
 
   /* if (clientId === undefined) {
     clientId = setup.applicationId;
@@ -59,7 +60,7 @@ export const verifyToken = async (id_token) => {
     '/jwks.json';
 
   try {
-    console.log('-- verifyToken => try => ')
+    console.log('-- verifyToken => try => ', url)
     const response = await axios.get(url);
     console.log('>>> verifyToken => try => response.data', response.data)
     console.log('>>> verifyToken => try => jwtPayload.header.kid', jwtPayload.header.kid)

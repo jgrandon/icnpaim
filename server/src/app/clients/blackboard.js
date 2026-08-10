@@ -86,7 +86,7 @@ class BlackBoardApiClient {
           return response
         },
         async (error) => {
-          console.log('before handleResponseError', error)
+          console.log('before handleResponseError', error.message)
           return await this.handleResponseError(error)
         }
       )
