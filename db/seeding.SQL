@@ -1,6 +1,5 @@
 insert into subject (name, bb_id) values ('NeuroBiologia', '_89726_1');
 
-INSERT INTO student (name, bb_id) VALUES ('John Doe', '123');
 
 INSERT INTO Unit (name, description, color, position, subject_id, evaluation_name, evaluation_id, published)
 VALUES (

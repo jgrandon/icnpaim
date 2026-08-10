@@ -17,6 +17,21 @@ CREATE TABLE Subject (
     bb_id varchar(255) NOT NULL
 );
 
+/* need this for report */
+CREATE TABLE Subject_Student (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    subject_id INT,
+    student_id INT,
+    last_access DATE DEFAULT CURRENT_DATE,
+    CONSTRAINT FK_Subject_SubjectStudent
+        FOREIGN KEY (subject_id) REFERENCES Subject(id),
+    CONSTRAINT FK_Student_SubjectStudent
+        FOREIGN KEY (student_id) REFERENCES Student(id),
+	CONSTRAINT UQ_subject_student
+        UNIQUE (subject_id, student_id)
+);
+
+
 CREATE TABLE Unit (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
