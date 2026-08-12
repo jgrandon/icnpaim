@@ -61,7 +61,7 @@ const requireLTISession = async (req, res, next) => {
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
         })
-        const isAdminUrl = req.originalUrl.includes('v2/units')
+        const isAdminUrl = req.originalUrl.includes('v2/units') || req.originalUrl.includes('v2/results')
         const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
         const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
@@ -75,7 +75,9 @@ const requireLTISession = async (req, res, next) => {
             if (!isAdminUrl) {
                 student = await studentHandler.getOrCreate({
                     name: jwt.body.name,
-                    bbId: bbStudentId})
+                    bbId: bbStudentId,
+                    subject
+                })
             }
 
             req.ltiSession = {
@@ -829,19 +831,28 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
         const __DEFAULT_STUDENT_LR_INDEX = 1
         let fullUnits = []
         //units.map(u => {
-        for( let i=0; i < 1/*units.length*/ ; i++ ) {
+        for( let i=0; i < units.length; i++ ) {
             const currentUnit = units[i]
             const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
 
             //assign grade to content
-            const cards = currentUnit.cards.map(c => {
+            let cards = []
+            for( let x=0; x < currentUnit.cards.length; x++ ) {
+                const c = currentUnit.cards[x]
                 const grade = allGrades.find(g => g.contentId == c.contentId)
-                return {
+                if (grade?.grade?.status == 'Graded') {
+                    // notify progress
+                    await LRHandler.updateContentProgress({
+                        studentId: student.id,
+                        contentId: c.id,
+                    })
+                }
+                cards.push({
                     ...c,
                     grade,
-                    completed: grade?.grade?.status == 'Graded'
-                }
-            })
+                    completed: c.completed || grade?.grade?.status == 'Graded'
+                })
+            }
             
             let studentLearningIndex = null
             let studentLearningRoute = []
@@ -945,5 +956,72 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
     }
 })
 
+router.get('/v2/results' , requireLTISession, async (req, res) => {
+    try {
+        const { bbCourseId, subject } = req.ltiSession
+        const students = await studentHandler.getStudentsResults(subject.id)
+        
+        const units = await LRHandler.getContentsByLevel(subject.id)
+        const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
+        const groups = await contentsHandler.getBBGroups(bbCourseId)
+        //get students by group
+        //get students unit grades
+        
+        
+
+        //mix students progress with group name
+        //mix student with units grades
+
+        const report = students.map(student => {
+            const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
+            const progress = units.map(u => {
+                const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
+                if (!subjectGrades[u.unit.id]) {
+                    return noProgress
+                }
+                const grade = subjectGrades[u.unit.id].find(g => g.userId == student.bbId)
+                if (!grade) {
+                    return noProgress
+                }
+                const studentGrade = parseFloat(grade?.displayGrade?.text)
+                if (studentGrade==NaN) {
+                    return noProgress
+                }
+
+                
+                console.log('unit with grade => ', u)
+
+                console.log('studentGrade', studentGrade)
+                console.log('u.levels', u.levels)
+                const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
+                const studentProgress = student.units.find(sUnit => sUnit.unitId == u.unit.id)?.progress
+                const value = parseFloat( studentProgress ?? 0 )
+                const total = parseFloat(studentLevel?.total)
+                const percentage = +(value * 100 / total).toFixed(1)
+                return { unitId: u.unit.id, value, total, percentage }
+            })
+            
+            return {
+                student,
+                progress,
+                group
+            }
+        })
+
+        return res.status(200).json({
+            ok: true,
+            students: report,
+            units,
+            subjectGrades,
+            groups,
+            report
+        })
+    } catch (error) {
+        return res.status(200).json({
+            success: false,
+            error: error?.message ?? 'unknown error'
+        })
+    }
+})
 
 export default router

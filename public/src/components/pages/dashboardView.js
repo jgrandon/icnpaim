@@ -760,7 +760,7 @@ class DashboardView extends React.Component {
                           {unit.studentLearningRoute?.length} actividades
                         </div>
                       </div>
-                      {!unit.studentGrade
+                      {!unit.unitGrade
                         ? <Typography variant="h6" style={{
                           color: 'black',
                           margin: '20px 0px 0px 0px'

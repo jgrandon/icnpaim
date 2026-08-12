@@ -155,8 +155,9 @@ export default function UnitForm ({
                     />
                 </div>
 
+                { unit.id &&
                 <div className={styles.inputWrapper}>
-                    <label className={styles.label} >Evaluación</label>
+                    <label className={styles.label}> Evaluación </label>
                     <input
                         type='text'
                         name='evaluationName'
@@ -165,13 +166,13 @@ export default function UnitForm ({
                         value={formData.evaluationName}
                         onChange={handleInputChange}
                     />
-                </div>
+                </div> }                
 
-                { formData.evaluationId
-                    ? null
-                    : <div className={styles.errorMessage}>
+                { unit.id && !formData.evaluationId
+                    ? <div className={styles.errorMessage}>
                         No se pudo encontrar esta evaluación en BlackBoard
-                    </div> }
+                    </div>
+                    : null }
 
                 <div className={styles.inputWrapper}>
                     <label

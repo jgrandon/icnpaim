@@ -90,6 +90,17 @@ export async function getGrades(courseId, columnId) {
         const grades = await db.getData(`/grades/${courseId}/${columnId}`)
         return grades ?? []
     } catch (error) {
+
+        console.warn('cache error getGrades =>',error.message)
+        return []
+    }
+}
+
+export async function getSubjectGrades(courseId) {
+    try {
+        const grades = await db.getData(`/grades/${courseId}`)
+        return grades ?? []
+    } catch (error) {
         console.warn(error)
         return []
     }
@@ -97,4 +108,18 @@ export async function getGrades(courseId, columnId) {
 
 export function saveGrades(courseId, columnId, grades) {
     db.push(`/grades/${courseId}/${columnId}`, grades)
+}
+
+export async function getGroups(courseId) {
+    try {
+        const groups = await db.getData(`/courses/${courseId}/groups`)
+        return groups
+    } catch (error) {
+        console.warn(error)
+        return null
+    }
+}
+
+export function saveGroups(courseId, groups) {
+    db.push(`/courses/${courseId}/groups`, groups)
 }

@@ -53,6 +53,12 @@ const useStyles = makeStyles((theme) => ({
     },
     leftAlignedTab: {
         '& .MuiTab-wrapper': {
+            alignItems: 'flex-start',
+            textAlign: 'center',
+        },
+    },
+    centeredTab: {
+        '& .MuiTab-wrapper': {
             alignItems: 'center',
             textAlign: 'center',
         },
@@ -64,6 +70,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function VerticalTabs(props) {
+    const orientation = props.orientation ?? 'vertical'
     const classes = useStyles()
     const [ children, setChildren ] = React.useState([])
     const [ value, setValue ] = React.useState(0)
@@ -80,12 +87,12 @@ export default function VerticalTabs(props) {
         setValue(newValue)
     }
     return (
-        <div className={props.orientation == 'horizontal' 
+        <div className={orientation == 'horizontal' 
             ? classes.rootHorizontal 
             : classes.root
         }>
             <Tabs
-                orientation={props.orientation ?? 'vertical'}
+                orientation={orientation}
                 variant='scrollable'
                 value={value}
                 onChange={handleChange}
@@ -95,7 +102,7 @@ export default function VerticalTabs(props) {
                     React.Children.map(children, (child, index) => (
                         <Tab 
                             label={child.props['data-title']} {...a11yProps(index)}
-                            className={ props.orientation == 'vertical' 
+                            className={ orientation == 'vertical' 
                                 ? classes.leftAlignedTab
                                 : classes.centeredTab }
                             onClick={child.props['onClick']}
