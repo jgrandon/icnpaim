@@ -1,5 +1,13 @@
 import client from '../../db/postgres'
 
+export async function getOrCreate (data) {
+    let subject = await getSubjectByBBid(data.bbId)
+    if (!subject) {
+        subject = await createSubject(data)
+    }
+    return subject
+}
+
 export async function getSubjectByBBid(bbId) {
     const res = await client.query(
         `SELECT * FROM subject WHERE bb_id = $1`,
@@ -8,14 +16,6 @@ export async function getSubjectByBBid(bbId) {
     const subject = res.rows[0]
     if (!subject) return null
     return { ...subject, bbId }
-}
-
-export async function getOrCreate (data) {
-    let subject = await getSubjectByBBid(data.bbId)
-    if (!subject) {
-        subject = await createSubject(data)
-    }
-    return subject
 }
 
 export async function createSubject ({

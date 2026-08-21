@@ -319,10 +319,13 @@ module.exports = function (app) {
     // Now finally redirect to the UI
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     const {person_sourcedid : bbStudentExternalId} = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/lis']
-    const bbCourseId = jwtPayload.return_url
+    
+    const bbCourseId = jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
+
+    /* const bbCourseId = jwtPayload.return_url
       .split('?')[1]
       .split('&')[0]
-      .replace('course_id=','')
+      .replace('course_id=','') */
     if (messageType === 'LtiDeepLinkingRequest') {
       res.redirect(`/deep_link_options?nonce=${state}`);
     } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {

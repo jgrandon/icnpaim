@@ -272,10 +272,13 @@ class DashboardView extends React.Component {
   }
 
   getBBCourseId(jwtPayload) {
+    return jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
+    /*
     return jwtPayload.return_url
       .split('?')[1]
       .split('&')[0]
       .replace('course_id=','')
+    */
   }
 
     loadDashboard = async (course) => {
