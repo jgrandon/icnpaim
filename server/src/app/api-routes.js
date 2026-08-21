@@ -16,6 +16,9 @@ import * as LRHandler from './handlers/v2/learningRoutes'
 import * as dashboardHandler from './handlers/v2/dashboard'
 import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
+import * as ddaStudentHandler from './handlers/v2/dda/student'
+// import * as ddaCourseHandler from './handlers/v2/dda/course'
+// import * as ddaGradesHandler from './handlers/v2/dda/grades'
 // import mockLti from './mockLti.json'
 
 const router = express.Router()
@@ -56,7 +59,8 @@ const requireLTISession = async (req, res, next) => {
         console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
         console.log('requireLTISession => jwt => ', jwt)
         
-        const bbStudentId = await students.getStudentId(bbStudentExternalId)
+        //const bbStudentId = await students.getStudentId(bbStudentExternalId)
+        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId)
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
@@ -784,18 +788,8 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ).map(c => c.contentId)
         ).reduce((acc = [], a) => [ ...acc, ...a ], [])
     
-        //console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
-
-        //mezcla todos los contentId de cards y de units en una sola variable
-        /*
-        const contentIds = [
-            ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
-            ...cardsContentIds // cards contents
-        ]
-        */
         
-        console.log('/v2/dashboard => contentIds', contentIds )
-
+        //query to get all course higher score grades from every student
 
         // get content grades
         let allGrades = []
