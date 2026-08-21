@@ -320,7 +320,7 @@ module.exports = function (app) {
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     const {person_sourcedid : bbStudentExternalId} = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/lis']
     
-    const bbCourseId = jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
+    const bbCourseExternalId = jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
 
     /* const bbCourseId = jwtPayload.return_url
       .split('?')[1]
@@ -337,7 +337,7 @@ module.exports = function (app) {
       await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
-      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
+      await db.insertNewAuthToken(state, bbCourseExternalId, 'bbCourseExternalId');
       // Redirigir al dashboard
       res.redirect('/dashboard');
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
@@ -363,7 +363,7 @@ module.exports = function (app) {
       //await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       //await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
-      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
+      await db.insertNewAuthToken(state, bbCourseExternalId, 'bbCourseExternalId');
 
       const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
           .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')

@@ -17,7 +17,7 @@ import * as dashboardHandler from './handlers/v2/dashboard'
 import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
 import * as ddaStudentHandler from './handlers/v2/dda/student'
-// import * as ddaCourseHandler from './handlers/v2/dda/course'
+import * as ddaCourseHandler from './handlers/v2/dda/course'
 // import * as ddaGradesHandler from './handlers/v2/dda/grades'
 // import mockLti from './mockLti.json'
 
@@ -49,17 +49,17 @@ const requireLTISession = async (req, res, next) => {
                 jwt: auth.jwt,
                 sessionId: sessionId,
                 bbStudentExternalId: auth.bbStudentExternalId,
-                bbCourseId: auth.bbCourseId
+                bbCourseExternalId: auth.bbCourseExternalId
             }
         }
         
         // get subject and student data from db
-        const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
-        console.log('requireLTISession => bbCourseId => ', bbCourseId)
+        const { bbCourseExternalId, jwt, bbStudentExternalId } = req.ltiSession
+        console.log('requireLTISession => bbCourseExternalId => ', bbCourseExternalId)
         console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
         console.log('requireLTISession => jwt => ', jwt)
         
-        //const bbStudentId = await students.getStudentId(bbStudentExternalId)
+        const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId)
         const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId)
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
@@ -790,6 +790,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
     
         
         //query to get all course higher score grades from every student
+        const ddaGrades = await ddaStudentHandler.getStudentGrades(bbStudentId, bbCourseId)
 
         // get content grades
         let allGrades = []
@@ -878,6 +879,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             fullUnits.push({
                 ...currentUnit,
                 unitGrade,
+                ddaGrades,
                 cards,
                 learningRoutes: currentLR,
                 studentLearningRoute,
