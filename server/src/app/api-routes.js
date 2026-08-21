@@ -18,7 +18,7 @@ import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
 import * as ddaStudentHandler from './handlers/v2/dda/student'
 import * as ddaCourseHandler from './handlers/v2/dda/course'
-// import * as ddaGradesHandler from './handlers/v2/dda/grades'
+import * as ddaGradesHandler from './handlers/v2/dda/grades'
 // import mockLti from './mockLti.json'
 
 const router = express.Router()
@@ -790,7 +790,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
     
         
         //query to get all course higher score grades from every student
-        const ddaGrades = await ddaStudentHandler.getStudentGrades(bbStudentId, bbCourseId)
+        const ddaGrades = await ddaGradesHandler.getStudentGrades(bbStudentId, bbCourseId)
 
         // get content grades
         let allGrades = []
