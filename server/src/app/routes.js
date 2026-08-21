@@ -320,7 +320,7 @@ module.exports = function (app) {
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     const {person_sourcedid : bbStudentExternalId} = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/lis']
     
-    const bbCourseExternalId = jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
+    const bbCourseExternalId = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/context']
 
     /* const bbCourseId = jwtPayload.return_url
       .split('?')[1]
