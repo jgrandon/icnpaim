@@ -3,6 +3,7 @@ import * as contentsHandler from './contents'
 import * as columns from '../columns'
 import unitServices from '../../../../../public/src/services/units'
 import { objectToCamelCase } from '../../lib/objectToCamelCase'
+import * as ddaGradesHandler from './dda/grades'
 
 export async function getAllUnits(subjectId) {
     const res = await client.query(
@@ -95,7 +96,7 @@ function getEvaluationName (position) {
 async function getEvaluationId (evaluationName, bbCourseId) {
     let evaluationId = null
     try {
-        evaluationId = await columns.getColumnByName(bbCourseId, evaluationName)
+        evaluationId = await ddaGradesHandler.getGradeByName(bbCourseId, evaluationName)
     } catch(e) {
         console.log('error getting column by name', e.message)
     }
