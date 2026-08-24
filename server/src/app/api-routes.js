@@ -947,7 +947,9 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         const students = await studentHandler.getStudentsResults(subject.id)
         
         const units = await LRHandler.getContentsByLevel(subject.id)
-        const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
+        // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
+        const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
+
         const groups = await contentsHandler.getBBGroups(bbCourseId)
         //get students by group
         //get students unit grades
@@ -961,14 +963,19 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
+                /*
                 if (!subjectGrades[u.unit.id]) {
                     return noProgress
-                }
-                const grade = subjectGrades[u.unit.id].find(g => g.userId == student.bbId)
+                }*/
+                const grade = subjectGrades.find(g => g.userId == student.bbId && g.gradebookId == u.unit.evaluationId)
                 if (!grade) {
                     return noProgress
                 }
-                const studentGrade = parseFloat(grade?.displayGrade?.text)
+                
+                //parseFloat(grade?.displayGrade?.text)
+                let studentGrade = NaN
+                try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
+                catch (e) { console.warn('/v2/results => ERROR while trying to parse student grade', e.message) } 
                 if (studentGrade==NaN) {
                     return noProgress
                 }
