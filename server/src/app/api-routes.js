@@ -879,7 +879,6 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             fullUnits.push({
                 ...currentUnit,
                 unitGrade,
-                ddaGrades,
                 cards,
                 learningRoutes: currentLR,
                 studentLearningRoute,
@@ -899,7 +898,8 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             success: true,
             units: fullUnits,
             subject,
-            student
+            student,
+            ddaGrades
         })
       
     } catch (error) {

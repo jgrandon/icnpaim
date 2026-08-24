@@ -80,7 +80,7 @@ export async function updateUnit({ id, name, color, position, description, publi
             color = $2,
             description = $3,
             published = $4,
-            free_progress = $5,
+            free_progress = $5
         WHERE id = $6 RETURNING *`,
         [ name, color || null, description, published,
             freeProgress, id ]
