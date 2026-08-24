@@ -41,13 +41,13 @@ export async function getGradeByName(courseId, name) {
 
 export async function getCourseGrades(courseId) {
     const res = await client.query(
+        // gbm.title AS content_title,
+        // gbg.average_score,
         `select 
             gbm.possible,
             gbm.pk1 AS gradebook_id,
-            gbm.title AS content_title,
             gbm.crsmain_pk1 AS course_id,
             gbm.course_contents_pk1 AS content_id,
-            gbg.average_score,
             a.score,
             cu.users_pk1 as user_id
         FROM gradebook_main AS gbm
