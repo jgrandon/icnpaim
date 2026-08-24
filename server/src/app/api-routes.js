@@ -87,6 +87,7 @@ const requireLTISession = async (req, res, next) => {
             req.ltiSession = {
                 ...req.ltiSession,
                 bbStudentId,
+                bbCourseId,
                 subject,
                 student,
                 isStudent,
