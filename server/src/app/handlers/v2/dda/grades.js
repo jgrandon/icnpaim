@@ -15,10 +15,8 @@ export async function getStudentGrades(studentId, courseId) {
           JOIN gradebook_grade AS gbg ON gbm.pk1 = gbg.gradebook_main_pk1
           JOIN attempt AS a ON gbg.highest_attempt_pk1 = a.pk1
           JOIN course_users AS cu ON gbg.course_users_pk1 = cu.pk1
-          JOIN course_main as cm ON cu.crsmain_pk1 = cm.pk1
-          WHERE  gbm.crsmain_pk1 = 85368
-          LIMIT 100;`,
-        [ externalId ]
+          WHERE cu.users_pk1 = $1 AND gbm.crsmain_pk1 = $2`,
+        [ studentId, courseId ]
     )
     const grades = res.rows.map(r => objectToCamelCase(r))
     return grades
