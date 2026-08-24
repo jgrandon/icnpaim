@@ -29,13 +29,13 @@ export async function getGroups(courseId) {
     let groups = []
     for(let i=0; i < res.rows.length; i++) {
         const { id, name, userId } = objectToCamelCase(res.rows[i])
-        if (!groups[id]) {
-            groups[id] = {
-                id,
-                name,
-                students: [ userId ]
-            }
-        } else groups[id].students.push(userId)
+        let existingGroup = groups.find(g => g.id == id)
+        if (!existingGroup) groups.push({id, name, students: [ userId ]})
+        else {
+            groups = groups.map(g => g.id == id 
+                ? { ...g, students: [...g.students, userId]}
+                : g )
+        }
     }
 
     console.log('DDA => Course => getGroups => groups', groups.length)
