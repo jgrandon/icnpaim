@@ -24,14 +24,14 @@ export async function getStudentGrades(studentId, courseId) {
 }
 
 export async function getGradeByName(courseId, name) {
-    const comparison = `'%${name}%`
+    const comparison = `'%${name}%'`
     const res = await client.query(
         `SELECT pk1 AS id
         FROM gradebook_main
         WHERE crsmain_pk1 = $1
-            AND title SIMILAR TO $2 `,
+            AND title SIMILAR TO $2`,
         [ courseId, comparison ]
     )
-    const course = res.rows[0]
-    return course?.id
+    const grade = res.rows[0]
+    return grade?.id
 }
