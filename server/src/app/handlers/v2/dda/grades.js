@@ -24,7 +24,7 @@ export async function getStudentGrades(studentId, courseId) {
 }
 
 export async function getGradeByName(courseId, name) {
-    const comparison = `'%${name}%'`
+    const comparison = `%${name}%`
     const res = await client.query(
         `SELECT pk1 AS id
         FROM gradebook_main
