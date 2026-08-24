@@ -26,7 +26,7 @@ export async function getGroups(courseId) {
     
     console.log('DDA => Course => getGroups => rows', res.rows.length)
 
-    const groups = []
+    let groups = []
     for(let i=0; i < res.rows.length; i++) {
         const { id, name, userId } = objectToCamelCase(res.rows[i])
         if (!groups[id]) {
@@ -37,6 +37,8 @@ export async function getGroups(courseId) {
             }
         } else groups[id].students.push(userId)
     }
+
+    console.log('DDA => Course => getGroups => groups', groups.length)
 
     return groups
 }
