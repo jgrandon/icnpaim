@@ -32,6 +32,9 @@ export async function getGradeByName(courseId, name) {
             AND title SIMILAR TO $2`,
         [ courseId, comparison ]
     )
+    console.log('getGradeByName => courseId', courseId)
+    console.log('getGradeByName => comparison', comparison)
+    console.log('getGradeByName => res.rows', res.rows.length)
     const grade = res.rows[0]
     return grade?.id
 }
