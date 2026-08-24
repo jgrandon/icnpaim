@@ -955,7 +955,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         //const groups = await contentsHandler.getBBGroups(bbCourseId)
                 
         const report = students.map(student => {
-            const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
+            const group = groups.find(g => g.students.find(userId => userId == student.bbId))
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
                 /*

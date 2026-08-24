@@ -31,7 +31,8 @@ export async function getGroups(courseId) {
         const { id, name, userId } = objectToCamelCase(res.rows[i])
         if (!groups[id]) {
             groups[id] = {
-                ...current,
+                id,
+                name,
                 students: [ userId ]
             }
         } else groups[id].students.push(userId)
