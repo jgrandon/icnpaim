@@ -950,15 +950,10 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
         const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
 
-        const groups = await contentsHandler.getBBGroups(bbCourseId)
         //get students by group
-        //get students unit grades
-        
-        
-
-        //mix students progress with group name
-        //mix student with units grades
-
+        const groups = await ddaCourseHandler.getGroups(bbCourseId)
+        //const groups = await contentsHandler.getBBGroups(bbCourseId)
+                
         const report = students.map(student => {
             const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
             const progress = units.map(u => {
