@@ -44,7 +44,7 @@ export default function UnitForm ({
     }, [])
 
     const resetFormData = () => {
-        timeToString(unit.expiresAt) ?? '2000-01-01'
+        
         setFormData({
             id: unit.id ?? '',
             name: unit.name ?? '',
@@ -54,7 +54,7 @@ export default function UnitForm ({
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.freeProgress ?? false,
-            expiresAt: 
+            expiresAt: timeToString(unit.expiredAt)
         })
     }
 
