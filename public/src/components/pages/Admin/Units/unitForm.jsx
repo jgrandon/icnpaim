@@ -14,7 +14,7 @@ import * as styles from '../form.module.css'
 const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
 const getTodayString = () => (new Date()).toJSON().slice(0,10)
 const timeToString = (time) => {
-    try { return (new Date(time)).toJSON().slice(0,10) } 
+    try { return (new Date( parseInt(time) )).toJSON().slice(0,10) }
     catch (e) { 
         console.warn('Error => timeToString', e)
         return getTodayString()
