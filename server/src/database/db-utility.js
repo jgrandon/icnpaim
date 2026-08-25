@@ -121,7 +121,7 @@ export const insertNewAuthToken = async (state, token, type) => {
     console.log(`${type} added to state: ${state}`);
     return 'success';
   } catch (e) {
-    console.log(e);
+    console.log('ERROR IN insertNewAuthToken => ', e.message);
     return e;
   }
 };
@@ -162,9 +162,13 @@ export const getExpiredSessions = () => {
     }
     
     sessions.forEach(session => {
+      console.log('validating expired sessions', session)
       const created = new Date(session.expirationDate);
+      console.log('validating expired sessions => created', created)
+
       if (Object.prototype.hasOwnProperty.call(sessions, 'jwt')) {
         const exp = session.auth.jwt.body.exp;
+      console.log('validating expired sessions => exp', exp)
         if (now > exp) {
           expiredSessions.push(session);
         }
