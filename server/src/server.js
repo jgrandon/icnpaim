@@ -78,6 +78,7 @@ httpProxy.use((req, res, next) => {
 });
 
 httpProxy.all('/*', function (req, res) {
+  console.log('>> httpProxy.all', req.url)
   //modify the url in any way you want
   let learnUrl = 'https://isthisthingon.hopto.org' + req.url;
 
