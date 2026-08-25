@@ -11,6 +11,9 @@ import {
 import API from '../../../../services/units'
 import * as styles from '../form.module.css'
 
+const timeToString = (timestamp) => (new Date(timestamp)).toJSON().slice(0,10)
+const getTodayString = () => (new Date()).toJSON().slice(0,10)
+const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
 
 export default function UnitForm ({
     unit,
@@ -33,10 +36,6 @@ export default function UnitForm ({
     useEffect(()=> {
         resetFormData()
     }, [])
-
-    const timeToString = (timestamp) => (new Date(timestamp)).toJSON().slice(0,10)
-    const getTodayString = () => (new Date()).toJSON().slice(0,10)
-    const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
 
     const resetFormData = () => {
         setFormData({
