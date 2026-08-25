@@ -158,9 +158,6 @@ class Dashboard extends React.Component {
               {/*
               <Route exact path="/" component={LaunchEndpoint}/>
               <Route path="/home" component={LaunchEndpoint}/>
-              */}
-              <Route exact path="/" component={TestPage}/>
-              <Route path="/home" component={TestPage}/>
               <Route path="/content_item" component={ContentItemView}/>
               <Route path="/cim_request" component={CIMRequestView}/>
               <Route path="/lti_adv_view" component={LtiAdvView}/>
@@ -175,14 +172,15 @@ class Dashboard extends React.Component {
               <Route path="/proctoring_end_options_view" component={ProctoringEndOptionsView}/>
               <Route path="/proctoring_end_actions_view" component={ProctoringEndActionsView}/>
               <Route path="/ms_teams_view" component={MicrosoftTeamsView}/>
-              <Route path="/applications" component={ApplicationsView}/>
               <Route
-                path="/assign_grades_view"
-                component={AssignGradesView}
+              path="/assign_grades_view"
+              component={AssignGradesView}
               />
               <Route path="/lti_custom_app" component={CustomLtiApp}/>
-              <Route path="/dashboard" component={DashboardWrapper}/>
               <Route path="/unit-progress" component={UnitProgressView}/>
+              */ }
+              <Route path="/dashboard" component={DashboardWrapper}/>
+              <Route path="/applications" component={ApplicationsView}/>
             </main>
             <SnackBar/>
           </ErrorBoundary>

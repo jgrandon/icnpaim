@@ -19,8 +19,10 @@ ReactDOM.render(
     <BrowserRouter>
         <Switch>
             <Route path='/units-admin' component={UnitsAdmin}/>
+            <Route path='/dashboard' component={Dashboard} />
+            <Route path='/applications' component={Dashboard} />
             <Route path='/not-allowed' component={NotAllowed} />
-            <Route path='/' component={Dashboard} />
+            <Route path='/' component={NotAllowed}/>
         </Switch>
     </BrowserRouter>,
     document.getElementById('root')

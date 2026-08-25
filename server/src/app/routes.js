@@ -770,10 +770,10 @@ module.exports = function (app) {
   });
 
     app.get('/applications', async (req, res) => {
-        if (!req.query.appadmin) {
-            res.redirect(`/not-allowed`)
+        if (req.query.appadmin == process.env.APP_ADMIN_PASSWORD) {
+          res.sendFile(path.resolve('./public', 'index.html'));
         } else {
-            res.sendFile(path.resolve('./public', 'index.html'));
+          res.redirect(`/not-allowed`)
         }
     });
 
@@ -809,6 +809,8 @@ module.exports = function (app) {
         const isAdmin = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
 
+        console.log('/* => roles', jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles'])
+        
         if (process.env.NODE_ENV != 'development'
             && !isStudent
             && !isAdmin
