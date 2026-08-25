@@ -38,6 +38,7 @@ CREATE TABLE Unit (
     description varchar(255),
     color varchar(255),
     position INT NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT false,
     free_progress BOOLEAN NOT NULL DEFAULT false,
     published BOOLEAN NOT NULL DEFAULT false,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,

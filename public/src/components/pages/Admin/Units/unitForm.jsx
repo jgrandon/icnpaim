@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import SaveIcon from '@material-ui/icons/Save'
 import CloseIcon from '@material-ui/icons/Close'
 import DeleteIcon from '@material-ui/icons/Delete'
-import Button from '@material-ui/core/Button'
-import Switch from '@material-ui/core/Switch'
-import Tooltip from '@material-ui/core/Tooltip'
+import {
+    Button,
+    TextField,
+    Switch,
+    Tooltip
+} from '@material-ui/core'
 import API from '../../../../services/units'
 import * as styles from '../form.module.css'
 
@@ -23,7 +26,8 @@ export default function UnitForm ({
         evaluationName: '',
         evaluationId: '',
         published: false,
-        freeProgress: false
+        freeProgress: false,
+        expiration: '2000-01-01'
     })
 
     useEffect(()=> {
@@ -39,12 +43,14 @@ export default function UnitForm ({
             evaluationName: unit.evaluationName,
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
-            freeProgress: unit.free_progress ?? false
+            freeProgress: unit.free_progress ?? false,
+            expiration: unit.expiration ?? '2000-01-01'
         })
     }
 
     const handleInputChange = (e) => {
         setModified(true)
+        console.log('handleInputChange', e)
         const { name, value, checked } = e.target
         let finalValue = value
         //if (name === 'position') finalValue = parseInt(value, 10)
@@ -214,6 +220,30 @@ export default function UnitForm ({
                         />
                     </Tooltip>
 
+                </div>
+
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Fecha de Término</label>
+                    <Tooltip
+                        title={'Fecha en que se cierra la unidad'}
+                        placement='bottom'
+                        arrow
+                    >
+                        <TextField
+                            name='expiration'
+                            label='Fecha Cierre'
+                            type='date'
+                            defaultValue={(new Date()).toJSON().slice(0,10)}
+                            className=''
+                            color='primary'
+                            onChange={handleInputChange}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Tooltip>
                 </div>
 
             </div>
