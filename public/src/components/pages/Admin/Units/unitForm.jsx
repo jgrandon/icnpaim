@@ -239,7 +239,6 @@ export default function UnitForm ({
                         <TextField
                             name='expiresAt'
                             type='date'
-                            defaultValue={getTodayString()}
                             className=''
                             value={formData.expiresAt ?? getTodayString()}
                             color='primary'
