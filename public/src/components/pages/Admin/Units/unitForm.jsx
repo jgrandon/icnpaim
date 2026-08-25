@@ -54,7 +54,7 @@ export default function UnitForm ({
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.freeProgress ?? false,
-            expiresAt: timeToString(unit.expiredAt)
+            expiresAt: timeToString(unit.expiresAt)
         })
     }
 
