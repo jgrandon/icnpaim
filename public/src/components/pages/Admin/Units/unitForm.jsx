@@ -11,9 +11,15 @@ import {
 import API from '../../../../services/units'
 import * as styles from '../form.module.css'
 
-const timeToString = (timestamp) => (new Date(timestamp)).toJSON().slice(0,10)
-const getTodayString = () => (new Date()).toJSON().slice(0,10)
 const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
+const getTodayString = () => (new Date()).toJSON().slice(0,10)
+const timeToString = (time) => {
+    try { return (new Date(time)).toJSON().slice(0,10) } 
+    catch (e) { 
+        console.warn('Error => timeToString', e)
+        return getTodayString()
+    }
+}
 
 export default function UnitForm ({
     unit,
@@ -38,6 +44,7 @@ export default function UnitForm ({
     }, [])
 
     const resetFormData = () => {
+        timeToString(unit.expiresAt) ?? '2000-01-01'
         setFormData({
             id: unit.id ?? '',
             name: unit.name ?? '',
@@ -47,7 +54,7 @@ export default function UnitForm ({
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.freeProgress ?? false,
-            expiresAt: timeToString(unit.expiresAt) ?? '2000-01-01'
+            expiresAt: 
         })
     }
 
