@@ -47,7 +47,7 @@ export default function ProgressReport() {
             students = getStudentsWithoutGroup()
         } else {
             const group = report.groups.find(g => g.id == value)
-            students = report.students.filter(s => group.students.find(g => g.userId == s.student.bbId)) ?? []
+            students = report.students.filter(s => group.students.find(userId => userId == s.student.bbId)) ?? []
         }
         setFilteredStudents(students)
         setSelectedGroup(value)
@@ -55,12 +55,10 @@ export default function ProgressReport() {
     }
 
     const getStudentsWithoutGroup = () => {
-        const studentsWithGroup = report.groups.map(
-            // extract id strings from each group
-            group => group.students.map(s => s.userId)
-        ).reduce((accumulator = [], current) => 
-            [ ...accumulator, ...current]
-        ) // merge all into a single array
+        const studentsWithGroup = report.groups.map(g => g.students)
+            .reduce((accumulator = [], current) => 
+                [ ...accumulator, ...current]
+            ) // merge all into a single array
         const studentsWithoutGroup = report.students.filter(
             s => !studentsWithGroup.includes(s.student.bbId)
         ) ?? []

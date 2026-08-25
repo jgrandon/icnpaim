@@ -319,10 +319,13 @@ module.exports = function (app) {
     // Now finally redirect to the UI
     const messageType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/message_type'];
     const {person_sourcedid : bbStudentExternalId} = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/lis']
-    const bbCourseId = jwtPayload.return_url
+    
+    const bbCourseExternalId = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/context'].label
+
+    /* const bbCourseId = jwtPayload.return_url
       .split('?')[1]
       .split('&')[0]
-      .replace('course_id=','')
+      .replace('course_id=','') */
     if (messageType === 'LtiDeepLinkingRequest') {
       res.redirect(`/deep_link_options?nonce=${state}`);
     } else if (jwtPayload.target_link_uri && jwtPayload.target_link_uri.includes('/lti/launch')) {
@@ -334,7 +337,7 @@ module.exports = function (app) {
       await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
-      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
+      await db.insertNewAuthToken(state, bbCourseExternalId, 'bbCourseExternalId');
       // Redirigir al dashboard
       res.redirect('/dashboard');
     } else if (jwtPayload.target_link_uri.endsWith('lti13bobcat')) {
@@ -360,7 +363,7 @@ module.exports = function (app) {
       //await db.insertNewAuthToken(state, wpStudentId, 'wpStudentId');
       //await db.insertNewAuthToken(state, wpCourseId, 'wpCourseId');
       await db.insertNewAuthToken(state, bbStudentExternalId, 'bbStudentExternalId');
-      await db.insertNewAuthToken(state, bbCourseId, 'bbCourseId');
+      await db.insertNewAuthToken(state, bbCourseExternalId, 'bbCourseExternalId');
 
       const isStudent = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/roles']
           .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
@@ -796,7 +799,9 @@ module.exports = function (app) {
     // Catch all
     app.get('*', async (req, res) => {
         console.log('catchall - (' + req.url + ')');
-
+        console.log('/* => req.query => ', req.query)
+        console.log('/* => origin => ', req.get('origin'))
+        
         const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
 
         const isStudent = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']

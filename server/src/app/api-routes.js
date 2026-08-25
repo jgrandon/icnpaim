@@ -16,6 +16,9 @@ import * as LRHandler from './handlers/v2/learningRoutes'
 import * as dashboardHandler from './handlers/v2/dashboard'
 import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
+import * as ddaStudentHandler from './handlers/v2/dda/student'
+import * as ddaCourseHandler from './handlers/v2/dda/course'
+import * as ddaGradesHandler from './handlers/v2/dda/grades'
 // import mockLti from './mockLti.json'
 
 const router = express.Router()
@@ -46,17 +49,18 @@ const requireLTISession = async (req, res, next) => {
                 jwt: auth.jwt,
                 sessionId: sessionId,
                 bbStudentExternalId: auth.bbStudentExternalId,
-                bbCourseId: auth.bbCourseId
+                bbCourseExternalId: auth.bbCourseExternalId
             }
         }
         
         // get subject and student data from db
-        const { bbCourseId, jwt, bbStudentExternalId } = req.ltiSession
-        console.log('requireLTISession => bbCourseId => ', bbCourseId)
+        const { bbCourseExternalId, jwt, bbStudentExternalId } = req.ltiSession
+        console.log('requireLTISession => bbCourseExternalId => ', bbCourseExternalId)
         console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
         console.log('requireLTISession => jwt => ', jwt)
         
-        const bbStudentId = await students.getStudentId(bbStudentExternalId)
+        const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId)
+        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId)
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
@@ -83,6 +87,7 @@ const requireLTISession = async (req, res, next) => {
             req.ltiSession = {
                 ...req.ltiSession,
                 bbStudentId,
+                bbCourseId,
                 subject,
                 student,
                 isStudent,
@@ -784,20 +789,13 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ).map(c => c.contentId)
         ).reduce((acc = [], a) => [ ...acc, ...a ], [])
     
-        //console.log('/v2/dashboard => cardsContentIds', cardsContentIds )
-
-        //mezcla todos los contentId de cards y de units en una sola variable
-        /*
-        const contentIds = [
-            ...units.filter(u => u.bbId)?.map(u => u.bbId), // units contents
-            ...cardsContentIds // cards contents
-        ]
-        */
         
-        console.log('/v2/dashboard => contentIds', contentIds )
-
+        //query to get all course higher score grades from every student
+        const ddaGrades = await ddaGradesHandler.getStudentGrades(bbStudentId, bbCourseId)
 
         // get content grades
+
+        /*
         let allGrades = []
         const iContents = contentIds.length
         for (let i = 0; i<iContents; i++) {
@@ -820,27 +818,22 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                 grade
             })
         }
-
-        // obtiene contents desde bb
-        /* obtiene notas:
-            - obtiene bb column id en base a bb course id y bb content id
-            - obtiene grade en base a bb column id */
+        */
             
         let allLR = await LRHandler.getAllUnitsLearningRoutes(subject.id)
     
         const __DEFAULT_STUDENT_LR_INDEX = 1
         let fullUnits = []
-        //units.map(u => {
         for( let i=0; i < units.length; i++ ) {
             const currentUnit = units[i]
-            const currentLR = allLR[currentUnit.id]//.map(lr => lr.contents)
+            const currentLR = allLR[currentUnit.id]
 
             //assign grade to content
             let cards = []
             for( let x=0; x < currentUnit.cards.length; x++ ) {
                 const c = currentUnit.cards[x]
-                const grade = allGrades.find(g => g.contentId == c.contentId)
-                if (grade?.grade?.status == 'Graded') {
+                const grade = ddaGrades.find(g => g.contentId == c.contentId)
+                if (grade /*?.grade?.status == 'Graded'*/) {
                     // notify progress
                     await LRHandler.updateContentProgress({
                         studentId: student.id,
@@ -850,7 +843,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                 cards.push({
                     ...c,
                     grade,
-                    completed: c.completed || grade?.grade?.status == 'Graded'
+                    completed: c.completed || !!grade
                 })
             }
             
@@ -859,11 +852,10 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             let unitGrade = null
 
             try {
-                    // TODO:: find grade to decide student lr index
-                    unitGrade = await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
-                    const { displayGrade } = unitGrade
+                    unitGrade = ddaGrades.find(g => g.gradebookId == currentUnit.evaluationId)
+                      //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
                     console.log('unitGrade =>', unitGrade)
-                    const score = displayGrade.score * 7 / displayGrade.possible
+                    const score = (unitGrade.score * 6 / unitGrade.possible) + 1
                     console.log('score =>', score)
 
                     studentLearningIndex = currentLR.find(
@@ -891,19 +883,12 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             })
         }
     
-        /* itera unidades:
-            - set units grade
-            - set grade to all cards
-            - get unit learningRoutes
-            - assign a studentLearningRoute based on grade */
-        // notify new progress
-        // return units, contents, allGrades
-    
         return res.status(200).json({
             success: true,
             units: fullUnits,
             subject,
-            student
+            student,
+            ddaGrades
         })
       
     } catch (error) {
@@ -962,28 +947,30 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         const students = await studentHandler.getStudentsResults(subject.id)
         
         const units = await LRHandler.getContentsByLevel(subject.id)
-        const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
-        const groups = await contentsHandler.getBBGroups(bbCourseId)
+        // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
+        const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
+
         //get students by group
-        //get students unit grades
-        
-        
-
-        //mix students progress with group name
-        //mix student with units grades
-
+        const groups = await ddaCourseHandler.getGroups(bbCourseId)
+        //const groups = await contentsHandler.getBBGroups(bbCourseId)
+                
         const report = students.map(student => {
-            const group = groups.find(g => g.students.find(s => s.userId == student.bbId))
+            //const group = groups.find(g => g.students.find(userId => userId == student.bbId))
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
+                /*
                 if (!subjectGrades[u.unit.id]) {
                     return noProgress
-                }
-                const grade = subjectGrades[u.unit.id].find(g => g.userId == student.bbId)
+                }*/
+                const grade = subjectGrades.find(g => g.userId == student.bbId && g.gradebookId == u.unit.evaluationId)
                 if (!grade) {
                     return noProgress
                 }
-                const studentGrade = parseFloat(grade?.displayGrade?.text)
+                
+                //parseFloat(grade?.displayGrade?.text)
+                let studentGrade = NaN
+                try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
+                catch (e) { console.warn('/v2/results => ERROR while trying to parse student grade', e.message) } 
                 if (studentGrade==NaN) {
                     return noProgress
                 }
@@ -1004,7 +991,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             return {
                 student,
                 progress,
-                group
+                //group
             }
         })
 

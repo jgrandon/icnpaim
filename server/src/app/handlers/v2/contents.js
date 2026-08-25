@@ -81,7 +81,8 @@ function processUrl ({
         //https://udla-staging.blackboard.com/ultra/courses/_89726_1/scorm/overview/_4639218_1
         //https://udla-staging.blackboard.com/ultra/courses/_89726_1/scorm/_4639218_1/columns/_1077428_1/submissions?courseId=_89726_1&gradeitemView=students
     }
-    return { url, bbContentId }
+    const cleanContentId = bbContentId.replace('_1', '').replace('_', '')
+    return { url, bbContentId: cleanContentId }
 }
 
 function getCourseIdFromURL (url) {
