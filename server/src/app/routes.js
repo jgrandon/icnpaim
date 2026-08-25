@@ -799,7 +799,9 @@ module.exports = function (app) {
     // Catch all
     app.get('*', async (req, res) => {
         console.log('catchall - (' + req.url + ')');
-
+        console.log('/* => req.query => ', req.query)
+        console.log('/* => origin => ', req.get('origin'))
+        
         const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
 
         const isStudent = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
