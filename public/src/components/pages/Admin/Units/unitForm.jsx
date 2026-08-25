@@ -54,7 +54,7 @@ export default function UnitForm ({
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
             freeProgress: unit.freeProgress ?? false,
-            expiresAt: timeToString(unit.expiredAt) / 1000
+            expiresAt: timeToString(unit.expiredAt * 1000)
         })
     }
 
@@ -76,7 +76,7 @@ export default function UnitForm ({
         e.preventDefault()
         if (!formData.name) return alert('Nombre es obligatorio')
         
-        const expiresAt = stringToTime(formData.expiresAt)
+        const expiresAt = stringToTime(formData.expiresAt) / 1000
 
         try {
             if (unit.id) {
