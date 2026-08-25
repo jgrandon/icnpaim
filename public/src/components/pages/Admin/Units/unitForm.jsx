@@ -27,12 +27,16 @@ export default function UnitForm ({
         evaluationId: '',
         published: false,
         freeProgress: false,
-        expiration: '2000-01-01'
+        expirationDate: getTodayString()
     })
 
     useEffect(()=> {
         resetFormData()
     }, [])
+
+    const timeToString = (timestamp) => (new Date(timestamp)).toJSON().slice(0,10)
+    const getTodayString = () => (new Date()).toJSON().slice(0,10)
+    const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
 
     const resetFormData = () => {
         setFormData({
@@ -43,8 +47,8 @@ export default function UnitForm ({
             evaluationName: unit.evaluationName,
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
-            freeProgress: unit.free_progress ?? false,
-            expiration: unit.expiration ?? '2000-01-01'
+            freeProgress: unit.freeProgress ?? false,
+            expirationDate: timeToString(unit.expirationDate) ?? '2000-01-01'
         })
     }
 
@@ -65,11 +69,13 @@ export default function UnitForm ({
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!formData.name) return alert('Nombre es obligatorio')
+        
+        const expirationDate = stringToTime(formData.expirationDate)
 
         try {
             if (unit.id) {
             // Update Action
-                const allUnits = await API.updateUnit({ ...formData })
+                const allUnits = await API.updateUnit({ ...formData, expirationDate })
                 //setSelectedUnitId(null)
                 updateCallback('updated',allUnits)
             } else {
@@ -233,10 +239,10 @@ export default function UnitForm ({
                     >
                         <TextField
                             name='expiration'
-                            label='Fecha Cierre'
                             type='date'
-                            defaultValue={(new Date()).toJSON().slice(0,10)}
+                            defaultValue={getTodayString()}
                             className=''
+                            value={formData.expirationDate ?? getTodayString()}
                             color='primary'
                             onChange={handleInputChange}
                             InputLabelProps={{
