@@ -74,7 +74,8 @@ export async function createDefaultLR(unitId) {
     return res.rows
 }
 
-export async function updateUnit({ id, name, color, position, description, published, freeProgress, bbCourseId, expiresAt }) {
+export async function updateUnit({ id, name, color, position, description,
+    published, freeProgress, bbCourseId, expiresAt }) {
     const res = await client.query(
         `UPDATE unit SET
             name = $1,
