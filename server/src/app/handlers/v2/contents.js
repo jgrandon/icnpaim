@@ -87,8 +87,9 @@ function processUrl ({
         console.log('processUrl finalUrl => ',url)
         console.log('processUrl bbContentId => ',bbContentId)
         
-        const cleanContentId = bbContentId?.replace('_1', '')?.replace('_', '')
-        
+        const cleanContentId = cleanBBId(bbContentId)
+        console.log('processUrl cleanContentId => ',cleanContentId)
+
         return { url, bbContentId: cleanContentId }
     } catch (e) {
         console.error('ERROR: processUrl() => ', e)
@@ -96,6 +97,15 @@ function processUrl ({
     }
 }
 
+function cleanBBId(identifier) {
+    if (identifier.startsWith('_')) {
+        identifier = identifier.slice(1);
+    }
+    if (identifier.endsWith('_1')) {
+        identifier = identifier.slice(0, -2);
+    }
+    return identifier;
+}
 
 function getCourseIdFromURL (url) {
     const match = url.match(/courses\/(.*?)(?=\/assessment)/)
