@@ -203,7 +203,8 @@ export const deleteSession = (state) => {
     try {
         console.log('deleteSession => state', state)
         const index = auth.getIndex('.auth-data', state)
-        auth.delete(`.auth-data[${index}]`)
+        console.log('deleteSession => index', index)
+        auth.delete(`.auth-data[${index - 1}]`)
         return true
     } catch (e) {
         return e
