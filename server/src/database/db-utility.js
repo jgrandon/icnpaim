@@ -190,7 +190,8 @@ export const deleteExpiredSessions = () => {
   if (sessions && sessions.length > 0) {
     sessions.forEach(session => {
       try {
-        const index = auth.getIndex('.auth-data', session.state);
+        console.log('deleteExpiredSessions => session.state', session.state)
+        const index = auth.getIndex('.auth-data', session.state, 'state');
         auth.delete(`.auth-data[${index}]`);
       } catch (e) {
         return e;
@@ -202,7 +203,8 @@ export const deleteExpiredSessions = () => {
 export const deleteSession = (state) => {
     try {
         console.log('deleteSession => state', state)
-        const index = auth.getIndex('.auth-data', state)
+        const index = auth.getIndex('.auth-data', state, 'state')
+        console.log('deleteSession => index', index)
         auth.delete(`.auth-data[${index}]`)
         return true
     } catch (e) {
