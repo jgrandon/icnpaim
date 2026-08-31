@@ -60,7 +60,7 @@ const requireLTISession = async (req, res, next) => {
         console.log('requireLTISession => jwt => ', jwt)
         
         const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId)
-        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId)
+        const bbStudentId = 1073956 //await ddaStudentHandler.getBBid(bbStudentExternalId)
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
