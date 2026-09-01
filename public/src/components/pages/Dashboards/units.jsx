@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid'
 export default function DashboardUnits (props) {
     //const { units } = props
     const [selectedUnitId, setSelectedUnitId] = useState(null)
+    const isMobile = window.matchMedia('(max-width: 800)').matches
+
 
     const handleAccordionChange = (panel) => (e, isExpanded) => {
         console.log('handleAccordionChange')
