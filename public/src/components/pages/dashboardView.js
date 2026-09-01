@@ -215,12 +215,13 @@ class DashboardView extends React.Component {
           //loading: false
         });
 
-        this.loadDashboard();
-      } else {
+      } 
+      /*else {
         await this.loadUserData();
         await this.loadCourses();
         await this.loadBBCourseId();
-      }
+      }*/
+      this.loadDashboard();
       
     } catch (error) {
       console.error('Error loading dashboard:', error);
