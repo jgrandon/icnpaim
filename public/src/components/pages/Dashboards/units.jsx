@@ -35,7 +35,7 @@ export default function DashboardUnits (props) {
             console.log('useEffect notExpiredUnits', notExpiredUnits)
             const activeUnit = notExpiredUnits[0]
             console.log('useEffect activeUnit', activeUnit)
-            setSelectedUnitId(activeUnit.id)
+            if (!!activeUnit) setSelectedUnitId(activeUnit?.id)
         }
     }, [])
 
