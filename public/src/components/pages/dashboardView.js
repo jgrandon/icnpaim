@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import Typography from '@material-ui/core/Typography';
+import { Link } from 'react-router-dom'
 import {
+  Typography,
   Card,
   CardContent,
   Grid,
@@ -16,23 +17,27 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  CardActions
+  CardActions,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Modal
 } from '@material-ui/core';
 import { 
   School, 
   ChevronRight
 } from '@material-ui/icons';
-import Modal from '@material-ui/core/Modal';
 import { withStyles } from '@material-ui/core/styles';
-import { openSnackbar } from '../page_objects/snackbar';
-import parameters from '../../util/parameters';
-import ContentCard from '../organisms/contentCard/';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
+import ContentCard from '../organisms/contentCard/';
+import { openSnackbar } from '../page_objects/snackbar';
+import parameters from '../../util/parameters';
 import { useResponsive } from '../../hooks/useResponsive'
-import { Link } from 'react-router-dom'
+import DashboardUnits from './Dashboards/units';
 
 const nodeEnv = process.env.NODE_ENV
+//const backendUrl = process.env.APP_BACKEND_URL
 
 
 const params = parameters.getInstance();
@@ -196,9 +201,9 @@ class DashboardView extends React.Component {
 
   async componentDidMount() {
     try {
-      //bypass lti integration
       console.log('DashboardView => componentDidMount => nodeEnv', nodeEnv)
-
+      
+      //bypass lti integration
       if (nodeEnv=='development') {
         console.log('DashboardView => componentDidMount => DEVELOPMENT')
   
@@ -600,84 +605,12 @@ class DashboardView extends React.Component {
                   </Typography>
                 </CardContent>
               </Card>
-            ) : (              
-              <div style={{
-                width: isMobile ? 'fit-content' : 'unset',
-                maxWidth: isMobile ? 'unset' :'800px',
-                display: 'flex',
-                flexDirection: 'column',
-                margin: 'auto',
-                gap: '100px'
-              }}>
-                {units.map((unit, unitIndex) => {
-                  const learningRoute = unit.studentLearningRoute
-                  return (
-                    <div key={uuidv4()}>
-                      <div style={{
-                        // width: 500,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        border: '2px rgb(229 231 235f)',
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '9999px',
-                        alignItems: 'center',
-                        boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
-                      }}>
-                        <div style={{
-                          width: '3rem',
-                          height: '3rem',
-                          border: `1px solid ${unit.color ?? 'gray'}`,
-                          borderRadius: '999px',
-                          display: 'flex',
-                          gap: '15px',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                          <School style={{
-                            width: 'calc(3rem * 0.7)',
-                            height: 'calc(3rem * 0.7)'
-                          }}/>
-                        </div>
-                        <div>
-                          <Typography variant="h4"
-                          style={{fontSize: '1.25rem'}}
-                          >{unit.name}</Typography>
-                          <Typography variant="h6"
-                          style={{fontSize: '0.85rem'}}
-                          >{unit.description}</Typography>
-                        </div>
-                        <div>
-                          {unit.studentLearningRoute?.length} actividades
-                        </div>
-                      </div>
-                      {!unit.unitGrade
-                        ? <Typography variant="h6" style={{
-                          color: 'black',
-                          margin: '20px 0px 0px 0px'
-                          }}>
-                            Aun no tienes nota de evaluación para esta unidad
-                          </Typography>
-                        : null}
-                      <Box 
-                        key={uuidv4()}
-                        style={{ padding: 10 }}
-                      >
-                        {
-                        
-                        learningRoute?.map((card, index) => (
-                          <ContentCard
-                            ref={el => _this.cardsRef.current[unitIndex][index].current = el}
-                            key={uuidv4()}
-                            card={card}
-                            onClick={(e) => this.notifyContentProgress(e,unit, card)}
-                            unit={unit}
-                          />
-                        ))}
-                      </Box>
-                    </div>
-                  );
-                })}
-              </div>
+            ) : (
+              <DashboardUnits
+                units={units}
+                notifyContentProgress={notifyContentProgress}
+                cardsRef={_this.cardsRef}
+              />
             )}
             
           </>
