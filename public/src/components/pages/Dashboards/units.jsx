@@ -14,12 +14,8 @@ import ContentCard from '../../organisms/contentCard/'
 import { v4 as uuidv4 } from 'uuid'
 
 
-export default function DashboardUnits ({
-    units,
-    cardsRef,
-    notifyContentProgress,
-    handle
-}) {
+export default function DashboardUnits (props) {
+    //const { units } = props
     const [selectedUnitId, setSelectedUnitId] = useState(null)
 
     const handleAccordionChange = (panel) => (e, isExpanded) => {
@@ -29,10 +25,12 @@ export default function DashboardUnits ({
 
     useEffect(() => {
         const now = new Date().getTime();
-        const notExpiredUnits = units
-            .filter(u => u.expiresAt > now)
+        const notExpiredUnits = props.units
+            ?.filter(u => u.expiresAt > now)
             ?.sort((a,b) => a.expiresAt - b.expiresAt)
+        console.log('useEffect notExpiredUnits', notExpiredUnits)
         const activeUnit = notExpiredUnits[0]
+        console.log('useEffect activeUnit', activeUnit)
         setSelectedUnitId(activeUnit.id)
     }, [])
 
@@ -45,7 +43,7 @@ export default function DashboardUnits ({
         margin: 'auto',
         gap: '100px'
     }}>
-        {units.map((unit, unitIndex) => (
+        {props.units.map((unit, unitIndex) => (
         <Accordion
             key={uuidv4()}
             expanded={selectedUnitId === unit.id}
@@ -110,10 +108,10 @@ export default function DashboardUnits ({
                 >
                     {unit.studentLearningRoute?.map((card, index) => (
                         <ContentCard
-                        ref={el => cardsRef.current[unitIndex][index].current = el}
+                        ref={el => props.cardsRef.current[unitIndex][index].current = el}
                         key={uuidv4()}
                         card={card}
-                        onClick={(e) => notifyContentProgress(e,unit, card)}
+                        onClick={(e) => props.notifyContentProgress(e,unit, card)}
                         unit={unit}
                         />
                     ))}
