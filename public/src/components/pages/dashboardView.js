@@ -609,7 +609,7 @@ class DashboardView extends React.Component {
             ) : (
               <DashboardUnits
                 units={units}
-                notifyContentProgress={notifyContentProgress}
+                notifyContentProgress={_this.notifyContentProgress}
                 cardsRef={_this.cardsRef}
               />
             )}
