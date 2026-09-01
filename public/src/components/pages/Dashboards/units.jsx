@@ -27,13 +27,16 @@ export default function DashboardUnits (props) {
 
     useEffect(() => {
         const now = new Date().getTime();
-        const notExpiredUnits = props.units
-            ?.filter(u => u.expiresAt > now)
-            ?.sort((a,b) => a.expiresAt - b.expiresAt)
-        console.log('useEffect notExpiredUnits', notExpiredUnits)
-        const activeUnit = notExpiredUnits[0]
-        console.log('useEffect activeUnit', activeUnit)
-        setSelectedUnitId(activeUnit.id)
+        console.log('useEffect => props.units', props.units)
+        if (!!props.units) {
+            const notExpiredUnits = props.units
+                ?.filter(u => u.expiresAt > now)
+                ?.sort((a,b) => a.expiresAt - b.expiresAt)
+            console.log('useEffect notExpiredUnits', notExpiredUnits)
+            const activeUnit = notExpiredUnits[0]
+            console.log('useEffect activeUnit', activeUnit)
+            setSelectedUnitId(activeUnit.id)
+        }
     }, [])
 
     return (
@@ -99,7 +102,7 @@ export default function DashboardUnits (props) {
                         color: 'black',
                         margin: '20px 0px 0px 0px'
                         }}>
-                        Aun no tienes nota de evaluación para esta unidad
+                            Aun no tienes nota de evaluación para esta unidad
                         </Typography>
                     : null
                 }
