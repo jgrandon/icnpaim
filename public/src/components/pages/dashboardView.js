@@ -564,112 +564,7 @@ class DashboardView extends React.Component {
 
         <ProgressDashboard units={units} onNextTask={(nextTask) => this.focusOnNextTask(nextTask)}/>
 
-        {/* Estadísticas del Curso */}
-        {/*
-        {selectedCourse && (
-          <Grid container spacing={3} style={{ marginBottom: 24 }}>
-            <Grid item xs={12} sm={4}>
-              <Card className={classes.statsCard} elevation={4}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {units.length}
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Unidades Totales
-                      </Typography>
-                    </Box>
-                    <Assignment fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            */}
-            {/*
-            <Grid item xs={12} sm={4}>
-              <Card className={classes.progressCard} elevation={4}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {grades.length}
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Evaluaciones
-                      </Typography>
-                    </Box>
-                    <BarChart fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card elevation={4} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {overallProgress}%
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Promedio Notas
-                      </Typography>
-                    </Box>
-                    <TrendingUp fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            */}
-          {/* 
-          </Grid>
-          /*}
-        )}
-
-        {/* Cursos */}
-        {/*
-        {courses.length > 0 && (
-          <>
-            <Typography variant="h5" className={classes.sectionTitle}>
-              <Assignment className={classes.cardIcon} />
-              Mis Cursos
-            </Typography>
-            
-            <Grid container spacing={3}>
-              {courses.map(course => (
-                <Grid item xs={12} sm={6} md={4} key={course.id}>
-                  <Card 
-                    className={`${classes.courseCard} ${selectedCourse?.id === course.id ? classes.selectedCourse : ''}`}
-                    onClick={() => this.selectCourse(course)}
-                    elevation={selectedCourse?.id === course.id ? 8 : 2}
-                  >
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        {course.title}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        {course.meta?.lms_context_label || 'Curso'}
-                      </Typography>
-                      {selectedCourse?.id === course.id && (
-                        <Chip 
-                          label="Seleccionado" 
-                          color="primary" 
-                          size="small" 
-                          style={{ marginTop: 8 }}
-                        />
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        )}
-          */}
-
         <div style={{
-          // margin: '50px auto',
           width: isMobile ? 'fit-content' : 'unset',
           maxWidth: isMobile ? 'unset' :'800px',
           margin: '70px auto',
@@ -694,14 +589,6 @@ class DashboardView extends React.Component {
         {/* Unidades como Cards */}
         {selectedCourse && (
           <>
-          {/*
-            <Typography variant="h5" className={classes.sectionTitle}>
-              <TrendingUp className={classes.cardIcon} />
-              Unidades - {selectedCourse.title}
-            </Typography>
-          */}
-
-          
             {units.length === 0 ? (
               <Card>
                 <CardContent className={classes.emptyState}>
