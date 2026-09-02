@@ -38,7 +38,7 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
             description, freeProgress,
             evaluationId, expiresAt } = row
 
-        const content = { id: contentid,
+        const content = { id: contentId,
             title, type, url, completed, contentId: bbContentId }
         const unit = { id, name, description, color, position, freeProgress, evaluationId, expiresAt}
 
