@@ -82,7 +82,7 @@ export default function DashboardUnits (props) {
             onChange={handleAccordionChange(unit.id)}
             style={{
                 width: 'stretch',
-                borderRadius: 'none'
+                boxShadow: 'none'
             }}
         >
             <AccordionSummary 
