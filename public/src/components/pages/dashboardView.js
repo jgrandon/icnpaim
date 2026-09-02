@@ -342,7 +342,6 @@ class DashboardView extends React.Component {
                 loading: false
             });
 
-            const now = new Date().getTime();
             console.log('setting default active unit => units', units)
             if (!!units) {
                 const activeUnit = this.getActiveUnit()
@@ -521,6 +520,7 @@ class DashboardView extends React.Component {
   }
 
   getActiveUnit () {
+    const now = new Date().getTime();
     const notExpiredUnits = this.state.units
         ?.filter(u => u.expiresAt > now)
         ?.sort((a,b) => a.expiresAt - b.expiresAt)
