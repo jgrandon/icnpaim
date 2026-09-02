@@ -10,12 +10,39 @@ import {
 import { 
   School
 } from '@material-ui/icons'
+import { makeStyles } from '@material-ui/core/styles'
 import ContentCard from '../../organisms/contentCard/'
 import { v4 as uuidv4 } from 'uuid'
 
+const useStyles = makeStyles((theme) => ({
+    accordionSummary: {
+        display: 'flex',
+        gap: '5px',
+        justifyContent: 'space-between',
+        border: '2px rgb(229 231 235f)',
+        padding: '0.75rem 1.5rem',
+        borderRadius: '9999px',
+        alignItems: 'center',
+        '& .MuiAccordionSummary-content': {
+            gap: '15px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 10fr 2fr'
+        },
+    },
+    unitHeader: {
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '999px',
+        display: 'flex',
+        gap: '15px',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+}))
 
 export default function DashboardUnits (props) {
     //const { units } = props
+    const classes = useStyles()
     const [selectedUnitId, setSelectedUnitId] = useState(null)
     const isMobile = window.matchMedia('(max-width: 800)').matches
 
@@ -54,28 +81,22 @@ export default function DashboardUnits (props) {
             expanded={selectedUnitId === unit.id}
             onChange={handleAccordionChange(unit.id)}
             style={{
-                width: 'stretch'
+                width: 'stretch',
+                borderRadius: 'none'
             }}
         >
-            <AccordionSummary style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            border: '2px rgb(229 231 235f)',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '9999px',
-            alignItems: 'center',
-            boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
-            }}>
-                <div style={{
-                    width: '3rem',
-                    height: '3rem',
-                    border: `1px solid ${unit.color ?? 'gray'}`,
-                    borderRadius: '999px',
-                    display: 'flex',
-                    gap: '15px',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
+            <AccordionSummary 
+                className={classes.accordionSummary}
+                style={{
+                    boxShadow: selectedUnitId === unit.id
+                        ? `0px 0px 6px 6px ${unit.color ?? 'gray'}`
+                        : '1px 2px 6px 3px rgb(0 0 0 / .15)'
+                }}    
+            >
+                <div 
+                    className={classes.unitHeader}
+                    style={{border: `1px solid ${unit.color ?? 'gray'}`}}
+                >
                     <School style={{
                         width: 'calc(3rem * 0.7)',
                         height: 'calc(3rem * 0.7)'
@@ -91,7 +112,10 @@ export default function DashboardUnits (props) {
                         style={{fontSize: '0.85rem'}}
                     >{unit.description}</Typography>
                 </div>
-                <div>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end'
+                }}>
                     {unit.studentLearningRoute?.length} actividades
                 </div>      
             </AccordionSummary>
