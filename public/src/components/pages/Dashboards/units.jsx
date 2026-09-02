@@ -47,20 +47,6 @@ export default function DashboardUnits (props) {
     const isMobile = window.matchMedia('(max-width: 800)').matches
 
 
-    const handleAccordionChange = (panel) => (e, isExpanded) => {
-        console.log('handleAccordionChange')
-        props.setSelectedUnitId(isExpanded ? panel : false )
-    }
-
-    useEffect(() => {
-        const now = new Date().getTime();
-        console.log('useEffect => props.units', props.units)
-        if (!!props.units) {
-            const activeUnit = props.getActiveUnit()
-            if (!!activeUnit) props.setSelectedUnitId(activeUnit?.id)
-        }
-    }, [])
-
     return (
     <div style={{
         width: isMobile ? 'fit-content' : 'unset',
@@ -74,7 +60,7 @@ export default function DashboardUnits (props) {
         <Accordion
             key={uuidv4()}
             expanded={props.selectedUnitId === unit.id}
-            onChange={handleAccordionChange(unit.id)}
+            onChange={props.handleAccordionChange(unit.id)}
             style={{
                 width: 'stretch',
                 boxShadow: 'none'

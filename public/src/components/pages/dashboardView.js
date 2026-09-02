@@ -330,6 +330,9 @@ class DashboardView extends React.Component {
             )
 
             console.log('cardsRef', this.cardsRef)
+
+            
+
             this.setState({
                 units,
                 selectedCourse: subject,
@@ -338,6 +341,13 @@ class DashboardView extends React.Component {
                 user: student,
                 loading: false
             });
+
+            const now = new Date().getTime();
+            console.log('setting default active unit => units', units)
+            if (!!units) {
+                const activeUnit = this.getActiveUnit()
+                if (!!activeUnit) this.setState({selectedUnitId:activeUnit?.id})
+            }
         } catch (error) {
             console.error('Error loading course data:', error);
         }
@@ -520,6 +530,12 @@ class DashboardView extends React.Component {
     return activeUnit
   }
 
+    
+  handleAccordionChange = (panel) => (e, isExpanded) => {
+      console.log('handleAccordionChange')
+      this.setState({selectedUnitId: isExpanded ? panel : false})
+  }
+
   render() {
     const isMobile = window.matchMedia('(max-width: 800)').matches
     const _this = this
@@ -625,8 +641,7 @@ class DashboardView extends React.Component {
                 notifyContentProgress={_this.notifyContentProgress}
                 cardsRef={_this.cardsRef}
                 selectedUnitId={_this.state.selectedUnitId}
-                setSelectedUnitId={(unitId) => _this.setState({ selectedUnitId: unitId })}
-                getActiveUnit={_this.getActiveUnit}
+                handleAccordionChange={_this.handleAccordionChange}
               />
             )}
             
