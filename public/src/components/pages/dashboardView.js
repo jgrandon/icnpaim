@@ -194,7 +194,8 @@ class DashboardView extends React.Component {
       overallProgress: 0,
       bbCourseId: null,
       isModalOpen: false,
-      modalData: {}
+      modalData: {},
+      selectedUnitId: null
     };
     this.cardsRef = React.createRef()
   }
@@ -503,8 +504,20 @@ class DashboardView extends React.Component {
     const color = searchedCard.current.getAttribute('data-color') ?? '#ec622b'
     searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
     console.log('refs', this.cardsRef)
-    
+
+    const activeUnit = this.getActiveUnit()
+    this.setState({selectedUnitId: activeUnit?.id})
     searchedCard.current.scrollIntoView()
+  }
+
+  getActiveUnit () {
+    const notExpiredUnits = this.state.units
+        ?.filter(u => u.expiresAt > now)
+        ?.sort((a,b) => a.expiresAt - b.expiresAt)
+    console.log('useEffect notExpiredUnits', notExpiredUnits)
+    const activeUnit = notExpiredUnits[0]
+    console.log('useEffect activeUnit', activeUnit)
+    return activeUnit
   }
 
   render() {
@@ -611,6 +624,9 @@ class DashboardView extends React.Component {
                 units={units}
                 notifyContentProgress={_this.notifyContentProgress}
                 cardsRef={_this.cardsRef}
+                selectedUnitId={_this.state.selectedUnitId}
+                setSelectedUnitId={(unitId) => _this.setState({ selectedUnitId: unitId })}
+                getActiveUnit={_this.getActiveUnit}
               />
             )}
             

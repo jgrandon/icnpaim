@@ -43,26 +43,21 @@ const useStyles = makeStyles((theme) => ({
 export default function DashboardUnits (props) {
     //const { units } = props
     const classes = useStyles()
-    const [selectedUnitId, setSelectedUnitId] = useState(null)
+    //const [selectedUnitId, setSelectedUnitId] = useState(null)
     const isMobile = window.matchMedia('(max-width: 800)').matches
 
 
     const handleAccordionChange = (panel) => (e, isExpanded) => {
         console.log('handleAccordionChange')
-        setSelectedUnitId(isExpanded ? panel : false )
+        props.setSelectedUnitId(isExpanded ? panel : false )
     }
 
     useEffect(() => {
         const now = new Date().getTime();
         console.log('useEffect => props.units', props.units)
         if (!!props.units) {
-            const notExpiredUnits = props.units
-                ?.filter(u => u.expiresAt > now)
-                ?.sort((a,b) => a.expiresAt - b.expiresAt)
-            console.log('useEffect notExpiredUnits', notExpiredUnits)
-            const activeUnit = notExpiredUnits[0]
-            console.log('useEffect activeUnit', activeUnit)
-            if (!!activeUnit) setSelectedUnitId(activeUnit?.id)
+            const activeUnit = props.getActiveUnit()
+            if (!!activeUnit) props.setSelectedUnitId(activeUnit?.id)
         }
     }, [])
 
@@ -73,12 +68,12 @@ export default function DashboardUnits (props) {
         display: 'flex',
         flexDirection: 'column',
         margin: 'auto',
-        gap: '100px'
+        gap: '0px'
     }}>
         {props.units.map((unit, unitIndex) => (
         <Accordion
             key={uuidv4()}
-            expanded={selectedUnitId === unit.id}
+            expanded={props.selectedUnitId === unit.id}
             onChange={handleAccordionChange(unit.id)}
             style={{
                 width: 'stretch',
@@ -88,7 +83,7 @@ export default function DashboardUnits (props) {
             <AccordionSummary 
                 className={classes.accordionSummary}
                 style={{
-                    boxShadow: selectedUnitId === unit.id
+                    boxShadow: props.selectedUnitId === unit.id
                         ? `0px 0px 6px 6px ${unit.color ?? 'gray'}`
                         : '1px 2px 6px 3px rgb(0 0 0 / .15)'
                 }}    
