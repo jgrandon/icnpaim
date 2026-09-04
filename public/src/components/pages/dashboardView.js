@@ -508,17 +508,18 @@ class DashboardView extends React.Component {
   }
 
   focusOnNextTask (nextTask) {
+    const activeUnit = this.getActiveUnit()
+    this.setState({selectedUnitId: activeUnit?.id})
     console.log('nextTask', nextTask)
     console.log('nextTask => ', this.cardsRef)
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
     const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == nextTask.id)
     const color = searchedCard.current.getAttribute('data-color') ?? '#ec622b'
-    searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
     console.log('refs', this.cardsRef)
-
-    const activeUnit = this.getActiveUnit()
-    this.setState({selectedUnitId: activeUnit?.id})
-    searchedCard.current.scrollIntoView()
+    setTimeout(()=>{
+      searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
+      searchedCard.current.scrollIntoView()
+    }, 500)
   }
 
   getActiveUnit () {
