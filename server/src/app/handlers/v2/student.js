@@ -51,7 +51,7 @@ export async function registerStudentInSubject (student, subject) {
 
 export async function getStudentsResults (subject) {
     try {
-        const students = await ddaStudentHandler(subject.bbId)//await getStudentsInSubject(subjectId)
+        const students = await ddaStudentHandler.getStudentsInCourse(subject.bbId)//await getStudentsInSubject(subjectId)
         const progress = await getProgressByStudent(subject.id)
 
         return students.map(s => {
