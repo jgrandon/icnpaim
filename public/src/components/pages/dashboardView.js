@@ -492,7 +492,9 @@ class DashboardView extends React.Component {
       */
       const isScorm = card.type.toLowerCase() == 'scorm'
       const isControl = card.type.toLowerCase() == 'control'
-      if (!isControl && !isScorm) {
+      const isLabster = card.type.toLowerCase() == 'labster'
+
+      if (!isControl && !isScorm && !isLabster) {
         this.handleCardComplete(unit.id, card.id)
       }
     // }
