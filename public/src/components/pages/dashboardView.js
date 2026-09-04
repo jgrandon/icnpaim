@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import Typography from '@material-ui/core/Typography';
+import { Link } from 'react-router-dom'
 import {
+  Typography,
   Card,
   CardContent,
   Grid,
@@ -16,23 +17,27 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  CardActions
+  CardActions,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Modal
 } from '@material-ui/core';
 import { 
   School, 
   ChevronRight
 } from '@material-ui/icons';
-import Modal from '@material-ui/core/Modal';
 import { withStyles } from '@material-ui/core/styles';
-import { openSnackbar } from '../page_objects/snackbar';
-import parameters from '../../util/parameters';
-import ContentCard from '../organisms/contentCard/';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
+import ContentCard from '../organisms/contentCard/';
+import { openSnackbar } from '../page_objects/snackbar';
+import parameters from '../../util/parameters';
 import { useResponsive } from '../../hooks/useResponsive'
-import { Link } from 'react-router-dom'
+import DashboardUnits from './Dashboards/units';
 
 const nodeEnv = process.env.NODE_ENV
+//const backendUrl = process.env.APP_BACKEND_URL
 
 
 const params = parameters.getInstance();
@@ -189,16 +194,17 @@ class DashboardView extends React.Component {
       overallProgress: 0,
       bbCourseId: null,
       isModalOpen: false,
-      modalData: {}
+      modalData: {},
+      selectedUnitId: null
     };
     this.cardsRef = React.createRef()
   }
 
   async componentDidMount() {
     try {
-      //bypass lti integration
       console.log('DashboardView => componentDidMount => nodeEnv', nodeEnv)
-
+      
+      //bypass lti integration
       if (nodeEnv=='development') {
         console.log('DashboardView => componentDidMount => DEVELOPMENT')
   
@@ -210,12 +216,13 @@ class DashboardView extends React.Component {
           //loading: false
         });
 
-        this.loadDashboard();
-      } else {
+      } 
+      /*else {
         await this.loadUserData();
         await this.loadCourses();
         await this.loadBBCourseId();
-      }
+      }*/
+      this.loadDashboard();
       
     } catch (error) {
       console.error('Error loading dashboard:', error);
@@ -323,6 +330,9 @@ class DashboardView extends React.Component {
             )
 
             console.log('cardsRef', this.cardsRef)
+
+            
+
             this.setState({
                 units,
                 selectedCourse: subject,
@@ -331,6 +341,12 @@ class DashboardView extends React.Component {
                 user: student,
                 loading: false
             });
+
+            console.log('setting default active unit => units', units)
+            if (!!units) {
+                const activeUnit = this.getActiveUnit()
+                if (!!activeUnit) this.setState({selectedUnitId:activeUnit?.id})
+            }
         } catch (error) {
             console.error('Error loading course data:', error);
         }
@@ -476,7 +492,9 @@ class DashboardView extends React.Component {
       */
       const isScorm = card.type.toLowerCase() == 'scorm'
       const isControl = card.type.toLowerCase() == 'control'
-      if (!isControl && !isScorm) {
+      const isLabster = card.type.toLowerCase() == 'labster'
+
+      if (!isControl && !isScorm && !isLabster) {
         this.handleCardComplete(unit.id, card.id)
       }
     // }
@@ -490,15 +508,35 @@ class DashboardView extends React.Component {
   }
 
   focusOnNextTask (nextTask) {
+    const activeUnit = this.getActiveUnit()
+    this.setState({selectedUnitId: activeUnit?.id})
     console.log('nextTask', nextTask)
     console.log('nextTask => ', this.cardsRef)
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
     const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == nextTask.id)
     const color = searchedCard.current.getAttribute('data-color') ?? '#ec622b'
-    searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
     console.log('refs', this.cardsRef)
-    
     searchedCard.current.scrollIntoView()
+    setTimeout(()=>{
+      searchedCard.current.children[2].style['box-shadow'] = `${color} 2px 4px 12px 6px`
+    }, 500)
+  }
+
+  getActiveUnit () {
+    const now = new Date().getTime();
+    const notExpiredUnits = this.state.units
+        ?.filter(u => u.expiresAt > now)
+        ?.sort((a,b) => a.expiresAt - b.expiresAt)
+    console.log('useEffect notExpiredUnits', notExpiredUnits)
+    const activeUnit = notExpiredUnits[0]
+    console.log('useEffect activeUnit', activeUnit)
+    return activeUnit
+  }
+
+    
+  handleAccordionChange = (panel) => (e, isExpanded) => {
+      console.log('handleAccordionChange')
+      this.setState({selectedUnitId: isExpanded ? panel : false})
   }
 
   render() {
@@ -564,112 +602,7 @@ class DashboardView extends React.Component {
 
         <ProgressDashboard units={units} onNextTask={(nextTask) => this.focusOnNextTask(nextTask)}/>
 
-        {/* Estadísticas del Curso */}
-        {/*
-        {selectedCourse && (
-          <Grid container spacing={3} style={{ marginBottom: 24 }}>
-            <Grid item xs={12} sm={4}>
-              <Card className={classes.statsCard} elevation={4}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {units.length}
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Unidades Totales
-                      </Typography>
-                    </Box>
-                    <Assignment fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            */}
-            {/*
-            <Grid item xs={12} sm={4}>
-              <Card className={classes.progressCard} elevation={4}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {grades.length}
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Evaluaciones
-                      </Typography>
-                    </Box>
-                    <BarChart fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card elevation={4} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        {overallProgress}%
-                      </Typography>
-                      <Typography variant="body2" style={{ opacity: 0.9 }}>
-                        Promedio Notas
-                      </Typography>
-                    </Box>
-                    <TrendingUp fontSize="large" />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            */}
-          {/* 
-          </Grid>
-          /*}
-        )}
-
-        {/* Cursos */}
-        {/*
-        {courses.length > 0 && (
-          <>
-            <Typography variant="h5" className={classes.sectionTitle}>
-              <Assignment className={classes.cardIcon} />
-              Mis Cursos
-            </Typography>
-            
-            <Grid container spacing={3}>
-              {courses.map(course => (
-                <Grid item xs={12} sm={6} md={4} key={course.id}>
-                  <Card 
-                    className={`${classes.courseCard} ${selectedCourse?.id === course.id ? classes.selectedCourse : ''}`}
-                    onClick={() => this.selectCourse(course)}
-                    elevation={selectedCourse?.id === course.id ? 8 : 2}
-                  >
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        {course.title}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        {course.meta?.lms_context_label || 'Curso'}
-                      </Typography>
-                      {selectedCourse?.id === course.id && (
-                        <Chip 
-                          label="Seleccionado" 
-                          color="primary" 
-                          size="small" 
-                          style={{ marginTop: 8 }}
-                        />
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        )}
-          */}
-
         <div style={{
-          // margin: '50px auto',
           width: isMobile ? 'fit-content' : 'unset',
           maxWidth: isMobile ? 'unset' :'800px',
           margin: '70px auto',
@@ -694,14 +627,6 @@ class DashboardView extends React.Component {
         {/* Unidades como Cards */}
         {selectedCourse && (
           <>
-          {/*
-            <Typography variant="h5" className={classes.sectionTitle}>
-              <TrendingUp className={classes.cardIcon} />
-              Unidades - {selectedCourse.title}
-            </Typography>
-          */}
-
-          
             {units.length === 0 ? (
               <Card>
                 <CardContent className={classes.emptyState}>
@@ -713,84 +638,14 @@ class DashboardView extends React.Component {
                   </Typography>
                 </CardContent>
               </Card>
-            ) : (              
-              <div style={{
-                width: isMobile ? 'fit-content' : 'unset',
-                maxWidth: isMobile ? 'unset' :'800px',
-                display: 'flex',
-                flexDirection: 'column',
-                margin: 'auto',
-                gap: '100px'
-              }}>
-                {units.map((unit, unitIndex) => {
-                  const learningRoute = unit.studentLearningRoute
-                  return (
-                    <div key={uuidv4()}>
-                      <div style={{
-                        // width: 500,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        border: '2px rgb(229 231 235f)',
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '9999px',
-                        alignItems: 'center',
-                        boxShadow: '1px 2px 6px 3px rgb(0 0 0 / .15)'
-                      }}>
-                        <div style={{
-                          width: '3rem',
-                          height: '3rem',
-                          border: `1px solid ${unit.color ?? 'gray'}`,
-                          borderRadius: '999px',
-                          display: 'flex',
-                          gap: '15px',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                          <School style={{
-                            width: 'calc(3rem * 0.7)',
-                            height: 'calc(3rem * 0.7)'
-                          }}/>
-                        </div>
-                        <div>
-                          <Typography variant="h4"
-                          style={{fontSize: '1.25rem'}}
-                          >{unit.name}</Typography>
-                          <Typography variant="h6"
-                          style={{fontSize: '0.85rem'}}
-                          >{unit.description}</Typography>
-                        </div>
-                        <div>
-                          {unit.studentLearningRoute?.length} actividades
-                        </div>
-                      </div>
-                      {!unit.unitGrade
-                        ? <Typography variant="h6" style={{
-                          color: 'black',
-                          margin: '20px 0px 0px 0px'
-                          }}>
-                            Aun no tienes nota de evaluación para esta unidad
-                          </Typography>
-                        : null}
-                      <Box 
-                        key={uuidv4()}
-                        style={{ padding: 10 }}
-                      >
-                        {
-                        
-                        learningRoute?.map((card, index) => (
-                          <ContentCard
-                            ref={el => _this.cardsRef.current[unitIndex][index].current = el}
-                            key={uuidv4()}
-                            card={card}
-                            onClick={(e) => this.notifyContentProgress(e,unit, card)}
-                            unit={unit}
-                          />
-                        ))}
-                      </Box>
-                    </div>
-                  );
-                })}
-              </div>
+            ) : (
+              <DashboardUnits
+                units={units}
+                notifyContentProgress={_this.notifyContentProgress}
+                cardsRef={_this.cardsRef}
+                selectedUnitId={_this.state.selectedUnitId}
+                handleAccordionChange={_this.handleAccordionChange}
+              />
             )}
             
           </>

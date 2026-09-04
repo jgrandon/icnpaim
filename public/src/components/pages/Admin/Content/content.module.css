@@ -41,9 +41,10 @@
 
 .link {
   font-size: 0.9rem;
-  color: #6c757d;
   text-decoration: none;
+  line-break: anywhere;
   width: fit-content;
+  color: #6c757d;
   transition: color 0.15s ease;
 }
 

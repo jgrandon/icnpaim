@@ -2,12 +2,24 @@ import React, { useState, useEffect } from 'react'
 import SaveIcon from '@material-ui/icons/Save'
 import CloseIcon from '@material-ui/icons/Close'
 import DeleteIcon from '@material-ui/icons/Delete'
-import Button from '@material-ui/core/Button'
-import Switch from '@material-ui/core/Switch'
-import Tooltip from '@material-ui/core/Tooltip'
+import {
+    Button,
+    TextField,
+    Switch,
+    Tooltip
+} from '@material-ui/core'
 import API from '../../../../services/units'
 import * as styles from '../form.module.css'
 
+const stringToTime = (string) => new Date(string).getTime()+(4*60*60*1000)
+const getTodayString = () => (new Date()).toJSON().slice(0,10)
+const timeToString = (time) => {
+    try { return (new Date( parseInt(time) )).toJSON().slice(0,10) }
+    catch (e) { 
+        console.warn('Error => timeToString', e)
+        return getTodayString()
+    }
+}
 
 export default function UnitForm ({
     unit,
@@ -23,7 +35,8 @@ export default function UnitForm ({
         evaluationName: '',
         evaluationId: '',
         published: false,
-        freeProgress: false
+        freeProgress: false,
+        expiresAt: getTodayString()
     })
 
     useEffect(()=> {
@@ -31,6 +44,7 @@ export default function UnitForm ({
     }, [])
 
     const resetFormData = () => {
+        
         setFormData({
             id: unit.id ?? '',
             name: unit.name ?? '',
@@ -39,12 +53,14 @@ export default function UnitForm ({
             evaluationName: unit.evaluationName,
             evaluationId: unit.evaluationId,
             published: unit.published ?? false,
-            freeProgress: unit.free_progress ?? false
+            freeProgress: unit.freeProgress ?? false,
+            expiresAt: timeToString(unit.expiresAt)
         })
     }
 
     const handleInputChange = (e) => {
         setModified(true)
+        console.log('handleInputChange', e)
         const { name, value, checked } = e.target
         let finalValue = value
         //if (name === 'position') finalValue = parseInt(value, 10)
@@ -59,16 +75,18 @@ export default function UnitForm ({
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!formData.name) return alert('Nombre es obligatorio')
+        
+        const expiresAt = stringToTime(formData.expiresAt)
 
         try {
             if (unit.id) {
             // Update Action
-                const allUnits = await API.updateUnit({ ...formData })
+                const allUnits = await API.updateUnit({ ...formData, expiresAt })
                 //setSelectedUnitId(null)
                 updateCallback('updated',allUnits)
             } else {
             // Create Action
-                const allUnits = await API.updateUnit(formData)
+                const allUnits = await API.updateUnit({...formData, expiresAt})
                 updateCallback('added', allUnits)
             }
             //alert('Datos Guardados')
@@ -214,6 +232,29 @@ export default function UnitForm ({
                         />
                     </Tooltip>
 
+                </div>
+
+                <div className={styles.inputWrapper}>
+                    <label
+                        className={styles.label}
+                    >Fecha de Término</label>
+                    <Tooltip
+                        title={'Fecha en que se cierra la unidad'}
+                        placement='bottom'
+                        arrow
+                    >
+                        <TextField
+                            name='expiresAt'
+                            type='date'
+                            className=''
+                            value={formData.expiresAt ?? getTodayString()}
+                            color='primary'
+                            onChange={handleInputChange}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Tooltip>
                 </div>
 
             </div>

@@ -46,9 +46,9 @@ export async function createUnit({ name, color, description, published, freeProg
     const evaluationId = await getEvaluationId(evaluationName, bbCourseId)
     const res = await client.query(
         `INSERT INTO unit (name, color, position, subject_id, description,
-            published, free_progress, evaluation_name, evaluation_id)
+            published, free_progress, evaluation_name, evaluation_id, expires_at)
         VALUES ($1, $2, $3, $4, $5,
-            $6, $7, $8, $9)
+            $6, $7, $8, $9, $10)
         RETURNING *`,
         [ name, color || null, position, subjectId, description,
             published, freeProgress, evaluationName, evaluationId ]
@@ -74,17 +74,19 @@ export async function createDefaultLR(unitId) {
     return res.rows
 }
 
-export async function updateUnit({ id, name, color, position, description, published, freeProgress, bbCourseId }) {
+export async function updateUnit({ id, name, color, position, description,
+    published, freeProgress, bbCourseId, expiresAt }) {
     const res = await client.query(
         `UPDATE unit SET
             name = $1,
             color = $2,
             description = $3,
             published = $4,
-            free_progress = $5
-        WHERE id = $6 RETURNING *`,
+            free_progress = $5,
+            expires_at = $6
+        WHERE id = $7 RETURNING *`,
         [ name, color || null, description, published,
-            freeProgress, id ]
+            freeProgress, expiresAt, id ]
     )
     return res.rows[0] || null
 }

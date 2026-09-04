@@ -86,6 +86,7 @@ export default function ContentsForm ({
                     <MenuItem value={'documento'}>Documento</MenuItem>
                     <MenuItem value={'control'}>Control</MenuItem>
                     <MenuItem value={'scorm'}>Scorm</MenuItem>
+                    <MenuItem value={'labster'}>Labster</MenuItem>
                 </Select>
                 {/*}
                 <input

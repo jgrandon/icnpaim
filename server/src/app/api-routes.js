@@ -60,7 +60,7 @@ const requireLTISession = async (req, res, next) => {
         console.log('requireLTISession => jwt => ', jwt)
         
         const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId)
-        const bbStudentId = 1073956 //await ddaStudentHandler.getBBid(bbStudentExternalId)
+        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId) // 1073956
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
@@ -944,7 +944,7 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
 router.get('/v2/results' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession
-        const students = await studentHandler.getStudentsResults(subject.id)
+        const students = await studentHandler.getStudentsResults(subject)
         
         const units = await LRHandler.getContentsByLevel(subject.id)
         // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )

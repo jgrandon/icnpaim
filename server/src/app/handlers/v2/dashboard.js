@@ -1,14 +1,15 @@
 import client from '../../db/postgres'
+import { objectToCamelCase } from '../../lib/objectToCamelCase'
 
 export async function getUnitsWithCards(courseId = '1', studentId) {
     const res = await client.query(
         `SELECT
             u.*,
-            c.id as contentId,
+            c.id as content_id,
             c.title,
             c.type,
             c.url,
-            c.bb_content_id as bbcontentid,
+            c.bb_content_id,
             p.completed
         FROM unit AS u
         FULL OUTER JOIN content AS c
@@ -30,16 +31,16 @@ export async function getUnitsWithCards(courseId = '1', studentId) {
 
     for (let i=0; i < res.rows.length; i++) {
         
-        const row = res.rows[i]
+        const row = objectToCamelCase(res.rows[i])
         console.log('getUnitsWithCards => for ', {i, row})
         const { id, name, color, position,
-            contentid, bbcontentid, title, type, url, completed,
-            description, free_progress: freeProgress,
-            evaluation_id: evaluationId } = row
+            contentId, bbContentId, title, type, url, completed,
+            description, freeProgress,
+            evaluationId, expiresAt } = row
 
-        const content = { id: contentid,
-            title, type, url, completed, contentId: bbcontentid }
-        const unit = { id, name, description, color, position, freeProgress, evaluationId}
+        const content = { id: contentId,
+            title, type, url, completed, contentId: bbContentId }
+        const unit = { id, name, description, color, position, freeProgress, evaluationId, expiresAt}
 
         const inArray = units.find(u => row.id==u.id )
         if (!inArray) {
