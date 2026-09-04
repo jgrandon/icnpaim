@@ -1,2 +1,4 @@
 ALTER TABLE unit
 ADD COLUMN expires_at BIGINT;
+
+ALTER TABLE content ALTER url TYPE VARCHAR(2000);
