@@ -1,0 +1,2 @@
+ALTER TABLE unit
+ADD COLUMN expires_at BIGINT;
