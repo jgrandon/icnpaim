@@ -944,7 +944,7 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
 router.get('/v2/results' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession
-        const students = await studentHandler.getStudentsResults(subject.id)
+        const students = await studentHandler.getStudentsResults(subject)
         
         const units = await LRHandler.getContentsByLevel(subject.id)
         // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )

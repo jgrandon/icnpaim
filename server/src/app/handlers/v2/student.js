@@ -1,6 +1,7 @@
 import { map } from 'lodash'
 import client from '../../db/postgres'
 import { objectToCamelCase } from '../../lib/objectToCamelCase'
+import * as ddaStudentHandler from './dda/student'
 
 export async function getStudentByBBid(bbId) {
     const res = await client.query(
@@ -48,10 +49,10 @@ export async function registerStudentInSubject (student, subject) {
     return res.rows[0]
 }
 
-export async function getStudentsResults (subjectId) {
+export async function getStudentsResults (subject) {
     try {
-        const students = await getStudentsInSubject(subjectId)
-        const progress = await getProgressByStudent(subjectId)
+        const students = await ddaStudentHandler(subject.bbId)//await getStudentsInSubject(subjectId)
+        const progress = await getProgressByStudent(subject.id)
 
         return students.map(s => {
             const units = progress.filter(p => p.studentId == s.id)
@@ -87,6 +88,7 @@ export async function getStudentsResults (subjectId) {
     
 }
 
+/*
 export async function getStudentsInSubject (subjectId) {
     try {
         const res = await client.query(
@@ -106,7 +108,7 @@ export async function getStudentsInSubject (subjectId) {
         return []
     }
 }
-
+*/
 
 export async function getProgressByStudent (subjectId) {
     try {
