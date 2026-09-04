@@ -43,9 +43,13 @@ export default function ProgressReport() {
         let students
         if ( value == 'all') {
             students = report.students
-        } else if (value == 'none') {
+        }
+        /* 
+        else if (value == 'none') {
             students = getStudentsWithoutGroup()
-        } else {
+        }
+        */
+        else {
             const group = report.groups.find(g => g.id == value)
             students = report.students.filter(s => group.students.find(userId => userId == s.student.bbId)) ?? []
         }
@@ -91,7 +95,7 @@ export default function ProgressReport() {
                             }}
                         >
                             <MenuItem value={'all'} key={uuidv4()}>Todas</MenuItem>
-                            <MenuItem value={'none'} key={uuidv4()}>Sin Sección - ({getStudentsWithoutGroup().length} alumnos)</MenuItem>
+                            {/*<MenuItem value={'none'} key={uuidv4()}>Sin Sección - ({getStudentsWithoutGroup().length} alumnos)</MenuItem>*/}
                             { report.groups.map(g => (
                                 <MenuItem value={g.id} key={uuidv4()}>{g.name} - ({g.students.length} alumnos)</MenuItem>
                             )) }
