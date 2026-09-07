@@ -38,7 +38,7 @@ async function getNextPosition (subjectId) {
     return lastPosition + 1
 }
 
-export async function createUnit({ name, color, description, published, freeProgress, subjectId, bbCourseId }) {
+export async function createUnit({ name, color, description, published, freeProgress, subjectId, bbCourseId, expiresAt }) {
     //const bbId = '123' //mock blackBoard content Id
     const position = await getNextPosition(subjectId)
     console.log('createUnit => position', position)
@@ -51,7 +51,7 @@ export async function createUnit({ name, color, description, published, freeProg
             $6, $7, $8, $9, $10)
         RETURNING *`,
         [ name, color || null, position, subjectId, description,
-            published, freeProgress, evaluationName, evaluationId ]
+            published, freeProgress, evaluationName, evaluationId, expiresAt ]
     )
     const newUnit = res.rows[0]
     if (newUnit) {
