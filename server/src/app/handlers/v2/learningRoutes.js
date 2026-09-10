@@ -209,7 +209,6 @@ export async function getContentsByLevel(subjectId) {
             GROUP BY  lrs.level, lrs.unit_id, lrs.min_grade, lrs.max_grade
             ) AS rslt ON rslt.id = u.id
             WHERE u.enabled = TRUE
-            AND u.published = TRUE
             AND u.subject_id = $1
         ORDER BY u.id, rslt.level`,
         [subjectId]
