@@ -119,3 +119,6 @@ local.properties
 .env
 .env.prod
 .env.dev
+
+# Kiro profiles
+*.code-profile
