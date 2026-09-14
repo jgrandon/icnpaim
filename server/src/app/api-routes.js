@@ -856,7 +856,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             try {
                     const evaluationTitle = currentUnit.position < 2
                         ? 'prueba de conocimientos iniciales'
-                        : `${calculatedGradeKeyword} ${(u.unit.position - 1)}`.toLowerCase()
+                        : `${calculatedGradeKeyword} ${(currentUnit.position - 1)}`.toLowerCase()
 
                     unitGrade = ddaGrades.find(g => 
                         g.contentTitle.toLowerCase().includes(evaluationTitle))
