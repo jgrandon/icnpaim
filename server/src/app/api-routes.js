@@ -856,10 +856,10 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             try {
                     const evaluationTitle = currentUnit.position < 2
                         ? 'prueba de conocimientos iniciales'
-                        : `${calculatedGradeKeyword} ${(u.unit.position - 1)}`
+                        : `${calculatedGradeKeyword} ${(u.unit.position - 1)}`.toLowerCase()
 
-                    const unitGrade = ddaGrades.find(g => 
-                        g.title.toLowerCase().includes(evaluationTitle))
+                    unitGrade = ddaGrades.find(g => 
+                        g.contentTitle.toLowerCase().includes(evaluationTitle))
 
                         // unitGrade = ddaGrades.find(g => g.gradebookId == currentUnit.evaluationId)
                         //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
