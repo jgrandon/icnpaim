@@ -24,6 +24,8 @@ import * as ddaGradesHandler from './handlers/v2/dda/grades'
 const router = express.Router()
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 
+const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
+
 // Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
     try {
@@ -59,8 +61,8 @@ const requireLTISession = async (req, res, next) => {
         console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
         console.log('requireLTISession => jwt => ', jwt)
         
-        const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId)
-        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId) // 1073956
+        const bbCourseId = 129148 //await ddaCourseHandler.getBBid(bbCourseExternalId)
+        const bbStudentId = 1114143 //await ddaStudentHandler.getBBid(bbStudentExternalId) // 1073956
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
@@ -852,8 +854,15 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             let unitGrade = null
 
             try {
-                    unitGrade = ddaGrades.find(g => g.gradebookId == currentUnit.evaluationId)
-                      //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
+                    const evaluationTitle = currentUnit.position < 2
+                        ? 'prueba de conocimientos iniciales'
+                        : `${calculatedGradeKeyword} ${(currentUnit.position - 1)}`.toLowerCase()
+
+                    unitGrade = ddaGrades.find(g => 
+                        g.contentTitle.toLowerCase().includes(evaluationTitle))
+
+                        // unitGrade = ddaGrades.find(g => g.gradebookId == currentUnit.evaluationId)
+                        //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
                     console.log('unitGrade =>', unitGrade)
                     const score = (unitGrade.score * 6 / unitGrade.possible) + 1
                     console.log('score =>', score)
