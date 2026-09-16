@@ -1037,8 +1037,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             units,
             subjectGrades,
             groups,
-            report,
-            students /* for debuggin only */
+            report /* for debuggin only */
         })
     } catch (error) {
         console.error('Error in Results Report API => ', error)
