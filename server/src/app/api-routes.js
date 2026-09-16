@@ -1036,7 +1036,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
     } catch (error) {
         return res.status(200).json({
             success: false,
-            error: error?.message ?? 'unknown error'
+            error: error ?? 'unknown error'
         })
     }
 })
