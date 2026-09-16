@@ -999,7 +999,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                     if (c.bbId) { // is a gradable content
                         bbContentGrade = c.bbId && subjectGrades.find(g => 
                             g.userId == student.bbId
-                            && g.content_id == c.bbId)
+                            && g.contentId == c.bbId)
                         completed = !!bbContentGrade
                     }
                     return {
