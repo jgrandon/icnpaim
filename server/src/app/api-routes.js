@@ -1043,9 +1043,10 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             students /* for debuggin only */
         })
     } catch (error) {
+        console.error('Error in Results Report API => ', error)
         return res.status(200).json({
             success: false,
-            error: error ?? 'unknown error'
+            error: error.message ?? 'unknown error'
         })
     }
 })
