@@ -971,7 +971,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                     : `${calculatedGradeKeyword} ${(u.position - 1)}`
 
                 const grade = subjectGrades.find( g => 
-                    g.userId == student.bbId 
+                    g.userId == student.bbId
                     && g.title.toLowerCase().includes(evaluationTitle)
                 )
                 if (!grade) {
@@ -998,7 +998,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                     let bbContentGrade = null
                     if (c.bbId) { // is a gradable content
                         bbContentGrade = c.bbId && subjectGrades.find(g => 
-                            g.userId == student.bbStudentId 
+                            g.userId == student.bbId
                             && g.content_id == c.bbId)
                         completed = !!bbContentGrade
                     }
