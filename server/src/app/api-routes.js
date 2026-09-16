@@ -945,47 +945,84 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession
         const students = await studentHandler.getStudentsResults(subject)
-        
         const units = await LRHandler.getContentsByLevel(subject.id)
-        // const subjectGrades = await grades.getSubjectGrades( bbCourseId, units )
         const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
-
-        //get students by group
-        const groups = await ddaCourseHandler.getGroups(bbCourseId)
-        //const groups = await contentsHandler.getBBGroups(bbCourseId)
+        const groups = await ddaCourseHandler.getGroups(bbCourseId) //get students by group
                 
         const report = students.map(student => {
-            //const group = groups.find(g => g.students.find(userId => userId == student.bbId))
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
-                /*
-                if (!subjectGrades[u.unit.id]) {
-                    return noProgress
-                }*/
-                const grade = subjectGrades.find(g => g.userId == student.bbId && g.gradebookId == u.unit.evaluationId)
+                // find unit grade:
+                // compare name instead of id so i match the row
+                // that has grades instead of the first matching row
+                const evaluationTitle = u.unit.position < 2
+                    ? 'prueba de conocimientos iniciales'
+                    : `${calculatedGradeKeyword} ${(u.unit.position - 1)}`
+
+                const grade = subjectGrades.find( g => 
+                    g.userId == student.bbId 
+                    && g.title.toLowerCase().includes(evaluationTitle)
+                )
                 if (!grade) {
                     return noProgress
                 }
                 
-                //parseFloat(grade?.displayGrade?.text)
+                // get displayable score
                 let studentGrade = NaN
                 try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
                 catch (e) { console.warn('/v2/results => ERROR while trying to parse student grade', e.message) } 
                 if (studentGrade==NaN) {
                     return noProgress
                 }
-
-                
                 console.log('unit with grade => ', u)
-
                 console.log('studentGrade', studentGrade)
                 console.log('u.levels', u.levels)
+                // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
+                // iterate lr contents
+                const localStudentProgress = student.progress.find(p => p.unitId == u.unit.id)
+                
+                const contentProgressDetail = studentLevel.contents?.map(c => {
+                    // for each find local content or bb content
+                    const localContentProgress = localStudentProgress.find(localContent => localContent.contentId == c.contentId)
+                    let completed = !!localContentProgress
+                    let contentGrade = null
+                    if (c.bbId) { // is a gradable content
+                        contentGrade = c.bbId && subjectGrades.find(g => 
+                            g.userId == student.bbId 
+                            && g.content_id == c.bbId)
+                        completed = !!contentGrade
+                    } 
+                        // op 1: local
+
+                    // const progress = 
+                    return {
+                        ...c,
+                        grade: contentGrade,
+                        completed: !!completed
+                    }
+                })
+
+
+                const completedContents = contentProgressDetail.filter(c => c.completed)
+                /*
                 const studentProgress = student.units.find(sUnit => sUnit.unitId == u.unit.id)?.progress
                 const value = parseFloat( studentProgress ?? 0 )
                 const total = parseFloat(studentLevel?.total)
                 const percentage = +(value * 100 / total).toFixed(1)
-                return { unitId: u.unit.id, value, total, percentage }
+                */
+
+                const value = completedContents.length
+                const total = contentProgressDetail.length
+
+                return {
+                    unitId: u.unit.id,
+                    value,
+                    total,
+                    level: studentLevel.level,
+                    contents: contentProgressDetail,
+                    percentage: +(value * 100 / total).toFixed(1)
+                }
             })
             
             return {
@@ -1001,7 +1038,8 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
             units,
             subjectGrades,
             groups,
-            report
+            report,
+            subjectGrades /* for debuggin only */
         })
     } catch (error) {
         return res.status(200).json({
