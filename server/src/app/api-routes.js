@@ -991,14 +991,14 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
-                                const contentProgressDetail = studentLevel.contents?.map(c => {
+                const contentProgressDetail = studentLevel.contents?.map(c => {
                     // for each find local content or bb content
                     const localContentProgress = student.progress.find(localContent => localContent.contentId == c.contentId)
                     let completed = !!localContentProgress
                     let bbContentGrade = null
                     if (c.bbId) { // is a gradable content
                         bbContentGrade = c.bbId && subjectGrades.find(g => 
-                            g.userId == student.bbId 
+                            g.userId == student.bbStudentId 
                             && g.content_id == c.bbId)
                         completed = !!bbContentGrade
                     }

@@ -56,7 +56,7 @@ export async function getStudentsResults (subject) {
 
         return students.map(s => ({
             ...s,
-            progress: progress.filter(p => p.studentId == s.id)
+            progress: progress.filter(p => p.bbStudentId == s.bbId)
         }))
 /*
         //TODO: replace reduce with a for
@@ -114,7 +114,7 @@ export async function getProgressByStudent (subjectId) {
     try {
         const res = await client.query(
             `SELECT
-                p.student_id,
+                s.bb_id AS bb_student_id,
                 c.unit_id,
                 c.id as content_id,
                 c.bb_content_id as bb_id,
@@ -124,6 +124,7 @@ export async function getProgressByStudent (subjectId) {
             ) AS p
             JOIN content AS c ON p.content_id = c.id
             JOIN unit AS u ON c.unit_id = u.id
+            JOIN student AS s ON p.student_id = s.id
             WHERE u.enabled = TRUE
                 AND u.subject_id = $1
             ORDER BY p.student_id, c.unit_id`,
@@ -132,12 +133,12 @@ export async function getProgressByStudent (subjectId) {
         const data = (res.rows || []).map(d => objectToCamelCase(d))
         const map = {};
 
-        data.forEach(({ studentId, unitId, contentId, bbId, completed }) => {
-            const key = `${studentId}_${unitId}`;
+        data.forEach(({ bbStudentId, unitId, contentId, bbId, completed }) => {
+            const key = `${bbStudentId}_${unitId}`;
 
             if (!map[key]) {
                 map[key] = {
-                    studentId,
+                    bbStudentId,
                     unitId,
                     progress: [],
                 };
