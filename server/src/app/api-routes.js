@@ -953,13 +953,13 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         /*
         const report = students.map(student => {
             const progress = units.map(u => {
-                const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
+                const noProgress = { unitId: u.id, value: 0, total: 0, percentage: 0 }
                 // find unit grade:
                 // compare name instead of id so i match the row
                 // that has grades instead of the first matching row
-                const evaluationTitle = u.unit.position < 2
+                const evaluationTitle = u.position < 2
                     ? 'prueba de conocimientos iniciales'
-                    : `${calculatedGradeKeyword} ${(u.unit.position - 1)}`
+                    : `${calculatedGradeKeyword} ${(u.position - 1)}`
 
                 const grade = subjectGrades.find( g => 
                     g.userId == student.bbId 
@@ -982,7 +982,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
-                const localStudentProgress = student.progress.find(p => p.unitId == u.unit.id)
+                const localStudentProgress = student.progress.find(p => p.unitId == u.id)
                 
                 const contentProgressDetail = studentLevel.contents?.map(c => {
                     // for each find local content or bb content
@@ -1007,7 +1007,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 const total = contentProgressDetail.length
 
                 return {
-                    unitId: u.unit.id,
+                    unitId: u.id,
                     value,
                     total,
                     level: studentLevel.level,

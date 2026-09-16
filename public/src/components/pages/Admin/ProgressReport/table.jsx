@@ -90,8 +90,8 @@ export default function StudentProgressTable(props) {
                             <TableCell className={classes.headerCell}>Estudiante</TableCell>
                             {props.units.map( u => (
                                 <TableCell key={uuidv4()} align="center" className={classes.headerCell}>
-                                    <Tooltip title={u.unit.name} arrow placement="top">
-                                        <Box>{`Unidad ${(u.unit.position + 1)}`}</Box>
+                                    <Tooltip title={u.name} arrow placement="top">
+                                        <Box>{`Unidad ${(u.position + 1)}`}</Box>
                                     </Tooltip>
                                 </TableCell>
                             ))}

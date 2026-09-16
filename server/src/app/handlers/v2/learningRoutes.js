@@ -194,6 +194,7 @@ export async function getContentsByLevel(subjectId) {
         `SELECT
             u.name,
             u.evaluation_id,
+            u.position,
             rslt.*
         FROM unit AS U
         JOIN (
@@ -219,11 +220,12 @@ export async function getContentsByLevel(subjectId) {
     const data = (res.rows || []).map(d => objectToCamelCase(d))
     const unitMap = new Map();
     for (const row of data) {
-        const { id, name, level, minGrade, maxGrade, contentId, bbId, contentTitle } = row;
+        const { id, name, level, minGrade, maxGrade, contentId, bbId, contentTitle, position } = row;
         if (!unitMap.has(id)) {
             unitMap.set(id, {
                 id,
                 name,
+                position,
                 levels: new Map(),
             });
         }
