@@ -5,6 +5,8 @@ import unitServices from '../../../../../public/src/services/units'
 import { objectToCamelCase } from '../../lib/objectToCamelCase'
 import * as ddaGradesHandler from './dda/grades'
 
+const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
+
 export async function getAllUnits(subjectId) {
     const res = await client.query(
         `SELECT * FROM unit 
@@ -92,7 +94,7 @@ export async function updateUnit({ id, name, color, position, description,
 }
 
 function getEvaluationName (position) {
-    return position < 2 ? 'Prueba de Conocimientos Iniciales' : `Taller ${(position-1)}`
+    return position < 2 ? 'Prueba de Conocimientos Iniciales' : `${calculatedGradeKeyword} ${(position-1)}`
 }
 
 async function getEvaluationId (evaluationName, bbCourseId) {
