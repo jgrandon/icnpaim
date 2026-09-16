@@ -85,7 +85,7 @@ export async function getCourseGrades(courseId) {
                 ggc.score
             from gradebook_main AS gm
             JOIN gradebook_grade_calc AS ggc ON gm.pk1 = ggc.gradebook_main_pk1
-            where gm.crsmain_pk1 = $1
+            where gm.crsmain_pk1 = $1 AND ggc.possible > 0
             UNION
             select
                 gm.pk1 AS gradebook_id,
