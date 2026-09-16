@@ -1033,11 +1033,11 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
 
         return res.status(200).json({
             ok: true,
-            // students: report,
+            students: report,
             units,
             subjectGrades,
             groups,
-            // report,
+            report,
             students /* for debuggin only */
         })
     } catch (error) {
