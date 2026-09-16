@@ -949,7 +949,8 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         const units = await LRHandler.getContentsByLevel(subject.id)
         const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
         const groups = await ddaCourseHandler.getGroups(bbCourseId) //get students by group
-                
+        
+        /*
         const report = students.map(student => {
             const progress = units.map(u => {
                 const noProgress = { unitId: u.unit.id, value: 0, total: 0, percentage: 0 }
@@ -993,10 +994,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                             g.userId == student.bbId 
                             && g.content_id == c.bbId)
                         completed = !!contentGrade
-                    } 
-                        // op 1: local
-
-                    // const progress = 
+                    }
                     return {
                         ...c,
                         grade: contentGrade,
@@ -1004,15 +1002,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                     }
                 })
 
-
                 const completedContents = contentProgressDetail.filter(c => c.completed)
-                /*
-                const studentProgress = student.units.find(sUnit => sUnit.unitId == u.unit.id)?.progress
-                const value = parseFloat( studentProgress ?? 0 )
-                const total = parseFloat(studentLevel?.total)
-                const percentage = +(value * 100 / total).toFixed(1)
-                */
-
                 const value = completedContents.length
                 const total = contentProgressDetail.length
 
@@ -1032,15 +1022,16 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 //group
             }
         })
+        */
 
         return res.status(200).json({
             ok: true,
-            students: report,
+            // students: report,
             units,
             subjectGrades,
             groups,
-            report,
-            subjectGrades /* for debuggin only */
+            // report,
+            students /* for debuggin only */
         })
     } catch (error) {
         return res.status(200).json({
