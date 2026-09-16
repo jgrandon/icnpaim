@@ -968,7 +968,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 // that has grades instead of the first matching row
                 const evaluationTitle = u.position < 2
                     ? 'prueba de conocimientos iniciales'
-                    : `${calculatedGradeKeyword} ${(u.position - 1)}`
+                    : `${calculatedGradeKeyword} ${(u.position - 1)}`.toLowerCase()
 
                 const grade = subjectGrades.find( g => 
                     g.userId == student.bbId
