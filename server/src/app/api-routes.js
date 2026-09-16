@@ -950,7 +950,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
         const subjectGrades = await ddaGradesHandler.getCourseGrades(bbCourseId)
         const groups = await ddaCourseHandler.getGroups(bbCourseId) //get students by group
         
-        /*
+        
         const report = students.map(student => {
             const progress = units.map(u => {
                 const noProgress = { unitId: u.id, value: 0, total: 0, percentage: 0 }
@@ -1022,7 +1022,7 @@ router.get('/v2/results' , requireLTISession, async (req, res) => {
                 //group
             }
         })
-        */
+        
 
         return res.status(200).json({
             ok: true,
