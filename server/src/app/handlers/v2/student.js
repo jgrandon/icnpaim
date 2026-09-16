@@ -54,10 +54,10 @@ export async function getStudentsResults (subject) {
         const students = await ddaStudentHandler.getStudentsInCourse(subject.bbId)//await getStudentsInSubject(subjectId)
         const progress = await getProgressByStudent(subject.id)
 
-        return students.map(s => {
-            const units = progress.filter(p => p.studentId == s.id)
-            return {...s, units}
-        })
+        return students.map(s => ({
+            ...s,
+            progress: progress.filter(p => p.studentId == s.id)
+        }))
 /*
         //TODO: replace reduce with a for
         for(let i=0; i < data.length; i++) {
@@ -116,21 +116,37 @@ export async function getProgressByStudent (subjectId) {
             `SELECT
                 p.student_id,
                 c.unit_id,
-                COUNT(p.*) as progress
+                c.id as content_id,
+                c.bb_content_id as bb_id,
+                p.completed
             FROM (
                 SELECT * FROM progress WHERE completed = TRUE
             ) AS p
             JOIN content AS c ON p.content_id = c.id
             JOIN unit AS u ON c.unit_id = u.id
             WHERE u.enabled = TRUE
-                AND u.published = TRUE
                 AND u.subject_id = $1
-            GROUP BY p.student_id, c.unit_id
             ORDER BY p.student_id, c.unit_id`,
             [ subjectId ]
         )
         const data = (res.rows || []).map(d => objectToCamelCase(d))
-        return data
+        const map = {};
+
+        data.forEach(({ studentId, unitId, contentId, bbId, completed }) => {
+            const key = `${studentId}_${unitId}`;
+
+            if (!map[key]) {
+                map[key] = {
+                    studentId,
+                    unitId,
+                    progress: [],
+                };
+            }
+
+            map[key].progress.push({ contentId, bbId, completed });
+        });
+
+        return Object.values(map);
     } catch (e) {
         console.warn('Error in getProgressByStudent: ', e.message)
         return []
