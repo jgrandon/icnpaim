@@ -65,18 +65,41 @@ export async function getCourseGrades(courseId) {
     const res = await client.query(
         // gbm.title AS content_title,
         // gbg.average_score,
-        `select 
-            gbm.possible,
-            gbm.pk1 AS gradebook_id,
-            gbm.crsmain_pk1 AS course_id,
-            gbm.course_contents_pk1 AS content_id,
-            a.score,
-            cu.users_pk1 as user_id
-        FROM gradebook_main AS gbm
-        JOIN gradebook_grade AS gbg ON gbm.pk1 = gbg.gradebook_main_pk1
-        JOIN attempt AS a ON gbg.highest_attempt_pk1 = a.pk1
-        JOIN course_users AS cu ON gbg.course_users_pk1 = cu.pk1
-        WHERE gbm.crsmain_pk1 = $1`,
+        `SELECT
+            grade.gradebook_id,
+            grade.course_contents_pk1 AS content_id,
+            cu.users_pk1 AS user_id,
+            grade.crsmain_pk1 AS course_id,
+            grade.title,
+            grade.possible,
+            grade.score
+        FROM course_users AS cu
+        JOIN (
+            select
+                gm.pk1 AS gradebook_id,
+                gm.course_contents_pk1,
+                ggc.course_users_pk1,
+                gm.crsmain_pk1,
+                gm.title,
+                ggc.possible,
+                ggc.score
+            from gradebook_main AS gm
+            JOIN gradebook_grade_calc AS ggc ON gm.pk1 = ggc.gradebook_main_pk1
+            where gm.crsmain_pk1 = $1 AND ggc.possible > 0
+            UNION
+            select
+                gm.pk1 AS gradebook_id,
+                gm.course_contents_pk1,
+                gg.course_users_pk1,
+                gm.crsmain_pk1,
+                gm.title,
+                gm.possible,
+                a.score
+            FROM gradebook_main AS gm
+            JOIN gradebook_grade AS gg ON gm.pk1 = gg.gradebook_main_pk1
+            JOIN attempt AS a ON gg.highest_attempt_pk1 = a.pk1
+            where gm.crsmain_pk1 = $1
+        ) AS grade ON grade.course_users_pk1 = cu.pk1`,
         [ courseId ]
     )
     const grades = res.rows.map(r => objectToCamelCase(r))

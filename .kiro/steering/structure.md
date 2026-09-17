@@ -52,3 +52,13 @@ The repo is split into a **backend** (`server/`) and a **frontend** (`public/`),
 - Backend request handling is organized by domain under `app/handlers/`; put data access in `app/db/` and external integrations in `app/clients/`.
 - Schema changes: update `db/db.SQL` and add a versioned file under `db/updates/`.
 - Generated output (`public/dist/`, `server/lib/`) is built, not authored — edit the corresponding `src`.
+
+## Database
+- `server/src/app/db/postgres.js` - Paim DB connection - Db schema described in `db/db.SQL`
+- `server/src/app/db/dda.js` - BlackBoard DDa DB connection
+
+## API
+- `server/src/app/routes.js` - main routing file. BlackBoard LTI integration routes are located here
+- `server/src/app/api-routes.js` - Handle authenticated requests. Most currently used apis are exposed under '/v2/*' routes
+- `server/src/app/handlers/v2` - DB handlers for Paim DB queries
+- `server/src/app/handlers/v2/dda` - DB handlers for BlackBoard DDA DB queries

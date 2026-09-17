@@ -194,6 +194,7 @@ export async function getContentsByLevel(subjectId) {
         `SELECT
             u.name,
             u.evaluation_id,
+            u.position,
             rslt.*
         FROM unit AS U
         JOIN (
@@ -202,38 +203,48 @@ export async function getContentsByLevel(subjectId) {
                 lrs.level,
                 lrs.min_grade,
                 lrs.max_grade,
-                COUNT(*) FILTER (WHERE lrd.enabled = TRUE) AS total
+                c.id as content_id,
+                c.bb_content_id as bb_id,
+                c.title as content_title
             FROM learningrouteschema AS lrs
             LEFT JOIN learningroutedata AS lrd ON lrs.id = lrd.learning_route_id
+            JOIN content AS c ON lrd.content_id = c.id
             WHERE lrs.enabled = TRUE
-            GROUP BY  lrs.level, lrs.unit_id, lrs.min_grade, lrs.max_grade
-            ) AS rslt ON rslt.id = u.id
-            WHERE u.enabled = TRUE
-            AND u.published = TRUE
-            AND u.subject_id = $1
+        ) AS rslt ON rslt.id = u.id
+        WHERE u.enabled = TRUE
+        AND u.subject_id = $1
         ORDER BY u.id, rslt.level`,
         [subjectId]
     )
-    const data = res.rows || []
-    let contents = []
-    //data.forEach((d) => {
-    for(let i=0; i < data.length; i++) {
-        const row = objectToCamelCase(data[i])
-        const {id, name, evaluationId, level, total, maxGrade, minGrade} = row
-        const currentLevel = { level, total, maxGrade, minGrade }
-        const existing = contents.find(c => c.unit.id == id)
-        if (!existing){
-            contents.push({
-                unit: {
-                    id, name, evaluationId
-                },
-                levels: [currentLevel]
-            })
-        } else {
-            console.log('pushing new level => existing', existing)
-            console.log('pushing new level => currentLevel', currentLevel)
-            existing.levels.push(currentLevel)
+
+    const data = (res.rows || []).map(d => objectToCamelCase(d))
+    const unitMap = new Map();
+    for (const row of data) {
+        const { id, name, level, minGrade, maxGrade, contentId, bbId, contentTitle, position } = row;
+        if (!unitMap.has(id)) {
+            unitMap.set(id, {
+                id,
+                name,
+                position,
+                levels: new Map(),
+            });
         }
+        const unit = unitMap.get(id);
+        if (!unit.levels.has(level)) {
+            unit.levels.set(level, {
+                level,
+                minGrade,
+                maxGrade,
+                contents: [],
+            });
+        }
+        unit.levels.get(level).contents.push({ contentId, bbId, contentTitle });
     }
-    return contents
+
+    // Convert Maps to arrays
+    return Array.from(unitMap.values()).map(unit => ({
+        ...unit,
+        levels: Array.from(unit.levels.values()),
+    }));
+
 }
