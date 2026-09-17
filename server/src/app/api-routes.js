@@ -771,12 +771,12 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             student,
             bbStudentId
         } = req.ltiSession
-        logger.info({bbCourseId, bbStudentId}, '/v2/dashboard => LTI session => ',)
-        logger.info(subject.id, '/v2/dashboard => LTI subjectId => ')
+        logger.info({bbCourseId, bbStudentId}, '/v2/dashboard => LTI session => ')
+        logger.info({data: subject.id}, '/v2/dashboard => LTI subjectId => ')
         
         //iterate units and cards to set progress
         const units = await dashboardHandler.getUnitsWithCards(subject.id, student.id)
-        logger.info('/v2/dashboard => units => ', units)
+        logger.info({units}, '/v2/dashboard => units => ')
     
         //get all content ids in cards
         const contentIds = units.map(
@@ -830,7 +830,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
 
                         // unitGrade = ddaGrades.find(g => g.gradebookId == currentUnit.evaluationId)
                         //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
-                    logger.info(unitGrade, 'unitGrade =>')
+                    logger.info({unitGrade}, 'unitGrade =>')
                     const score = (unitGrade.score * 6 / unitGrade.possible) + 1
                     logger.info({ data: score }, 'score =>')
 
@@ -843,7 +843,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                         return { ...content, completed }
                     })
             } catch (e) {
-                logger.error({ data: e.message }, 'units grade error =>')
+                logger.error({ error: e.message }, 'units grade error =>')
                 studentLearningIndex = null
                 studentLearningRoute = []
                 unitGrade = null
@@ -867,10 +867,12 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ddaGrades
         })
       
-    } catch (error) {
+    } catch (e) {
+        const error = e?.message ?? 'unknown error'
+        logger.error({ error }, 'Error in /v2/dashboard')
         return res.status(500).json({
             success: false,
-            error: error?.message ?? 'unknown error'
+            error 
         })
     } 
 })
