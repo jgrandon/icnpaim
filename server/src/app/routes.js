@@ -798,34 +798,6 @@ module.exports = function (app) {
         });
     });    
 
-    //=======================================================
-    // Catch all
-    app.get('*', async (req, res) => {
-        console.log('catchall - (' + req.url + ')');
-        console.log('/* => req.query => ', req.query)
-        console.log('/* => origin => ', req.get('origin'))
-        
-        const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
-
-        const isStudent = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
-        const isAdmin = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
-
-        console.log('/* => roles', jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles'])
-        
-        if (process.env.NODE_ENV != 'development'
-            && !isStudent
-            && !isAdmin
-        ) {
-            console.log('Not Student nor Admin');
-            res.redirect(`/not-allowed`)
-        } else {
-            res.sendFile(path.resolve('./public', 'index.html'));
-        }
-    });
-
-    
     app.get('/logs', async (req, res) => {
       // Auth check
       if (req.headers['x-log-token'] !== LOG_SECRET) {
@@ -857,4 +829,32 @@ module.exports = function (app) {
       // Return last N lines
       res.json({ logs: allLines.slice(-lines) });
     });
+
+    //=======================================================
+    // Catch all
+    app.get('*', async (req, res) => {
+        console.log('catchall - (' + req.url + ')');
+        console.log('/* => req.query => ', req.query)
+        console.log('/* => origin => ', req.get('origin'))
+        
+        const jwtPayload = await db.getAuthFromState(req.query.nonce).jwt;
+
+        const isStudent = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
+        const isAdmin = jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles']
+            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
+
+        console.log('/* => roles', jwtPayload?.body['https://purl.imsglobal.org/spec/lti/claim/roles'])
+        
+        if (process.env.NODE_ENV != 'development'
+            && !isStudent
+            && !isAdmin
+        ) {
+            console.log('Not Student nor Admin');
+            res.redirect(`/not-allowed`)
+        } else {
+            res.sendFile(path.resolve('./public', 'index.html'));
+        }
+    });
+
 };
