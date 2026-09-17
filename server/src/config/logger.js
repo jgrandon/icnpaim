@@ -9,7 +9,7 @@ const transport = pino.transport({
       options: { destination: './logs/app.log', mkdir: true },
     },
     {
-      target: 'pino/file',
+      target: 'pm2',
       options: { destination: 1 }, // also stdout for PM2
     },
   ],
