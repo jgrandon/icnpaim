@@ -27,6 +27,9 @@ if (process.env.PORT) {
 if (process.env.DATABASE_DIRECTORY) {
     configResult['database_directory'] = process.env.DATABASE_DIRECTORY
 }
+if (process.env.LOGS_DIRECTORY) {
+    configResult['logs_directory'] = process.env.LOGS_DIRECTORY
+}
 
 // Asegurar que el directorio de base de datos termine con /
 if (configResult['database_directory'] && !configResult['database_directory'].endsWith('/')) {
