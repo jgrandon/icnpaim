@@ -7,6 +7,7 @@ import routes from './app/routes.js';
 import { sessionMiddleware } from './app/session-middleware';
 import { Task, SimpleIntervalJob, ToadScheduler } from 'toad-scheduler';
 import { deleteExpiredSessions } from './database/db-utility';
+import logger from './config/logger';
 
 const app = express();
 const httpProxy = express();
@@ -44,6 +45,15 @@ app.use((req, res, next) => {
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
   );
+  const start = Date.now();
+  res.on('finish', () => {
+    logger.info({
+      method: req.method,
+      url: req.originalUrl,
+      status: res.statusCode,
+      duration: `${Date.now() - start}ms`,
+    });
+  });
   next();
 });
 
