@@ -824,36 +824,37 @@ module.exports = function (app) {
             res.sendFile(path.resolve('./public', 'index.html'));
         }
     });
-};
 
-app.get('/logs', async (req, res) => {
-  // Auth check
-  if (req.headers['x-log-token'] !== LOG_SECRET) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-
-  const lines = parseInt(req.query.lines) || 100;
-  const level = req.query.level; // optional filter: error, warn, info
-  const logFile = path.join(LOG_DIRECTORY, 'logs', 'app.log');
-
-  if (!fs.existsSync(logFile)) {
-    return res.json({ logs: [] });
-  }
-
-  const allLines = [];
-  const rl = readline.createInterface({
-    input: fs.createReadStream(logFile),
-  });
-
-  for await (const line of rl) {
-    try {
-      const parsed = JSON.parse(line);
-      if (!level || parsed.level >= pino.levels.values[level]) {
-        allLines.push(parsed);
+    
+    app.get('/logs', async (req, res) => {
+      // Auth check
+      if (req.headers['x-log-token'] !== LOG_SECRET) {
+        return res.status(403).json({ error: 'Forbidden' });
       }
-    } catch { /* skip malformed lines */ }
-  }
-
-  // Return last N lines
-  res.json({ logs: allLines.slice(-lines) });
-});
+    
+      const lines = parseInt(req.query.lines) || 100;
+      const level = req.query.level; // optional filter: error, warn, info
+      const logFile = path.join(LOG_DIRECTORY, 'logs', 'app.log');
+    
+      if (!fs.existsSync(logFile)) {
+        return res.json({ logs: [] });
+      }
+    
+      const allLines = [];
+      const rl = readline.createInterface({
+        input: fs.createReadStream(logFile),
+      });
+    
+      for await (const line of rl) {
+        try {
+          const parsed = JSON.parse(line);
+          if (!level || parsed.level >= pino.levels.values[level]) {
+            allLines.push(parsed);
+          }
+        } catch { /* skip malformed lines */ }
+      }
+    
+      // Return last N lines
+      res.json({ logs: allLines.slice(-lines) });
+    });
+};
