@@ -1,15 +1,16 @@
 import config from './config';
 
+const LOG_DIRECTORY = process.env.LOG_DIRECTORY
 const pino = require('pino');
 
 const transport = pino.transport({
   targets: [
     {
       target: 'pino/file',
-      options: { destination: './logs/app.log', mkdir: true },
+      options: { destination: LOG_DIRECTORY + '/logs/app.log', mkdir: true },
     },
     {
-      target: 'pm2',
+      target: 'pino/file',
       options: { destination: 1 }, // also stdout for PM2
     },
   ],
