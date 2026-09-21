@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import eventstore from './eventstore';
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline'
 import * as lti from './lti';
 import * as db from '../database/db-utility';
 import { getCachedToken, getLearnRestToken } from './rest-service';
@@ -23,6 +24,8 @@ import apiRoutes from './api-routes';
 import wpClient from './wp-client';
 
 const contentitem_key = 'contentItemData';
+const LOG_DIRECTORY = process.env.LOG_DIRECTORY
+const LOG_SECRET = process.env.LOG_SECRET
 
 const ltiScopes = 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly ' +
   'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem ' +
@@ -795,6 +798,38 @@ module.exports = function (app) {
         });
     });    
 
+    app.get('/logs', async (req, res) => {
+      // Auth check
+      if (req.headers['x-log-token'] !== LOG_SECRET) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    
+      const lines = parseInt(req.query.lines) || 100;
+      const level = req.query.level; // optional filter: error, warn, info
+      const logFile = path.join(LOG_DIRECTORY, 'logs', 'app.log');
+    
+      if (!fs.existsSync(logFile)) {
+        return res.json({ logs: [] });
+      }
+    
+      const allLines = [];
+      const rl = readline.createInterface({
+        input: fs.createReadStream(logFile),
+      });
+    
+      for await (const line of rl) {
+        try {
+          const parsed = JSON.parse(line);
+          if (!level || parsed.level >= pino.levels.values[level]) {
+            allLines.push(parsed);
+          }
+        } catch { /* skip malformed lines */ }
+      }
+    
+      // Return last N lines
+      res.json({ logs: allLines.slice(-lines) });
+    });
+
     //=======================================================
     // Catch all
     app.get('*', async (req, res) => {
@@ -821,4 +856,5 @@ module.exports = function (app) {
             res.sendFile(path.resolve('./public', 'index.html'));
         }
     });
+
 };

@@ -67,7 +67,7 @@ const unitServices = {
     },
     getResults: async () => {
         try {
-            const response = await fetch('/api/v2/results')
+            const response = await fetch('/api/v2/report')
             //if (response.status == 401) window.location.href = '/not-allowed'
             if (!response.ok) {
                 throw new Error(`Failed to get results: ${response.status}`)
