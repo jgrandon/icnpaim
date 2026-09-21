@@ -1,6 +1,10 @@
 import express from 'express';
-
+import * as LRHandler from './handlers/v2/learningRoutes'
+import * as studentHandler from './handlers/v2/student'
+import * as ddaCourseHandler from './handlers/v2/dda/course'
+import * as ddaGradesHandler from './handlers/v2/dda/grades'
 const router = express.Router();
+import logger from '../../config/logger'
 
 router.get('/v2/report' , requireLTISession, async (req, res) => {
     try {
@@ -32,13 +36,13 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 // get displayable score
                 let studentGrade = NaN
                 try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
-                catch (e) { console.warn('/v2/report => ERROR while trying to parse student grade', e.message) } 
+                catch (e) { logger.error({ error: e.message}, '/v2/report => ERROR while trying to parse student grade') }
                 if (studentGrade==NaN) {
                     return noProgress
                 }
-                console.log('unit with grade => ', u)
-                console.log('studentGrade', studentGrade)
-                console.log('u.levels', u.levels)
+                logger.info( { unit: u }, 'unit with grade => ')
+                logger.info( { studentGrade }, 'studentGrade')
+                logger.info( { levels: u.levels }, 'u.levels')
                 // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
@@ -91,7 +95,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
             report /* for debuggin only */
         })
     } catch (error) {
-        console.error('Error in Results Report API => ', error)
+        logger.error(error, 'Error in Results Report API => ')
         return res.status(200).json({
             success: false,
             error: error.message ?? 'unknown error'

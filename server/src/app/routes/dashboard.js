@@ -1,4 +1,8 @@
 import express from 'express';
+import * as LRHandler from './handlers/v2/learningRoutes'
+import * as dashboardHandler from './handlers/v2/dashboard'
+import * as ddaGradesHandler from './handlers/v2/dda/grades'
+import logger from '../../config/logger'
 
 const router = express.Router();
 
@@ -71,7 +75,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                         //await grades.getGrade(bbCourseId, currentUnit.evaluationId, bbStudentId)
                     logger.info({unitGrade}, 'unitGrade =>')
                     const score = (unitGrade.score * 6 / unitGrade.possible) + 1
-                    logger.info({ data: score }, 'score =>')
+                    logger.info({score}, 'score =>')
 
                     studentLearningIndex = currentLR.find(
                         lr => (lr.minGrade < score && lr.maxGrade >= score)
@@ -82,7 +86,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                         return { ...content, completed }
                     })
             } catch (e) {
-                logger.error({ error: e.message }, 'units grade error =>')
+                logger.error({ error }, 'units grade error =>')
                 studentLearningIndex = null
                 studentLearningRoute = []
                 unitGrade = null
@@ -130,6 +134,7 @@ router.post('/v2/dashboard/progress' , requireLTISession, async (req, res) => {
             update
         })
     } catch (error) {
+        logger.error({error}, '/v2/dashboard/progress:: Error while informing student content progress')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'

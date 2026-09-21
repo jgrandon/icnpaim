@@ -1,4 +1,8 @@
 import express from 'express';
+import * as unitsHandler from './handlers/v2/units'
+import * as contentsHandler from './handlers/v2/contents'
+import * as LRHandler from './handlers/v2/learningRoutes'
+import logger from '../../config/logger'
 
 const router = express.Router();
 // Units
@@ -20,6 +24,7 @@ router.post('/v2/units', requireLTISession,  async (req, res) => {
             units
         })
     } catch (error) {
+        logger.error({error}, '/v2/units:: Error while updating units')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -37,6 +42,8 @@ router.get('/v2/units', requireLTISession, async (req, res) => {
             subject
         })
     } catch (error) {
+        logger.error({error}, '/v2/units:: Error while getting units')
+
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -55,6 +62,8 @@ router.delete('/v2/units', requireLTISession,  async (req, res) => {
             units
         })
     } catch (error) {
+        logger.error({error}, '/v2/units:: Error while deleting units')
+
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -74,6 +83,8 @@ router.get('/v2/units/:unitId/contents', requireLTISession, async (req, res) => 
             contents
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/contents:: Error while getting units contents')
+
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -95,6 +106,7 @@ router.post('/v2/units/:unitId/contents', requireLTISession, async (req, res) =>
             content
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/contents:: Error while updating units contents')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -111,6 +123,7 @@ router.delete('/v2/units/:unitId/contents', requireLTISession, async (req, res) 
             ok: true
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/contents:: Error while deleting units contents')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -134,6 +147,8 @@ router.post('/v2/units/:unitId/lr/schema', requireLTISession, async (req, res) =
             learningRoutes
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/lr/schema:: Error while getting lr schema')
+
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -151,6 +166,8 @@ router.get('/v2/units/:unitId/lr', requireLTISession, async (req, res) => {
             learningRoutes
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/lr:: Error while getting lr')
+
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -164,7 +181,7 @@ router.post('/v2/units/:unitId/lr/:ldId/contents', requireLTISession, async (req
         const data = req.body
         const update = await LRHandler.updateLRContents(ldId, data)
     
-        console.log('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
+        logger.info('POST => /v2/units/:unitId/lr/:ldId/contents => update', update)
         //TODO: find learningRouteData registers
         const learningRoutes = await LRHandler.getLearningRoutes(unitId)
     
@@ -173,6 +190,7 @@ router.post('/v2/units/:unitId/lr/:ldId/contents', requireLTISession, async (req
             learningRoutes
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/:unitId/lr/:ldId/contents:: Error while updating lr contents')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
@@ -185,7 +203,7 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession
         const { units: unitsToUpdate } = req.body
-        console.log('/v2/units/positions => units', unitsToUpdate.length)
+        logger.info('/v2/units/positions => units', unitsToUpdate.length)
         const update = await unitsHandler.updatePositions(unitsToUpdate, bbCourseId)
         const units = await unitsHandler.getAllUnits(subject.id)
         return res.status(200).json({
@@ -194,6 +212,7 @@ router.post('/v2/units/positions' , requireLTISession, async (req, res) => {
             units
         })
     } catch (error) {
+        logger.error({error}, '/v2/units/position:: Error while updating units positions')
         return res.status(200).json({
             success: false,
             error: error?.message ?? 'unknown error'
