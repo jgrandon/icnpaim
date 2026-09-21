@@ -1,7 +1,7 @@
 import express from 'express';
-import * as unitsHandler from './handlers/v2/units'
-import * as contentsHandler from './handlers/v2/contents'
-import * as LRHandler from './handlers/v2/learningRoutes'
+import * as unitsHandler from '../handlers/v2/units'
+import * as contentsHandler from '../handlers/v2/contents'
+import * as LRHandler from '../handlers/v2/learningRoutes'
 import logger from '../../config/logger'
 
 const router = express.Router();

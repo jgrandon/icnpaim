@@ -1,7 +1,7 @@
 import express from 'express';
-import * as LRHandler from './handlers/v2/learningRoutes'
-import * as dashboardHandler from './handlers/v2/dashboard'
-import * as ddaGradesHandler from './handlers/v2/dda/grades'
+import * as LRHandler from '../handlers/v2/learningRoutes'
+import * as dashboardHandler from '../handlers/v2/dashboard'
+import * as ddaGradesHandler from '../handlers/v2/dda/grades'
 import logger from '../../config/logger'
 
 const router = express.Router();

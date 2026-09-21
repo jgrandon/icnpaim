@@ -10,20 +10,14 @@ import * as columns from './handlers/columns'
 import * as grades from './handlers/grades'
 import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
-import * as unitsHandler from './handlers/v2/units'
-import * as contentsHandler from './handlers/v2/contents'
-import * as LRHandler from './handlers/v2/learningRoutes'
-import * as dashboardHandler from './handlers/v2/dashboard'
 import * as subjectHandler from './handlers/v2/subject'
 import * as studentHandler from './handlers/v2/student'
 import * as ddaStudentHandler from './handlers/v2/dda/student'
 import * as ddaCourseHandler from './handlers/v2/dda/course'
-import * as ddaGradesHandler from './handlers/v2/dda/grades'
 import unitsRoutes from './routes/units'
 import dashboardRoutes from './routes/dashboard'
 import reportsRoutes from './routes/reports'
 
-import logger from './../config/logger'
 // import mockLti from './mockLti.json'
 
 const router = express.Router()
