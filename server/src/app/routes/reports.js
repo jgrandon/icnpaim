@@ -1,4 +1,5 @@
 import express from 'express';
+import requireLTISession from '../middleware/requireLTISession'
 import * as LRHandler from '../handlers/v2/learningRoutes'
 import * as studentHandler from '../handlers/v2/student'
 import * as ddaCourseHandler from '../handlers/v2/dda/course'

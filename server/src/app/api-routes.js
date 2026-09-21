@@ -1,6 +1,5 @@
 import express from 'express';
 import wpClient from './wp-client';
-import { getAuthFromState } from '../database/db-utility';
 import { getCachedLTIToken } from './lti-token-service';
 import request from 'request';
 import { getUnit } from './handlers/units'
@@ -10,13 +9,10 @@ import * as columns from './handlers/columns'
 import * as grades from './handlers/grades'
 import * as students from './handlers/students'
 import { getContentsByIds } from './handlers/content';
-import * as subjectHandler from './handlers/v2/subject'
-import * as studentHandler from './handlers/v2/student'
-import * as ddaStudentHandler from './handlers/v2/dda/student'
-import * as ddaCourseHandler from './handlers/v2/dda/course'
 import unitsRoutes from './routes/units'
 import dashboardRoutes from './routes/dashboard'
 import reportsRoutes from './routes/reports'
+import requireLTISession from './middleware/requireLTISession'
 
 // import mockLti from './mockLti.json'
 
@@ -26,83 +22,7 @@ const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
 
 // Middleware para verificar sesión LTI
-const requireLTISession = async (req, res, next) => {
-    try {
-        
-        if (process.env.NODE_ENV == 'development') {
-            const mockLti = require('../../mockLti.json')
-            req.ltiSession = mockLti
-        } else {
-            const sessionId = req.cookies?.ltiState || req.session?.ltiState
-            console.log('requireLTISession => sessionId', sessionId)
-            console.log('requireLTISession => req.cookies?.ltiState', req.cookies?.ltiState)
-            console.log('requireLTISession => req.session?.ltiState', req.session?.ltiState)
-            if (!sessionId) {
-                return res.status(401).json({ error: 'No LTI session found' })
-            }
-        
-            const auth = await getAuthFromState(sessionId)
-            if (!auth?.jwt) {
-                return res.status(401).json({ error: 'Invalid LTI session' })
-            }
-        
-            req.ltiSession = {
-                jwt: auth.jwt,
-                sessionId: sessionId,
-                bbStudentExternalId: auth.bbStudentExternalId,
-                bbCourseExternalId: auth.bbCourseExternalId
-            }
-        }
-        
-        // get subject and student data from db
-        const { bbCourseExternalId, jwt, bbStudentExternalId } = req.ltiSession
-        console.log('requireLTISession => bbCourseExternalId => ', bbCourseExternalId)
-        console.log('requireLTISession => bbStudentExternalId => ', bbStudentExternalId)
-        console.log('requireLTISession => jwt => ', jwt)
-        
-        const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId) // 129148
-        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId) // 1114143
 
-        const subject = await subjectHandler.getOrCreate({
-            name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
-            bbId: bbCourseId
-        })
-        const isAdminUrl = req.originalUrl.includes('v2/units') || req.originalUrl.includes('v2/results')
-        const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
-        const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
-            .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')
-        let student = null
-
-        // validate profiles
-        if (isStudent && isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
-        else if (isAdmin && !isStudent && !isAdminUrl) res.status(401).json({ error: 'Unauthorized' })
-        else {
-            if (!isAdminUrl) {
-                student = await studentHandler.getOrCreate({
-                    name: jwt.body.name,
-                    bbId: bbStudentId,
-                    subject
-                })
-            }
-
-            req.ltiSession = {
-                ...req.ltiSession,
-                bbStudentId,
-                bbCourseId,
-                subject,
-                student,
-                isStudent,
-                isAdmin
-            }
-            console.log('=> next')
-            next()
-        }
-    } catch (error) {
-        console.error('Session validation error:', error)
-        res.status(401).json({ error: 'Session validation failed' })
-    }
-}
 
 // GET /api/me - datos del usuario en sesión
 router.get('/me', requireLTISession, (req, res) => {
