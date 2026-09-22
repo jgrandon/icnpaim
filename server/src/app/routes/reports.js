@@ -7,6 +7,8 @@ import * as ddaGradesHandler from '../handlers/v2/dda/grades'
 const router = express.Router();
 import logger from '../../config/logger'
 
+const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
+
 router.get('/v2/report' , requireLTISession, async (req, res) => {
     try {
         const { bbCourseId, subject } = req.ltiSession

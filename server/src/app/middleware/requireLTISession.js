@@ -5,6 +5,7 @@ import * as ddaStudentHandler from '../handlers/v2/dda/student'
 import * as ddaCourseHandler from '../handlers/v2/dda/course'
 import logger from '../../config/logger'
 
+// Middleware para verificar sesión LTI
 const requireLTISession = async (req, res, next) => {
     try {
         if (process.env.NODE_ENV == 'development') {

@@ -19,11 +19,6 @@ import requireLTISession from './middleware/requireLTISession'
 const router = express.Router()
 const bbBasePath = process.env.BLACKBOARD_BASE_PATH
 
-const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
-
-// Middleware para verificar sesión LTI
-
-
 // GET /api/me - datos del usuario en sesión
 router.get('/me', requireLTISession, (req, res) => {
   try {
