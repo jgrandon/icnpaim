@@ -86,7 +86,7 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
                         const completed = cards.find(c => content.id == c.id)?.completed ?? false
                         return { ...content, completed }
                     })
-            } catch (e) {
+            } catch (error) {
                 logger.error({ error }, 'units grade error =>')
                 studentLearningIndex = null
                 studentLearningRoute = []
@@ -111,12 +111,11 @@ router.get('/v2/dashboard', requireLTISession, async (req, res) => {
             ddaGrades
         })
       
-    } catch (e) {
-        const error = e?.message ?? 'unknown error'
+    } catch (error) {
         logger.error({ error }, 'Error in /v2/dashboard')
         return res.status(500).json({
             success: false,
-            error 
+            error: error?.message ?? 'unknown error'
         })
     } 
 })
