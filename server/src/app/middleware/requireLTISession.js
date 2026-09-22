@@ -51,7 +51,8 @@ const requireLTISession = async (req, res, next) => {
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
             bbId: bbCourseId
         })
-        const isAdminUrl = req.originalUrl.includes('v2/units') || req.originalUrl.includes('v2/results')
+        const isAdminUrl = req.originalUrl.includes('v2/units') 
+            || req.originalUrl.includes('v2/report')
         const isStudent = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
             .includes('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
         const isAdmin = jwt.body['https://purl.imsglobal.org/spec/lti/claim/roles']
@@ -83,7 +84,7 @@ const requireLTISession = async (req, res, next) => {
             next()
         }
     } catch (error) {
-        console.error('Session validation error:', error)
+        logger.error({ error }, 'Session validation error:')
         res.status(401).json({ error: 'Session validation failed' })
     }
 }
