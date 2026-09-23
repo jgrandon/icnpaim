@@ -4,23 +4,9 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   Box,
   Button,
-  LinearProgress,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   CircularProgress,
-  CardActions,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Modal
 } from '@material-ui/core';
 import { 
@@ -28,19 +14,13 @@ import {
   ChevronRight
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
-import { v4 as uuidv4 } from 'uuid';
 import ProgressDashboard from './Dashboards/progress'
-import ContentCard from '../organisms/contentCard/';
 import { openSnackbar } from '../page_objects/snackbar';
-import parameters from '../../util/parameters';
 import { useResponsive } from '../../hooks/useResponsive'
 import DashboardUnits from './Dashboards/units';
 
 const nodeEnv = process.env.NODE_ENV
-//const backendUrl = process.env.APP_BACKEND_URL
 
-
-const params = parameters.getInstance();
  
 const styles = theme => ({
   root: {
@@ -217,11 +197,6 @@ class DashboardView extends React.Component {
         });
 
       } 
-      /*else {
-        await this.loadUserData();
-        await this.loadCourses();
-        await this.loadBBCourseId();
-      }*/
       this.loadDashboard();
       
     } catch (error) {
@@ -233,66 +208,9 @@ class DashboardView extends React.Component {
     }
   }
 
-  loadUserData = async () => {
-    try {
-      const response = await fetch('/api/me');
-      if (!response.ok) {
-        throw new Error(`Failed to load user data: ${response.status}`);
-      }
-      const user = await response.json();
-      this.setState({ user });
-    } catch (error) {
-      console.error('Error loading user:', error);
-      throw error;
-    }
-  };
-
-  loadCourses = async () => {
-    try {
-      const response = await fetch('/api/courses');
-      if (!response.ok) {
-        console.warn('Courses API not available yet');
-        this.setState({ courses: [], loading: false });
-        return;
-      }
-      const courses = await response.json();
-      this.setState({ courses, loading: false });
-      
-      // Auto-seleccionar primer curso si existe
-      if (courses.length > 0) {
-        this.selectCourse(courses[0]);
-      }
-    } catch (error) {
-      console.error('Error loading courses:', error);
-      this.setState({ courses: [], loading: false });
-    }
-  };
-
-  loadBBCourseId = async () => {
-    console.log('loadBBCourseId')
-    const response = await fetch(`jwtPayloadData?nonce=${params.getNonce()}`)
-    const jwtResponse = await response.json()
-    const bbCourseId = this.getBBCourseId(jwtResponse)
-    this.setState({
-      bbCourseId
-    })
-  }
-
-  getBBCourseId(jwtPayload) {
-    return jwtPayload['https://purl.imsglobal.org/spec/lti/claim/context']
-    /*
-    return jwtPayload.return_url
-      .split('?')[1]
-      .split('&')[0]
-      .replace('course_id=','')
-    */
-  }
-
     loadDashboard = async (course) => {
-      //this.setState({ selectedCourse: course, units: [], grades: {}, progress: [] });
         try {
             // Cargar unidades
-            // const unitsResponse = await fetch(`/api/units?courseId=${course.id}`);
             const unitsResponse = await fetch(`/api/v2/dashboard`);
             console.log('unitsResponse => ', unitsResponse )
             const responseBody = await unitsResponse.json();
@@ -412,24 +330,6 @@ class DashboardView extends React.Component {
         console.log('handleCardComplete => newUnits => ', newUnits)
 
         this.setState({ units: newUnits })
-        /*
-        // const progressResponse = await fetch(`/api/progress?courseId=${this.state.selectedCourse.id}`);
-        // const rawProgress = await progressResponse.json();
-        console.log('handleCardComplete => progress', progress)
-        const oldUnits = this.state.units.filter(u => u.id == unitId)[0]
-        const otherUnits = this.state.units.filter(u => u.id != unitId)
-        const newUnit = cardId
-        const progress = this.state.units.filter
-        //if (progressResponse.ok) {
-          console.log('handleCardComplete => set state')
-        this.setState({ 
-          units: {
-            ...otherUnits
-          }
-        });
-        */
-        //this.selectCourse(this.state.selectedCourse)
-        //}
         console.log('handleCardComplete => openSnackbar')
 
         openSnackbar({ message: 'Progreso actualizado correctamente' });
@@ -439,33 +339,6 @@ class DashboardView extends React.Component {
       openSnackbar({ message: 'Error actualizando progreso' });
     }
   };
-/*
-  refreshGrades = async () => {
-    this.setState({ refreshingGrades: true });
-    try {
-      const response = await fetch('/api/grades/refresh', {
-        method: 'POST'
-      });
-
-      if (response.ok) {
-        // Recargar notas después del refresh
-        const gradesResponse = await fetch(`/api/courses/${this.state.selectedCourse.id}/grades`);
-        if (gradesResponse.ok) {
-          const grades = await gradesResponse.json();
-          this.setState({ grades });
-        }
-        openSnackbar({ message: 'Notas actualizadas desde el LMS' });
-      } else {
-        openSnackbar({ message: 'Error actualizando notas desde el LMS' });
-      }
-    } catch (error) {
-      console.error('Error refreshing grades:', error);
-      openSnackbar({ message: 'Error de conexión con el LMS' });
-    } finally {
-      this.setState({ refreshingGrades: false });
-    }
-  };
-  */
 
   getActivityTypeColor = (tipo) => {
     const colors = {
@@ -480,25 +353,14 @@ class DashboardView extends React.Component {
 
   notifyContentProgress = (e,unit, card) => {
     console.log('notifyContentProgress', card)
-    /*
-    if ( card.type=='control' ) {
-      console.log('es control', e)
-      e.preventDefault()
-      this.setState({
-        isModalOpen:true,
-        modalData: {unit,card}
-      })
-    } else {
-      */
-      const isScorm = card.type.toLowerCase() == 'scorm'
-      const isControl = card.type.toLowerCase() == 'control'
-      const isLabster = card.type.toLowerCase() == 'labster'
 
-      if (!isControl && !isScorm && !isLabster) {
-        this.handleCardComplete(unit.id, card.id)
-      }
-    // }
+    const isScorm = card.type.toLowerCase() == 'scorm'
+    const isControl = card.type.toLowerCase() == 'control'
+    const isLabster = card.type.toLowerCase() == 'labster'
 
+    if (!isControl && !isScorm && !isLabster) {
+      this.handleCardComplete(unit.id, card.id)
+    }
 
     const allCards = this.cardsRef.current.reduce((acc = [], current) => [...acc, ...current])
     const searchedCard = allCards.find(r => r.current?.getAttribute('data-id') == card.id)
@@ -650,83 +512,6 @@ class DashboardView extends React.Component {
             
           </>
         )}
-
-        {/* Notas */}
-        {
-        /*
-        selectedCourse && (
-          <>
-            <Box display="flex" justifyContent="space-between" alignItems="center" className={classes.sectionTitle}>
-              <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
-                <School className={classes.cardIcon} />
-                Mis Notas
-              </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                startIcon={refreshingGrades ? <CircularProgress size={20} color="inherit" /> : <Refresh />}
-                onClick={this.refreshGrades}
-                disabled={refreshingGrades}
-              >
-                {refreshingGrades ? 'Actualizando...' : 'Actualizar desde LMS'}
-              </Button>
-            </Box>
-
-            <Card elevation={3}>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell><strong>Actividad</strong></TableCell>
-                      <TableCell align="center"><strong>Nota</strong></TableCell>
-                      <TableCell align="center"><strong>Máximo</strong></TableCell>
-                      <TableCell align="center"><strong>Porcentaje</strong></TableCell>
-                      <TableCell align="center"><strong>Fecha</strong></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {grades.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center">
-                          <Box className={classes.emptyState}>
-                            <Typography variant="body2" color="textSecondary">
-                              No hay notas disponibles. Haz clic en "Actualizar desde LMS" para sincronizar.
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      grades.map((grade, index) => {
-                        const scoreGiven = grade.meta?.score_given || 0;
-                        const scoreMaximum = grade.meta?.score_maximum || 100;
-                        const percentage = scoreMaximum > 0 ? Math.round((scoreGiven / scoreMaximum) * 100) : 0;
-                        const timestamp = grade.meta?.timestamp ? new Date(grade.meta.timestamp).toLocaleDateString() : 'N/A';
-
-                        return (
-                          <TableRow key={index} hover>
-                            <TableCell>{grade.meta?.activity_title || grade.title?.rendered || 'Actividad'}</TableCell>
-                            <TableCell align="center">{scoreGiven}</TableCell>
-                            <TableCell align="center">{scoreMaximum}</TableCell>
-                            <TableCell align="center">
-                              <Chip 
-                                label={`${percentage}%`}
-                                color={percentage >= 70 ? 'primary' : percentage >= 50 ? 'default' : 'secondary'}
-                                size="small"
-                                className={classes.gradeChip}
-                              />
-                            </TableCell>
-                            <TableCell align="center">{timestamp}</TableCell>
-                          </TableRow>
-                        );
-                      })
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Card>
-          </>
-        )
-        */}
 
         {/* Estado sin curso seleccionado */}
         {!selectedCourse && courses.length > 0 && (
