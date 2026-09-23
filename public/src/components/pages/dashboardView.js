@@ -267,6 +267,7 @@ class DashboardView extends React.Component {
             }
         } catch (error) {
             console.error('Error loading course data:', error);
+            openSnackbar({ message: 'Error al cargar tus datos. Cierra esta pagina y vuelve a acceder desde BlackBoard' });
         }
     };
 
@@ -332,11 +333,11 @@ class DashboardView extends React.Component {
         this.setState({ units: newUnits })
         console.log('handleCardComplete => openSnackbar')
 
-        openSnackbar({ message: 'Progreso actualizado correctamente' });
+        openSnackbar({ message: 'Progreso actualizado' });
       }
     } catch (error) {
       console.error('Error updating progress:', error);
-      openSnackbar({ message: 'Error actualizando progreso' });
+      openSnackbar({ message: 'Error. No se actualizó tu progreso' });
     }
   };
 
