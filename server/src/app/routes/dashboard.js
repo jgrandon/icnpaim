@@ -5,7 +5,8 @@ import * as dashboardHandler from '../handlers/v2/dashboard'
 import * as ddaGradesHandler from '../handlers/v2/dda/grades'
 import logger from '../../config/logger'
 
-const router = express.Router();
+const router = express.Router()
+const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
 
 router.get('/v2/dashboard', requireLTISession, async (req, res) => {
     try {
