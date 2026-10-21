@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 import unitsRoutes from './routes/units'
 import dashboardRoutes from './routes/dashboard'
 import reportsRoutes from './routes/reports'

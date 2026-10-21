@@ -1,15 +1,15 @@
-import express from 'express';
+import express from 'express'
 import requireLTISession from '../middleware/requireLTISession'
 import * as unitsHandler from '../handlers/v2/units'
 import * as contentsHandler from '../handlers/v2/contents'
 import * as LRHandler from '../handlers/v2/learningRoutes'
 import logger from '../../config/logger'
 
-const router = express.Router();
+const router = express.Router()
 // Units
 router.post('/v2/units', requireLTISession,  async (req, res) => {
     try {
-      const { bbCourseId } = req.ltiSession
+        const { bbCourseId } = req.ltiSession
         const subjectId = req.ltiSession.subject.id
         const data = { ...req.body, subjectId, bbCourseId }
         let updatedUnit
