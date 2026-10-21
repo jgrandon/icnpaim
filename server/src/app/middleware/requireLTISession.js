@@ -1,4 +1,4 @@
-import { getAuthFromState } from '../../database/db-utility';
+import { getAuthFromState } from '../../database/db-utility'
 import * as subjectHandler from '../handlers/v2/subject'
 import * as studentHandler from '../handlers/v2/student'
 import * as ddaStudentHandler from '../handlers/v2/dda/student'
