@@ -10,8 +10,7 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles((theme) => ({
     udlaCard: {
         background: 'black',
-        color: 'white',
-        marginBottom: theme.spacing(3)
+        color: 'white'
     },
     udlaLogo: {
         width: '200px'
