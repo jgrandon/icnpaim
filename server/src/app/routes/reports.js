@@ -19,7 +19,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
         const groups = await ddaCourseHandler.getGroups(bbCourseId) //get students by group
         
         
-        const report = students.filter(s => s.bbId == 1114143).map(student => {
+        const report = students.map(student => {
             const progress = units.map(u => {
                 const noProgress = { unitId: u.id, value: 0, total: 0, percentage: 0 }
                 // find unit grade:
