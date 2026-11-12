@@ -40,7 +40,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 let studentGrade = NaN
                 try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
                 catch (e) { logger.error({ error: e.message}, '/v2/report => ERROR while trying to parse student grade') }
-                if (Math.isNAN(studentGrade)) {
+                if (isNaN(studentGrade)) {
                     return noProgress
                 }
                 logger.info( { unit: u }, 'unit with grade => ')
