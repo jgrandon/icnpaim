@@ -208,43 +208,43 @@ export async function getContentsByLevel(subjectId) {
                 c.title as content_title
             FROM learningrouteschema AS lrs
             LEFT JOIN learningroutedata AS lrd ON lrs.id = lrd.learning_route_id
-            JOIN content AS c ON lrd.content_id = c.id
+            LEFT JOIN content AS c ON lrd.content_id = c.id
             WHERE lrs.enabled = TRUE
         ) AS rslt ON rslt.id = u.id
         WHERE u.enabled = TRUE
         AND u.subject_id = $1
         ORDER BY u.id, rslt.level`,
-        [subjectId]
+        [ subjectId ]
     )
 
     const data = (res.rows || []).map(d => objectToCamelCase(d))
-    const unitMap = new Map();
+    const unitMap = new Map()
     for (const row of data) {
-        const { id, name, level, minGrade, maxGrade, contentId, bbId, contentTitle, position } = row;
+        const { id, name, level, minGrade, maxGrade, contentId, bbId, contentTitle, position } = row
         if (!unitMap.has(id)) {
             unitMap.set(id, {
                 id,
                 name,
                 position,
                 levels: new Map(),
-            });
+            })
         }
-        const unit = unitMap.get(id);
+        const unit = unitMap.get(id)
         if (!unit.levels.has(level)) {
             unit.levels.set(level, {
                 level,
                 minGrade,
                 maxGrade,
                 contents: [],
-            });
+            })
         }
-        unit.levels.get(level).contents.push({ contentId, bbId, contentTitle });
+        if (contentId) unit.levels.get(level).contents.push({ contentId, bbId, contentTitle })
     }
 
     // Convert Maps to arrays
     return Array.from(unitMap.values()).map(unit => ({
         ...unit,
         levels: Array.from(unit.levels.values()),
-    }));
+    }))
 
 }
