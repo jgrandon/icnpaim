@@ -99,6 +99,7 @@ class Dashboard extends React.Component {
 
     return (
       <MuiThemeProvider theme={this.state.theme}>
+        <UdlaBanner/>
         <div className={classes.root}>
           <CssBaseline/>
           <AppBar
@@ -154,8 +155,6 @@ class Dashboard extends React.Component {
           </Drawer>
           <ErrorBoundary>
             <main className={classes.content}>
-
-              <UdlaBanner/>
               {/*
               <Route exact path="/" component={LaunchEndpoint}/>
               <Route path="/home" component={LaunchEndpoint}/>
