@@ -442,7 +442,7 @@ class DashboardView extends React.Component {
                 <School fontSize="large" />
                 <Box>
                   <Typography variant="h4" component="h1">
-                    ¡Bienvenido, {user?.name || 'Estudiante'}!
+                    ¡Bienvenid@, {user?.name || 'Estudiante'}!
                   </Typography>
                   <Typography variant="subtitle1" style={{ opacity: 0.9 }}>
                     {selectedCourse ? selectedCourse.name : 'Plataforma de Aprendizaje ICNPAIM'}
