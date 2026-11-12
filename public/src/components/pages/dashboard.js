@@ -156,7 +156,6 @@ class Dashboard extends React.Component {
             <main className={classes.content}>
 
               <UdlaBanner/>
-              <div className={classes.appBarSpacer}/>
               {/*
               <Route exact path="/" component={LaunchEndpoint}/>
               <Route path="/home" component={LaunchEndpoint}/>
