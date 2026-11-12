@@ -7,13 +7,13 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     udlaCard: {
         background: 'black',
         color: 'white'
     },
     udlaLogo: {
-        width: '200px'
+        width: '150px'
     }
 }))
 
@@ -24,7 +24,7 @@ export default function UdlaBanner() {
             <CardContent>
                 <Box display='flex' alignItems='center' justifyContent='space-between'>
                     <Box>
-                        <Typography variant='h4' component='h1'>
+                        <Typography variant='h4' component='h4'>
                         Rutas Interactivas Aprendizaje (RIA)
                         </Typography>
                     </Box>
