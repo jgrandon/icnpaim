@@ -6,6 +6,7 @@ import * as ddaCourseHandler from '../handlers/v2/dda/course'
 import * as ddaGradesHandler from '../handlers/v2/dda/grades'
 const router = express.Router()
 import logger from '../../config/logger'
+import { Logger } from 'mongodb'
 
 const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
 
@@ -54,6 +55,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 const contentProgressDetail = studentLevel.contents?.map(c => {
                     // for each find local content or bb content
                     const localContentProgress = student.progress.find(localContent => localContent.contentId == c.contentId)
+                    logger.info({localContentProgress, contentId: c.contentId}, '>>>>>> localContentProgress')
                     let completed = !!(localContentProgress?.completed)
                     let bbContentGrade = null
                     if (c.bbId) { // is a gradable content
