@@ -54,7 +54,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 const contentProgressDetail = studentLevel.contents?.map(c => {
                     // for each find local content or bb content
                     const localContentProgress = student.progress.find(localContent => localContent.contentId == c.contentId)
-                    let completed = !!localContentProgress?.completed
+                    let completed = !!(localContentProgress?.completed)
                     let bbContentGrade = null
                     if (c.bbId) { // is a gradable content
                         bbContentGrade = c.bbId && subjectGrades.find(g => 
