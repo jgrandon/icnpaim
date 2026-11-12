@@ -1,11 +1,12 @@
-import express from 'express';
+import express from 'express'
 import requireLTISession from '../middleware/requireLTISession'
 import * as LRHandler from '../handlers/v2/learningRoutes'
 import * as studentHandler from '../handlers/v2/student'
 import * as ddaCourseHandler from '../handlers/v2/dda/course'
 import * as ddaGradesHandler from '../handlers/v2/dda/grades'
-const router = express.Router();
+const router = express.Router()
 import logger from '../../config/logger'
+import { Logger } from 'mongodb'
 
 const calculatedGradeKeyword = process.env.CALCULATED_GRADE_KEYWORD
 
@@ -40,19 +41,23 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 let studentGrade = NaN
                 try { studentGrade = (grade.score * 6 / grade.possible) + 1 }
                 catch (e) { logger.error({ error: e.message}, '/v2/report => ERROR while trying to parse student grade') }
-                if (studentGrade==NaN) {
+                if (isNaN(studentGrade)) {
                     return noProgress
                 }
                 logger.info( { unit: u }, 'unit with grade => ')
                 logger.info( { studentGrade }, 'studentGrade')
                 logger.info( { levels: u.levels }, 'u.levels')
+                logger.info( { progress: student.progress }, 'student progress => ')
+
                 // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
                 const contentProgressDetail = studentLevel.contents?.map(c => {
+                    const studentUnitProgress = student.progress.find(sp => sp.unitId == u.id)?.progress
                     // for each find local content or bb content
-                    const localContentProgress = student.progress.find(localContent => localContent.contentId == c.contentId)
-                    let completed = !!localContentProgress
+                    const localContentProgress = studentUnitProgress.find(localContent => localContent.contentId == c.contentId)
+                    logger.info({localContentProgress, contentId: c.contentId}, '>>>>>> localContentProgress')
+                    let completed = !!(localContentProgress?.completed)
                     let bbContentGrade = null
                     if (c.bbId) { // is a gradable content
                         bbContentGrade = c.bbId && subjectGrades.find(g => 
