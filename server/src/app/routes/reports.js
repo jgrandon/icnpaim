@@ -53,8 +53,9 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
                 const contentProgressDetail = studentLevel.contents?.map(c => {
+                    const studentUnitProgress = student.progress.find(sp => sp.unitId == u.id)?.progress
                     // for each find local content or bb content
-                    const localContentProgress = student.progress.find(localContent => localContent.contentId == c.contentId)
+                    const localContentProgress = studentUnitProgress.find(localContent => localContent.contentId == c.contentId)
                     logger.info({localContentProgress, contentId: c.contentId}, '>>>>>> localContentProgress')
                     let completed = !!(localContentProgress?.completed)
                     let bbContentGrade = null
