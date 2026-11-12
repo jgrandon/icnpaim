@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
     udlaCard: {
         background: 'black',
         color: 'white',
-        margin: '10px'
+        padding: '10px'
     },
     text: {
         fontSize: '1.5rem !important'
