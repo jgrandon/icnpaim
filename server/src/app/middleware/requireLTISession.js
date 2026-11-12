@@ -45,8 +45,8 @@ const requireLTISession = async (req, res, next) => {
             bbStudentExternalId
         },'requireLTISession => before searching course and student in DDA')
         
-        const bbCourseId = await ddaCourseHandler.getBBid(bbCourseExternalId) // 129148
-        const bbStudentId = await ddaStudentHandler.getBBid(bbStudentExternalId) // 1114143
+        const bbCourseId = 129148 // await ddaCourseHandler.getBBid(bbCourseExternalId) // 129148
+        const bbStudentId = 1114143 // await ddaStudentHandler.getBBid(bbStudentExternalId) // 1114143
 
         const subject = await subjectHandler.getOrCreate({
             name: jwt.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,

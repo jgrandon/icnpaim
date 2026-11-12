@@ -18,7 +18,7 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
         const groups = await ddaCourseHandler.getGroups(bbCourseId) //get students by group
         
         
-        const report = students.map(student => {
+        const report = students.filter(s => s.bbId == 129148).map(student => {
             const progress = units.map(u => {
                 const noProgress = { unitId: u.id, value: 0, total: 0, percentage: 0 }
                 // find unit grade:
@@ -46,6 +46,8 @@ router.get('/v2/report' , requireLTISession, async (req, res) => {
                 logger.info( { unit: u }, 'unit with grade => ')
                 logger.info( { studentGrade }, 'studentGrade')
                 logger.info( { levels: u.levels }, 'u.levels')
+                logger.info( { progress: student.progress }, 'student progress => ')
+
                 // select LR route
                 const studentLevel = u.levels.find(level => (level.minGrade <= studentGrade && level.maxGrade >= studentGrade))
                 // iterate lr contents
