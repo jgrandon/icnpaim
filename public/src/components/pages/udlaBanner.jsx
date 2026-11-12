@@ -11,6 +11,9 @@ const useStyles = makeStyles(() => ({
     udlaCard: {
         background: 'black',
         color: 'white',
+    },
+    content: {
+        paddingBottom: '10px',
         padding: '10px'
     },
     text: {
@@ -25,7 +28,7 @@ export default function UdlaBanner() {
     const classes = useStyles()
     return (
         <Card className={classes.udlaCard} elevation={4}>
-            <CardContent>
+            <CardContent className={classes.content}>
                 <Box display='flex' alignItems='center' justifyContent='space-between'>
                     <Box>
                         <Typography 
