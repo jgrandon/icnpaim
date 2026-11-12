@@ -33,11 +33,6 @@ const styles = theme => ({
     color: 'white',
     marginBottom: theme.spacing(3)
   },
-  udlaCard: {
-    background: 'black',
-    color: 'white',
-    marginBottom: theme.spacing(3)
-  },
   courseCard: {
     height: '100%',
     cursor: 'pointer',
@@ -439,7 +434,6 @@ class DashboardView extends React.Component {
 
     return (
       <div className={classes.root}>
-        
 
         {/* Header de Bienvenida */}
         <Card className={classes.welcomeCard} elevation={4}>
@@ -466,23 +460,6 @@ class DashboardView extends React.Component {
                   </Typography>
                 </Box>
               )}
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* Banner UDLA */}
-        <Card className={classes.udlaCard} elevation={4}>
-          <CardContent>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Box display="flex" alignItems="center" style={{ gap: 16 }}>
-                <School fontSize="large" />
-                <Box>
-                  <Typography variant="h4" component="h1">
-                    Rutas Interactivas Aprendizaje (RIA)
-                  </Typography>
-                  <img src="https://udla.cl/wp-content/uploads/2025/09/logo-udla-blanco.png" />
-                </Box>
-              </Box>
             </Box>
           </CardContent>
         </Card>

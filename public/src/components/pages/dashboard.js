@@ -40,6 +40,7 @@ import { fullListItems } from "../page_objects/listItems";
 import { styles } from "../../common/styles/styles";
 import TestPage from './testPage'
 import DashboardView from './dashboardView'
+import UdlaBanner from './udlaBanner'
 
 // Componente wrapper para ocultar el header demo en /dashboard
 const DashboardWrapper = (props) => {
@@ -153,6 +154,8 @@ class Dashboard extends React.Component {
           </Drawer>
           <ErrorBoundary>
             <main className={classes.content}>
+
+              <UdlaBanner/>
               <div className={classes.appBarSpacer}/>
               {/*
               <Route exact path="/" component={LaunchEndpoint}/>
