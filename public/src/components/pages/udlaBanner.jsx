@@ -11,10 +11,11 @@ const useStyles = makeStyles(() => ({
     udlaCard: {
         background: 'black',
         color: 'white',
+        borderRadius: '0px'
     },
     content: {
         paddingBottom: '10px',
-        padding: '10px'
+        padding: '10px !important'
     },
     text: {
         fontSize: '1.5rem !important'
